@@ -7,6 +7,7 @@ import {
 	MSG_WON,
 	PROMPT_PLAY_NEW,
 	PROMPT_WRONG,
+	TAP_TURN_MS,
 	TURN_MS
 } from './const';
 import { generate } from './logic';
@@ -64,12 +65,14 @@ export const persist = () => {
 // reduced motion: turns and risings jump straight to their end
 const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const ease = (k) => 1 - (1 - k) ** 3;
+// out: for what's already moving (a swipe settling); a tap on an arrow turns at an even pace
+const easeOut = (k) => 1 - (1 - k) ** 3;
+const linear = (k) => k;
 
 // one animation at a time per value: a new one cancels the old
 const tweens = {};
 
-const tween = (key, to, ms, done) => {
+const tween = (key, to, ms, done, ease = easeOut) => {
 	cancelAnimationFrame(tweens[key]);
 
 	const from = ss[key];
@@ -126,22 +129,23 @@ const onSettled = () => {
 	persist();
 };
 
-export const spinTo = (step) => {
+// the board eases to rest on a quarter turn: quickly after a swipe, slowly and evenly after a tap
+export const spinTo = (step, tapped = false) => {
 	if (ss.target !== step && step !== Math.round(ss.angle / 90)) {
 		whoosh();
 	}
 
 	ss.target = step;
-	tween('angle', step * 90, TURN_MS, onSettled);
+	tween('angle', step * 90, tapped ? TAP_TURN_MS : TURN_MS, onSettled, tapped ? linear : easeOut);
 };
 
-// dir 1: clockwise from above, so the east side comes round to the front (as a swipe to the left)
+// a tap on an arrow, or ← →; dir 1: clockwise from above, so the east side comes round to the front (as a swipe to the left)
 export const turnBy = (dir) => {
 	if (!ss.pzl) {
 		return;
 	}
 
-	spinTo((ss.target ?? Math.round(ss.angle / 90)) + dir);
+	spinTo((ss.target ?? Math.round(ss.angle / 90)) + dir, true);
 };
 
 export const newPuzzle = async () => {

@@ -40,7 +40,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   one speed, so no depth shows. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
   drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
   the tray's ends, and ← →, turn it as a swipe that way (left: clockwise); their arrows are Hexodus's shapes
-  (`Icon.svelte`), bare, without its rings. A new puzzle's planets rise from below the tray (`ss.rise`).
+  (`Icon.svelte`), bare, without its rings. A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
+  turn `TAP_TURN_MS` (0.5 s, linear), slowed at the designer's request. A new puzzle's planets rise from below the
+  tray (`ss.rise`).
 - A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
   mid-turn, giving the puzzle away.
 - Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Quicksand (`QS`, text), Space Mono (`SM`, labels).

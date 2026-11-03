@@ -24,7 +24,9 @@ export const MAP = 330;
 // a quarter turn slides the tray's planets this far, one side's lineup out and the next one's in;
 // they follow the finger, so it's also the swipe for a quarter turn
 export const SWIPE_PX = MAP + 40;
+// a swipe's last stretch, to rest; a whole quarter turn on a tap of an arrow (or ← →)
 export const TURN_MS = 420;
+export const TAP_TURN_MS = 500;
 
 export const PROMPT_SURRENDER = 'Show the solution?';
 export const PROMPT_RESET_STATS = 'Reset stats — are you sure?';
