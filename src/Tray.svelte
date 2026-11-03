@@ -1,6 +1,7 @@
 <script>
 	import { MAP, R, SIDES, SWIPE_PX } from './const';
 	import { elevation } from './logic';
+	import Icon from './Icon.svelte';
 	import Planet from './Planet.svelte';
 	import { persistCommon, sideAt, spinTo, ss, stopTurning, turnBy } from './shared.svelte';
 
@@ -120,10 +121,10 @@
 				<stop offset="1" stop-color="#b06bff" stop-opacity="0" />
 			</radialGradient>
 			<linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
-				<stop offset="0" stop-color="#ffd77a" stop-opacity="0" />
-				<stop offset="0.12" stop-color="#ffd77a" />
-				<stop offset="0.88" stop-color="#ffd77a" />
-				<stop offset="1" stop-color="#ffd77a" stop-opacity="0" />
+				<stop offset="0" stop-color="#8f86ff" stop-opacity="0" />
+				<stop offset="0.2" stop-color="#8f86ff" stop-opacity="0.45" />
+				<stop offset="0.8" stop-color="#8f86ff" stop-opacity="0.45" />
+				<stop offset="1" stop-color="#8f86ff" stop-opacity="0" />
 			</linearGradient>
 			<!-- the planets show only over the tray, and above it -->
 			<clipPath id="on-tray">
@@ -144,16 +145,16 @@
 			{/each}
 		</g>
 
-		<!-- the tray: the board's edge as a 2D being sees it, a line -->
-		<rect x={-HALF - 14} y={GROUND} width={MAP + 28} height="5" rx="2" fill="#4a3fae" />
-		<rect x={-HALF - 30} y={GROUND - 0.5} width={MAP + 60} height="2" fill="url(#edge)" class="edge" />
+		<!-- the tray: the board's edge as a 2D being sees it, a faint line -->
+		<rect x={-HALF - 30} y={GROUND} width={MAP + 60} height="1" fill="url(#edge)" />
 	</svg>
 
-	<button class="turn left" aria-label="Turn the board clockwise" onclick={() => turnBy(1)}>
-		<svg viewBox="0 0 40 40"><path d="M28 13 A 11 11 0 1 0 31 24" /><path d="M24 7 L 29 13 L 22 16" /></svg>
+	<!-- as a swipe that way: the left one turns the board clockwise, the right one counterclockwise -->
+	<button class="turn left" aria-label="Turn the board clockwise" aria-keyshortcuts="ArrowLeft" onclick={() => turnBy(1)}>
+		<Icon name="left" />
 	</button>
-	<button class="turn right" aria-label="Turn the board counterclockwise" onclick={() => turnBy(-1)}>
-		<svg viewBox="0 0 40 40"><path d="M12 13 A 11 11 0 1 1 9 24" /><path d="M16 7 L 11 13 L 18 16" /></svg>
+	<button class="turn right" aria-label="Turn the board counterclockwise" aria-keyshortcuts="ArrowRight" onclick={() => turnBy(-1)}>
+		<Icon name="right" />
 	</button>
 </div>
 
@@ -185,35 +186,32 @@
 		stroke-dasharray: 2 6;
 	}
 
-	.edge {
-		filter: drop-shadow(0 0 4px #ffd77a);
-	}
-
 	.turn {
 		grid-area: 1/1;
 		align-self: end;
 		width: 44px;
 		height: 44px;
-		margin-bottom: 4px;
+		margin-bottom: 12px;
 		padding: 0;
 		border: none;
-		border-radius: 50%;
-		background: #ffffff0d;
+		background: none;
+		color: #d8d2ff;
+		opacity: 0.8;
 		cursor: pointer;
 		display: grid;
 		place-items: center;
 		transition:
-			background 0.15s,
+			opacity 0.15s,
 			transform 0.1s;
 		-webkit-tap-highlight-color: transparent;
 	}
 
 	.turn:hover {
-		background: #ffffff1f;
+		opacity: 1;
 	}
 
 	.turn:active {
-		transform: scale(0.88);
+		transform: scale(0.85);
 	}
 
 	.turn.left {
@@ -224,15 +222,5 @@
 	.turn.right {
 		justify-self: end;
 		margin-right: 2px;
-	}
-
-	.turn svg {
-		width: 30px;
-		height: 30px;
-		fill: none;
-		stroke: #d8d2ff;
-		stroke-width: 2.6;
-		stroke-linecap: round;
-		stroke-linejoin: round;
 	}
 </style>

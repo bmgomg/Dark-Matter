@@ -27,18 +27,20 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 - **The map** (`Board.svelte`): flat, top-down, `MAP` (330 px) wide, the side being viewed at the bottom with a gold
   edge. It turns with the board (`ss.angle`), live while the tray is dragged; its planets stay upright. Tap a cell to
   mark it; the map itself doesn't swipe. No compass letters and no "from the South" label: the designer found them
-  unhelpful (the turning map shows the orientation; the scoreboard's dots show the sides seen).
+  unhelpful (the turning map shows the orientation).
 - **The palette** (`Palette.svelte`): the brushes (small, medium, large, empty) and Done at the end of the row.
 - **Messages**: the hint line above the map (`Message.svelte`: what to do next, or how many cells are off). Any
   prompt takes the palette's place (`Actions.svelte`): Keep looking / Show solution after a wrong Done; the
   confirmations, which follow the template (the question is the yes button, beside No); and at a game's end its
   message ("No more dark matter!", or best / average improved, or the revealed one) for `OVER_MS` (3 s), then Play new.
-- **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge seen by a 2D being: a line), its lanes under
+- **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge seen by a 2D being: a line, drawn as a faint
+  separator, not a gold underline), its lanes under
   the map's columns at the same scale. Swiping it turns the board, as decided with the designer: the planets follow
   the finger and slide off the tray's end, the next side's lineup slides in from the other end (a carousel), all at
   one speed, so no depth shows. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
-  drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). ← → and the arrow
-  buttons turn it too. A new puzzle's planets rise from below the tray (`ss.rise`).
+  drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
+  the tray's ends, and ← →, turn it as a swipe that way (left: clockwise); their arrows are Hexodus's shapes
+  (`Icon.svelte`), bare, without its rings. A new puzzle's planets rise from below the tray (`ss.rise`).
 - A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
   mid-turn, giving the puzzle away.
 - Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Quicksand (`QS`, text), Space Mono (`SM`, labels).
@@ -47,8 +49,23 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 
 ## Scoring (open)
 
-For now: a quarter turn counts 1 (a half turn 2). Per-level stats: solved, average turns, best. Sides seen are shown
-(the compass) but don't score. The designer wants to play it before settling scoring.
+For now: a quarter turn counts 1 (a half turn 2). The scoreboard shows the level's stats, led by its difficulty
+(solved, average turns, best), and the turns ("3 turns", on one line). No board size: the board shows it. The sides seen are still recorded (`pzl.seen`) but no longer shown: the designer dropped
+the scoreboard's sides-seen dots and their "n/4 sides" count. The designer wants to play it before settling scoring.
+
+**Par (on the back burner):** the fewest quarter turns from South to see a set of sides that solves the puzzle
+(0 to 3; any 3 turns see all four sides). Measured over 1,000 puzzles per level (Nov 2026), by the solver tier that
+graded each puzzle; tier 3 and true uniqueness gave the same within a point:
+
+| Level     | par 1 | par 2 | par 3 |
+|-----------|-------|-------|-------|
+| 4×4 Easy  | 25%   | 38%   | 37%   |
+| 4×4 Hard  | 1%    | 33%   | 67%   |
+| 5×5 Easy  | 15%   | 37%   | 48%   |
+| 5×5 Hard  | 6%    | 35%   | 59%   |
+
+None is solvable from South alone. As a golf score par is weak (looking at every side is never more than 2 over); the
+idea left open was showing it up front as the challenge ("par 1: two sides are enough"). 4–190 ms per puzzle to compute.
 
 ## Files
 
