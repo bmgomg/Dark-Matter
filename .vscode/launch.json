@@ -1,0 +1,23 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Dev server + Chrome",
+			"type": "node-terminal",
+			"request": "launch",
+			"command": "npm run dev",
+			"serverReadyAction": {
+				"pattern": "Local:",
+				"uriFormat": "http://localhost:1119",
+				"action": "debugWithChrome"
+			}
+		},
+		{
+			"name": "Chrome (server already running)",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:1119",
+			"webRoot": "${workspaceFolder}"
+		}
+	]
+}

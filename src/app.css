@@ -1,0 +1,90 @@
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
+@import '@fontsource/ibm-plex-sans/latin-400.css';
+@import '@fontsource/ibm-plex-sans/latin-500.css';
+@import '@fontsource/ibm-plex-sans/latin-600.css';
+@import '@fontsource/ibm-plex-mono/latin-500.css';
+
+:root {
+	--paper: #e9eef3;
+	--sheet: #f8fafc;
+	--ink: #18202c;
+	--muted: #586577;
+	--rule: #c5cfda;
+	--cell: #eef2f6;
+	--accent: #2c56c9;
+	--s: #e0a033;
+	--m: #2c9183;
+	--l: #7656c0;
+	--bad: #cf3d33;
+	--good: #25814f;
+	--display: 'Bricolage Grotesque Variable', 'Segoe UI', system-ui, sans-serif;
+	--body: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+	--mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+	color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--paper: #11161d;
+		--sheet: #1a212b;
+		--ink: #e6ebf1;
+		--muted: #97a3b3;
+		--rule: #36414f;
+		--cell: #222b36;
+		--accent: #7d9bff;
+		--s: #f0b54a;
+		--m: #3fb3a3;
+		--l: #9a7ee6;
+		--bad: #ff6b5f;
+		--good: #4cc47f;
+		color-scheme: dark;
+	}
+}
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+html,
+body {
+	margin: 0;
+	background: var(--paper);
+}
+body {
+	color: var(--ink);
+	font: 15px/1.5 var(--body);
+	padding: max(16px, env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px))
+		max(24px, env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+	-webkit-text-size-adjust: 100%;
+}
+
+button {
+	font: 600 14px var(--body);
+	color: var(--ink);
+	background: var(--sheet);
+	border: 1px solid var(--rule);
+	border-radius: 8px;
+	padding: 10px 12px;
+	cursor: pointer;
+	min-height: 44px;
+	touch-action: manipulation;
+}
+button:hover {
+	border-color: var(--accent);
+}
+button:focus-visible {
+	outline: 3px solid var(--accent);
+	outline-offset: 2px;
+}
+button.primary {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: var(--sheet);
+}
+button:disabled {
+	opacity: 0.45;
+	cursor: default;
+}
+button:disabled:hover {
+	border-color: var(--rule);
+}
