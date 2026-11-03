@@ -1,0 +1,31 @@
+export const APP_STATE = 'BMG • Matter of Perspective V1';
+export const DX = 450;
+export const DY = 800;
+
+// working title, split into the home page's two lines
+export const TITLE = ['Dark Matter', 'of Perspective'];
+export const TAGLINE = 'It takes a shift';
+
+export const LEVELS = [
+	{ id: '4easy', N: 4, diff: 'easy', label: '4×4', sub: 'easy' },
+	{ id: '4hard', N: 4, diff: 'hard', label: '4×4', sub: 'hard' },
+	{ id: '5easy', N: 5, diff: 'easy', label: '5×5', sub: 'easy' },
+	{ id: '5hard', N: 5, diff: 'hard', label: '5×5', sub: 'hard' }
+];
+
+// sphere radius by size, in hundredths of a cell; the same in the board and the horizon
+export const R = [0, 17, 29, 44];
+export const NAMES = ['empty', 'small', 'medium', 'large'];
+// the side facing the player after r clockwise turns of the board
+export const SIDES = ['South', 'East', 'North', 'West'];
+
+// a swipe turns the board a quarter for this many pixels of finger travel
+export const SWIPE_PX = 150;
+export const TURN_MS = 420;
+
+export const PROMPT_SURRENDER = 'Show the solution?';
+export const PROMPT_RESET_STATS = 'Reset stats — are you sure?';
+export const PROMPT_WRONG = 'wrong';
+export const PROMPT_PLAY_NEW = 'Play new';
+export const MSG_AVERAGE_IMPROVED = 'Average improved!';
+export const MSG_BEST_SCORE = 'Best score!';

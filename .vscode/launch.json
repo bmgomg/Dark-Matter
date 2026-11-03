@@ -1,0 +1,14 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			// starts the dev server task if it isn't running yet, then opens Chrome on it
+			"name": "Chrome + dev server",
+			"type": "chrome",
+			"request": "launch",
+			"url": "http://localhost:1119",
+			"webRoot": "${workspaceFolder}",
+			"preLaunchTask": "dev server"
+		}
+	]
+}
