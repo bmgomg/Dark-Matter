@@ -120,12 +120,6 @@
 				<stop offset="0.6" stop-color="#ff9f6a" stop-opacity="0.1" />
 				<stop offset="1" stop-color="#b06bff" stop-opacity="0" />
 			</radialGradient>
-			<linearGradient id="edge" x1="0" y1="0" x2="1" y2="0">
-				<stop offset="0" stop-color="#8f86ff" stop-opacity="0" />
-				<stop offset="0.2" stop-color="#8f86ff" stop-opacity="0.45" />
-				<stop offset="0.8" stop-color="#8f86ff" stop-opacity="0.45" />
-				<stop offset="1" stop-color="#8f86ff" stop-opacity="0" />
-			</linearGradient>
 			<!-- the planets show only over the tray, and above it -->
 			<clipPath id="on-tray">
 				<rect x={-HALF - 14} y="-40" width={MAP + 28} height={GROUND + 40} />
@@ -144,9 +138,6 @@
 				<Planet x={p.x} y={p.y} r={p.r} size={p.v} />
 			{/each}
 		</g>
-
-		<!-- the tray: the board's edge as a 2D being sees it, a faint line -->
-		<rect x={-HALF - 30} y={GROUND} width={MAP + 60} height="1" fill="url(#edge)" />
 	</svg>
 
 	<!-- as a swipe that way: the left one turns the board clockwise, the right one counterclockwise -->

@@ -23,6 +23,9 @@
 		{/if}
 	</div>
 
+	<!-- a faint line, halfway between the planets' ground and the palette -->
+	<div class="gap"><div class="separator"></div></div>
+
 	<!-- the palette, or a prompt's answers in its place (a game over is always one: Play new) -->
 	<div class="controls">
 		{#if ss.prompt}
@@ -37,7 +40,7 @@
 <style>
 	.game-page {
 		display: grid;
-		grid-template-rows: auto auto 1fr auto auto;
+		grid-template-rows: auto auto auto 1fr auto auto;
 		width: 450px;
 		height: 800px;
 		opacity: 0;
@@ -52,8 +55,8 @@
 
 	.stage {
 		display: grid;
-		align-content: center;
 		justify-items: center;
+		padding-top: 32px;
 		transition: opacity 0.3s;
 	}
 
@@ -61,10 +64,25 @@
 		opacity: 0.35;
 	}
 
+	/* the rest of the page's height, with the line in its middle; the tray ends 10px below its ground, so the line
+	   sits 5px above the row's middle, to be halfway from the ground to the palette */
+	.gap {
+		display: grid;
+		align-items: center;
+	}
+
+	.separator {
+		width: 410px;
+		height: 1px;
+		margin: 0 auto;
+		background: #8f86ff33;
+		translate: 0 -5px;
+	}
+
 	.controls {
 		display: grid;
-		height: 92px;
-		place-items: center;
+		height: 84px;
+		place-items: start center;
 	}
 
 	.charting {

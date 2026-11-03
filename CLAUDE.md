@@ -33,8 +33,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   prompt takes the palette's place (`Actions.svelte`): Keep looking / Show solution after a wrong Done; the
   confirmations, which follow the template (the question is the yes button, beside No); and at a game's end its
   message ("No more dark matter!", or best / average improved, or the revealed one) for `OVER_MS` (3 s), then Play new.
-- **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge seen by a 2D being: a line, drawn as a faint
-  separator, not a gold underline), its lanes under
+- **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge as a 2D being sees it), with no
+  line under the planets (a faint separator sets the palette off below instead), its lanes under
   the map's columns at the same scale. Swiping it turns the board, as decided with the designer: the planets follow
   the finger and slide off the tray's end, the next side's lineup slides in from the other end (a carousel), all at
   one speed, so no depth shows. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
