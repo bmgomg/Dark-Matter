@@ -1,12 +1,13 @@
 <script>
+	import { R } from './const';
 	import Planet from './Planet.svelte';
 
 	// A total eclipse, with the three planets on a tilted orbit around it, passing behind and in front.
 	const RX = 150;
 	const RY = 34;
 	const ORBIT = [
-		{ size: 1, r: 9, phase: 0 },
-		{ size: 2, r: 14, phase: 2.1 },
+		{ size: 1, r: (R[1] / R[3]) * 20, phase: 0 },
+		{ size: 2, r: (R[2] / R[3]) * 20, phase: 2.1 },
 		{ size: 3, r: 20, phase: 4.2 }
 	];
 

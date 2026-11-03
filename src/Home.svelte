@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { LEVELS, TAGLINE, TITLE } from './const';
+	import { LEVELS, R, TAGLINE, TITLE } from './const';
 	import Emblem from './Emblem.svelte';
 	import Planet from './Planet.svelte';
 	import { loadCommon, onPlay, ss } from './shared.svelte';
@@ -11,7 +11,7 @@
 
 	const RULES = [
 		[1, 'Planets of three sizes hide on a square board, at most one to a cell.'],
-		[2, 'You see the board <em>edge-on</em>, one side at a time. Swipe to turn it.'],
+		[2, 'You see the board <em>edge-on</em>, one side at a time. Swipe the edge to turn the board.'],
 		[3, 'A planet eclipses anything its size or smaller behind it. A bigger one still peeks over it.'],
 		[0, 'Map every planet, then tap <em>Done</em>.']
 	];
@@ -39,7 +39,7 @@
 				<li>
 					<svg viewBox="-12 -12 24 24" class="bullet">
 						{#if size}
-							<Planet x={0} y={0} r={[0, 5, 7, 9][size]} {size} />
+							<Planet x={0} y={0} r={(R[size] / R[3]) * 10} {size} />
 						{:else}
 							<circle r="3" class="dot" />
 						{/if}

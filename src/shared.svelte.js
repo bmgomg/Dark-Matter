@@ -1,7 +1,19 @@
-import { APP_STATE, LEVELS, MSG_AVERAGE_IMPROVED, MSG_BEST_SCORE, PROMPT_PLAY_NEW, PROMPT_WRONG, TURN_MS } from './const';
+import {
+	APP_STATE,
+	LEVELS,
+	MSG_AVERAGE_IMPROVED,
+	MSG_BEST_SCORE,
+	MSG_REVEALED,
+	MSG_WON,
+	PROMPT_PLAY_NEW,
+	PROMPT_WRONG,
+	TURN_MS
+} from './const';
 import { generate } from './logic';
 import { _sound, sfx, whoosh } from './sound.svelte';
-import { sideAt } from './view3d';
+
+// the side facing the player at a board angle, 0..3 (South, East, North, West)
+export const sideAt = (deg) => ((Math.round(deg / 90) % 4) + 4) % 4;
 
 export const newStats = () => ({ plays: 0, total: 0, best: 0 });
 
@@ -263,14 +275,14 @@ export const onDone = () => {
 	pzl.over = 'won';
 	sfx('won');
 
-	const turns = pzl.turns === 1 ? '1 turn' : `${pzl.turns} turns`;
-	ss.message =
-		stats.plays > 1 && best
-			? MSG_BEST_SCORE
-			: stats.plays > 1 && avgScore() < prevAvg
-				? MSG_AVERAGE_IMPROVED
-				: `Total eclipse — in ${turns}!`;
+	ss.message = stats.plays > 1 && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() < prevAvg ? MSG_AVERAGE_IMPROVED : MSG_WON;
+	gameOver();
+};
+
+// the game-over message holds the button's place for a while, then gives way to Play new
+const gameOver = () => {
 	ss.prompt = PROMPT_PLAY_NEW;
+	ss.overAt = Date.now();
 	persist();
 };
 
@@ -284,9 +296,8 @@ export const reveal = () => {
 
 	pzl.over = 'revealed';
 	sfx('drop');
-	ss.message = 'This is how the sky really lies.';
-	ss.prompt = PROMPT_PLAY_NEW;
-	persist();
+	ss.message = MSG_REVEALED;
+	gameOver();
 };
 
 export const resetStats = () => {

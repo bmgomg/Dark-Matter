@@ -19,8 +19,11 @@ export const NAMES = ['empty', 'small', 'medium', 'large'];
 // the side facing the player after r clockwise turns of the board
 export const SIDES = ['South', 'East', 'North', 'West'];
 
-// a swipe turns the board a quarter for this many pixels of finger travel
-export const SWIPE_PX = 150;
+// the map's width, and the tray's: its lanes line up under the map's columns at the same scale
+export const MAP = 330;
+// a quarter turn slides the tray's planets this far, one side's lineup out and the next one's in;
+// they follow the finger, so it's also the swipe for a quarter turn
+export const SWIPE_PX = MAP + 40;
 export const TURN_MS = 420;
 
 export const PROMPT_SURRENDER = 'Show the solution?';
@@ -29,3 +32,7 @@ export const PROMPT_WRONG = 'wrong';
 export const PROMPT_PLAY_NEW = 'Play new';
 export const MSG_AVERAGE_IMPROVED = 'Average improved!';
 export const MSG_BEST_SCORE = 'Best score!';
+export const MSG_WON = 'No more dark matter!';
+export const MSG_REVEALED = 'This is how the sky really lies.';
+// how long the game-over message stays before Play new takes its place
+export const OVER_MS = 3000;

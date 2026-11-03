@@ -39,9 +39,9 @@
 		grid-template-columns: repeat(5, 1fr);
 		align-items: center;
 		width: 410px;
-		height: 50px;
-		margin: 0 auto 16px;
+		height: 46px;
+		margin: 0 auto 12px;
 		border-top: 1px solid #8f86ff33;
-		padding-top: 10px;
+		padding-top: 8px;
 	}
 </style>

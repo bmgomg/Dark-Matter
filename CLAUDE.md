@@ -24,14 +24,23 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 - The planets (`Defs.svelte`, drawn once on a unit circle, used through `Planet.svelte`): 1 a golden cratered moon,
   2 a teal ocean world, 3 a violet gas giant with bands and a storm. Lit from the upper left. Radii as the brief:
   17, 29, 44 hundredths of a cell.
-- **The board** (`Board.svelte`): the player's map, drawn in perspective from their seat (`view3d.js`: camera south
-  of the board and above it, 48° down; the near edge 340 px wide at rest). Marks stand on it as planets, with contact
-  shadows. Compass letters at the sides; the side facing the player is gold. Swipe (or ← →, or the arrow buttons)
-  turns it: it follows the finger (150 px per quarter), a flick goes on to the next quarter, and it eases to rest.
-- **The horizon** (`Horizon.svelte`): the true view, edge-on and orthographic, lanes lined up under the board's near
-  edge at the same scale. While the board turns, the planets sink below the edge and the next side's rise.
-- The real planets are never drawn in perspective: depth would show, and give the puzzle away. Only the player's
-  own marks are.
+- **The map** (`Board.svelte`): flat, top-down, `MAP` (330 px) wide, the side being viewed at the bottom with a gold
+  edge. It turns with the board (`ss.angle`), live while the tray is dragged; its planets stay upright. Tap a cell to
+  mark it; the map itself doesn't swipe. No compass letters and no "from the South" label: the designer found them
+  unhelpful (the turning map shows the orientation; the scoreboard's dots show the sides seen).
+- **The palette** (`Palette.svelte`): the brushes (small, medium, large, empty) and Done at the end of the row.
+- **Messages**: the hint line above the map (`Message.svelte`: what to do next, or how many cells are off). Any
+  prompt takes the palette's place (`Actions.svelte`): Keep looking / Show solution after a wrong Done; the
+  confirmations, which follow the template (the question is the yes button, beside No); and at a game's end its
+  message ("No more dark matter!", or best / average improved, or the revealed one) for `OVER_MS` (3 s), then Play new.
+- **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge seen by a 2D being: a line), its lanes under
+  the map's columns at the same scale. Swiping it turns the board, as decided with the designer: the planets follow
+  the finger and slide off the tray's end, the next side's lineup slides in from the other end (a carousel), all at
+  one speed, so no depth shows. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
+  drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). ← → and the arrow
+  buttons turn it too. A new puzzle's planets rise from below the tray (`ss.rise`).
+- A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
+  mid-turn, giving the puzzle away.
 - Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Quicksand (`QS`, text), Space Mono (`SM`, labels).
 - Splash: the template's BMG one. Sounds: the template's effects sprite; Unmix's music (Eric Matyas, soundimage.org).
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
@@ -46,7 +55,7 @@ For now: a quarter turn counts 1 (a half turn 2). Per-level stats: solved, avera
 - `src/logic.js`: the prototype's rules, solver tiers and generator, as-is (`generate`, `tierOf`, `elevation`), tested
   in `src/logic.test.js` (`npm test`).
 - `src/shared.svelte.js`: the store `ss`, per-level saves (`APP_STATE • <level id>`: stats and the puzzle), turning
-  (`turnBy`, `spinTo`, `ss.angle`), marking, Done, reveal. `pzl.step` is the net count of clockwise quarter turns.
+  (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), marking, Done, reveal. `pzl.step` is the net count of clockwise quarter turns.
 - `src/const.js`: title, levels, sizes, sides, swipe and turn timing, prompts.
 - `scripts/build-itch.js`: `npm run build:itch`, a static build without the PWA parts, zipped for itch.io.
 

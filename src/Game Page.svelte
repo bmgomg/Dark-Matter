@@ -1,7 +1,9 @@
 <script>
+	import { fade } from 'svelte/transition';
 	import Actions from './Actions.svelte';
 	import Board from './Board.svelte';
-	import Horizon from './Horizon.svelte';
+	import Message from './Message.svelte';
+	import Tray from './Tray.svelte';
 	import Palette from './Palette.svelte';
 	import Scoreboard from './Scoreboard.svelte';
 	import { ss } from './shared.svelte';
@@ -10,25 +12,32 @@
 
 <div class="game-page ga11" class:show={!ss.home} inert={ss.home}>
 	<Scoreboard />
+	<Message />
 
 	<div class="stage" class:dim={ss.generating}>
 		{#if ss.pzl}
 			<Board />
-			<Horizon />
+			<Tray />
 		{:else}
 			<div class="charting">charting the sky…</div>
 		{/if}
 	</div>
 
-	<Palette />
-	<Actions />
+	<!-- the palette, or a prompt's answers in its place (a game over is always one: Play new) -->
+	<div class="controls">
+		{#if ss.prompt}
+			<div class="ga11" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}><Actions /></div>
+		{:else}
+			<div class="ga11" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}><Palette /></div>
+		{/if}
+	</div>
 	<Toolbar />
 </div>
 
 <style>
 	.game-page {
 		display: grid;
-		grid-template-rows: auto 1fr auto auto auto;
+		grid-template-rows: auto auto 1fr auto auto;
 		width: 450px;
 		height: 800px;
 		opacity: 0;
@@ -50,6 +59,12 @@
 
 	.dim {
 		opacity: 0.35;
+	}
+
+	.controls {
+		display: grid;
+		height: 92px;
+		place-items: center;
 	}
 
 	.charting {

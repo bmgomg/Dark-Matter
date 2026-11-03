@@ -1,8 +1,7 @@
 <script>
 	import NumberFlow from '@number-flow/svelte';
 	import { SIDES } from './const';
-	import { avgScore, level, ss } from './shared.svelte';
-	import { sideAt } from './view3d';
+	import { avgScore, level, sideAt, ss } from './shared.svelte';
 
 	// Scoring is still open: for now it counts quarter turns, and the stats are per level, in turns.
 	const pzl = $derived(ss.pzl);
@@ -53,9 +52,9 @@
 <style>
 	.scoreboard {
 		display: grid;
-		gap: 10px;
+		gap: 4px;
 		justify-items: center;
-		margin-top: 18px;
+		margin-top: 12px;
 	}
 
 	.stats {
@@ -112,14 +111,14 @@
 
 	.big {
 		font-family: CZ;
-		font-size: 30px;
+		font-size: 28px;
 		line-height: 1;
 		color: #fff4dc;
 		text-shadow: 0 0 12px #ffd77a55;
 	}
 
 	.turns .big {
-		font-size: 40px;
+		font-size: 36px;
 	}
 
 	.sides svg {
