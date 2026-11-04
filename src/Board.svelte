@@ -1,5 +1,6 @@
 <script>
 	import { MAP, R, SIDES } from './const';
+	import { brushCursor } from './cursor';
 	import Planet from './Planet.svelte';
 	import { isOver, paint, sideAt, ss } from './shared.svelte';
 
@@ -14,6 +15,8 @@
 	const front = $derived(sideAt(ss.angle));
 	const shown = $derived(pzl.over === 'revealed' ? pzl.sol : pzl.marks);
 	const won = $derived(pzl.over === 'won');
+	// the pointer over a cell: an arrow carrying the brush picked
+	const cursor = $derived(brushCursor(ss.brush));
 
 	// a point of the map turned with the board, clockwise on screen
 	const turned = (x, y) => {
@@ -78,6 +81,7 @@
 	role="grid"
 	tabindex="-1"
 	aria-label="Your map, viewed from the {SIDES[front]}. Tap a cell to mark it."
+	style:--brush={cursor}
 	onclick={onClick}
 >
 	<defs>
@@ -157,7 +161,7 @@
 		stroke: #8f86ff;
 		stroke-width: 1;
 		stroke-opacity: 0.5;
-		cursor: pointer;
+		cursor: var(--brush, pointer);
 		transition: fill 0.15s;
 	}
 

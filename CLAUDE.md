@@ -27,7 +27,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 - **The map** (`Board.svelte`): flat, top-down, `MAP` (330 px) wide, the side being viewed at the bottom with a gold
   edge. It turns with the board (`ss.angle`), live while the tray is dragged; its planets stay upright. Tap a cell to
   mark it; the map itself doesn't swipe. No compass letters and no "from the South" label: the designer found them
-  unhelpful (the turning map shows the orientation).
+  unhelpful (the turning map shows the orientation). Over a cell the pointer is an arrow carrying the picked brush
+  (`cursor.js`: the planet, sized in the board's ratios, or the cross; the planets' art copied in from Defs).
 - **The palette** (`Palette.svelte`): the brushes (small, medium, large, empty) and Done at the end of the row.
 - **Messages**: the hint line above the map (`Message.svelte`: what to do next, or how many cells are off). Any
   prompt takes the palette's place (`Actions.svelte`): Keep looking / Show solution after a wrong Done; the
