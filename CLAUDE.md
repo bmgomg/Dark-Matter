@@ -36,8 +36,12 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   shows the orientation). (Cursors carrying the brush went with the brushes.)
 - **Below the tray** (`Game Page.svelte`, the rest of the page's height, its content centred, no separator): with no
   cell selected, the hint (`Message.svelte`: what to do next), moved down from above the map at the designer's
-  request; with one selected, "Think twice — changing your mind costs $1." over the palette (`Palette.svelte`: small,
-  medium, large, clear; the cell's own planet lit and disabled, Clear disabled on a blank cell). Keys: 1–3 a planet,
+  request; with one selected, "Think twice — changing your mind costs $1." The palette (small, medium, large, clear;
+  the cell's own planet lit and disabled, Clear disabled on a blank cell) is being tried at the cell (`Picker.svelte`:
+  a pill on the map with a notch pointing at the cell, above it or below it near the top, growing out of it; a tap
+  off the map lets the cell go), because the designer kept mistaking a palette below the tray for the tray, both
+  rows of planets. `PALETTE_AT_CELL` switches back to the old palette there (`Palette.svelte`). Moving the tray above
+  the map was weighed and rejected: it belongs against the gold edge it's seen from. Keys: 1–3 a planet,
   0 / Delete / Backspace clear, Esc lets the cell go. Any prompt takes the same place (`Actions.svelte`, 50 px tall
   so the game-over message doesn't shift when Play new fades in): the confirmations, which follow the template (the
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average

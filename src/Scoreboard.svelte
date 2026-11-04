@@ -40,9 +40,9 @@
 <style>
 	.scoreboard {
 		display: grid;
-		gap: 10px;
+		gap: 22px;
 		justify-items: center;
-		margin-top: 12px;
+		margin-top: 20px;
 	}
 
 	.stats {

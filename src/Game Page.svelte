@@ -7,6 +7,7 @@
 	import Tray from './Tray.svelte';
 	import Palette from './Palette.svelte';
 	import Scoreboard from './Scoreboard.svelte';
+	import { PALETTE_AT_CELL } from './const';
 	import { ss } from './shared.svelte';
 	import Toolbar from './Toolbar.svelte';
 
@@ -38,7 +39,9 @@
 				{:else if mode === 'palette'}
 					<div class="ga11 marking" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}>
 						<Message />
-						<Palette />
+						{#if !PALETTE_AT_CELL}
+							<Palette />
+						{/if}
 					</div>
 				{:else}
 					<div class="ga11" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}><Message /></div>
@@ -79,7 +82,7 @@
 	.stage {
 		display: grid;
 		justify-items: center;
-		padding-top: 16px;
+		padding-top: 30px;
 		transition: opacity 0.3s;
 	}
 

@@ -1,8 +1,9 @@
 <script>
 	import { cubicOut } from 'svelte/easing';
-	import { MAP, R, SIDES } from './const';
+	import { MAP, PALETTE_AT_CELL, R, SIDES } from './const';
+	import Picker from './Picker.svelte';
 	import Planet from './Planet.svelte';
-	import { isOver, select, sideAt, ss } from './shared.svelte';
+	import { deselect, isOver, select, sideAt, ss } from './shared.svelte';
 
 	// The player's map, seen from above, the side they're viewing from at the bottom. It turns with the board,
 	// following the swipe on the tray below; the planets on it stay upright, lit from the upper left.
@@ -79,11 +80,38 @@
 				}
 			: { duration: 0 };
 
+	// the selected cell's centre on screen, for the picker beside it
+	// (kept once the cell is let go, for the picker to fade out where it was)
+	let lastAt = [0, 0];
+	const selAt = $derived(ss.sel ? turned(...center(ss.sel[0], ss.sel[1])) : null);
+	const at = $derived.by(() => {
+		if (selAt) {
+			lastAt = selAt;
+		}
+
+		return lastAt;
+	});
+
+	// a tap anywhere off the map lets the selected cell go, as with any popover
+	$effect(() => {
+		const onDown = (e) => {
+			if (ss.sel && !e.target.closest?.('.board')) {
+				deselect();
+			}
+		};
+
+		document.addEventListener('pointerdown', onDown);
+		return () => document.removeEventListener('pointerdown', onDown);
+	});
+
+	// a tap on a cell selects it (or lets it go); a tap elsewhere on the map lets the selected one go
 	const onClick = (e) => {
 		const id = e.target.dataset?.cell;
 
 		if (id !== undefined) {
 			select(Math.floor(id / N), id % N);
+		} else if (ss.sel) {
+			deselect();
 		}
 	};
 </script>
@@ -150,6 +178,10 @@
 			<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
 		</g>
 	{/each}
+
+	{#if PALETTE_AT_CELL && selAt && !isOver()}
+		<Picker x={at[0]} y={at[1]} {cell} id={ss.sel ? ss.sel[0] * N + ss.sel[1] : -1} />
+	{/if}
 </svg>
 
 <style>

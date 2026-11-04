@@ -34,7 +34,7 @@ export const PROMPT_PLAY_NEW = 'Play new';
 export const MSG_AVERAGE_IMPROVED = 'Average improved!';
 export const MSG_BEST_SCORE = 'Best score!';
 export const MSG_WON = 'No more dark matter!';
-export const MSG_BROKE = 'No more dark matter — but the bank\'s broken.';
+export const MSG_BROKE = 'No more dark matter — but the bank’s broken.';
 export const MSG_REVEALED = 'This is how the sky really lies.';
 
 // Each game starts with a bank. Every quarter turn costs, and so does changing your mind about a cell (another size,
@@ -42,6 +42,8 @@ export const MSG_REVEALED = 'This is how the sky really lies.';
 export const BANK = 10;
 export const COST_TURN = 1;
 export const COST_CHANGE = 1;
+// the palette: at the selected cell, on the map (being tried), or below the tray (as before)
+export const PALETTE_AT_CELL = true;
 export const MSG_THINK_TWICE = `Think twice — changing your mind costs $${COST_CHANGE}.`;
 // how long the game-over message stays before Play new takes its place
 export const OVER_MS = 3000;
