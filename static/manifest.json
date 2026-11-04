@@ -1,7 +1,7 @@
 {
 	"name": "Dark Matter of Perspective",
 	"short_name": "Dark Matter",
-	"description": "A puzzle in deep space. You see the board only edge-on, one side at a time: turn it, and map the planets hiding behind each other.",
+	"description": "A deep-space puzzle. See the board edge-on, one side at a time: turn it, and map the planets hiding behind each other.",
 	"start_url": "/",
 	"scope": "/",
 	"display": "standalone",
