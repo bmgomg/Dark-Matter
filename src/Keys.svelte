@@ -98,7 +98,7 @@
 
 	.what {
 		font-family: QS;
-		font-size: 17px;
+		font-size: 16px;
 		line-height: 1.3;
 		color: #ece8ff;
 	}
