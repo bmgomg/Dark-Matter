@@ -152,11 +152,6 @@
 
 		<ellipse cx="0" cy={AXIS} rx={HALF + 40} ry="44" fill="url(#sight)" />
 
-		{#each { length: N - 1 }, c (c)}
-			{@const x = -HALF + (c + 1) * lane}
-			<line x1={x} y1="8" x2={x} y2={H - 12} class="lane" />
-		{/each}
-
 		<g clip-path="url(#on-tray)">
 			{#each planets as p (p.id)}
 				<Planet x={p.x} y={p.y} r={p.r} size={p.v} />
@@ -204,13 +199,6 @@
 		width: 450px;
 		height: 96px;
 		overflow: visible;
-	}
-
-	.lane {
-		stroke: #8f86ff;
-		stroke-opacity: 0.22;
-		stroke-width: 1;
-		stroke-dasharray: 2 6;
 	}
 
 	.turn {

@@ -4,17 +4,19 @@
 	import { avgScore, level, sideAt, ss } from './shared.svelte';
 
 	// Scoring is still open: for now it counts quarter turns, and the stats are per level, in turns.
-	// The board's size shows on the board, so only the difficulty is named, leading the level's stats.
+	// The level's stats, led by its difficulty (the board's size shows on the board): plays (given-up games count,
+	// with a penalty), solved, avg and best. Best is 0 until a game is solved.
 	const pzl = $derived(ss.pzl);
 	const side = $derived(sideAt(ss.angle));
 	const turns = $derived(pzl?.turns ?? 0);
-	const fmt = (v) => (ss.stats.plays ? (Math.round(v * 10) / 10).toString() : '–');
+	const fmt = (v) => (ss.stats.plays && v ? (Math.round(v * 10) / 10).toString() : '–');
 </script>
 
 <div class="scoreboard">
 	<div class="stats">
 		<span class="label level">{level()?.sub}</span>
-		<div class="stat"><span class="label">solved</span><span class="value"><NumberFlow value={ss.stats.plays} /></span></div>
+		<div class="stat"><span class="label">plays</span><span class="value"><NumberFlow value={ss.stats.plays} /></span></div>
+		<div class="stat"><span class="label">solved</span><span class="value"><NumberFlow value={ss.stats.solved} /></span></div>
 		<div class="stat"><span class="label">avg</span><span class="value">{fmt(avgScore())}</span></div>
 		<div class="stat"><span class="label">best</span><span class="value">{fmt(ss.stats.best)}</span></div>
 	</div>

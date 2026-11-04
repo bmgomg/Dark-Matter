@@ -5,7 +5,7 @@
 	import TextButton from './Text Button.svelte';
 
 	// in the palette's place: the answers to a prompt, or, at the end of a game, its message for a while, then Play new
-	const PILL = 'font-size: 12px; letter-spacing: 0.16em; padding: 11px 18px;';
+	const PILL = 'font-size: 12px; letter-spacing: 0.06em; padding: 11px 18px;';
 
 	let lingering = $state(false);
 

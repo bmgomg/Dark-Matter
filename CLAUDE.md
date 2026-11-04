@@ -16,7 +16,11 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 - The player sees the board only edge-on, one side at a time, and turns it a quarter at a time.
 - A planet hides anything its size or smaller behind it; a bigger one behind still shows over it.
 - The player marks each cell small, medium, large or empty (blank counts as empty), then taps Done. Wrong cells are
-  outlined, with Keep looking / Show solution. Give Up shows the solution too.
+  outlined, with Keep looking / Show solution. Give Up shows the solution too, after a confirmation ("Average will be
+  affected — give up?" / No). Showing the solution either way is giving up: it counts as a play, scoring its turns plus
+  `GIVE_UP_TURNS` (4), so giving up can't help the average; best is only from solved games. The map changes over to
+  the solution through a transition: the wrong planets and crosses shrink and fade, then the true ones grow in, cell
+  by cell from the north-west corner.
 
 ## Look: deep space
 
@@ -35,7 +39,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   confirmations, which follow the template (the question is the yes button, beside No); and at a game's end its
   message ("No more dark matter!", or best / average improved, or the revealed one) for `OVER_MS` (3 s), then Play new.
 - **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge as a 2D being sees it), with no
-  line under the planets (a faint separator sets the palette off below instead), its lanes under
+  lane lines (the designer dropped the dashed ones) and no line under the planets (a faint separator sets the palette off below instead), its lanes under
   the map's columns at the same scale. The planets are centred on one line of sight (`AXIS`: as low as a large planet allows, its bottom on the old floor
   line, so the separator's spacing holds), not standing on a
   floor: a bigger one behind shows as a ring around the ones in front, like an annular eclipse (the designer's call;
@@ -59,8 +63,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 
 ## Scoring (open)
 
-For now: a quarter turn counts 1 (a half turn 2). The scoreboard shows the level's stats, led by its difficulty
-(solved, average turns, best), and the turns ("3 turns", on one line). No board size: the board shows it. The sides seen are still recorded (`pzl.seen`) but no longer shown: the designer dropped
+For now: a quarter turn counts 1 (a half turn 2). The scoreboard shows the level's stats, led by its difficulty:
+plays (with give-ups), solved, average turns, best; and the turns ("3 turns", on one line). No board size: the board shows it. The sides seen are still recorded (`pzl.seen`) but no longer shown: the designer dropped
 the scoreboard's sides-seen dots and their "n/4 sides" count. The designer wants to play it before settling scoring.
 
 **Par (on the back burner):** the fewest quarter turns from South to see a set of sides that solves the puzzle

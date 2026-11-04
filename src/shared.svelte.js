@@ -1,5 +1,6 @@
 import {
 	APP_STATE,
+	GIVE_UP_TURNS,
 	LEVELS,
 	MSG_AVERAGE_IMPROVED,
 	MSG_BEST_SCORE,
@@ -16,7 +17,7 @@ import { _sound, sfx, whoosh } from './sound.svelte';
 // the side facing the player at a board angle, 0..3 (South, East, North, West)
 export const sideAt = (deg) => ((Math.round(deg / 90) % 4) + 4) % 4;
 
-export const newStats = () => ({ plays: 0, total: 0, best: 0 });
+export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 
 // pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, seen, wrong, over }
 //   marks: -1 blank (counts as empty), 0 marked empty, 1..3 a sphere
@@ -196,7 +197,8 @@ export const onPlay = (id) => {
 		delete ss.message;
 
 		const job = JSON.parse(localStorage.getItem(appKey()));
-		ss.stats = job?.stats ?? newStats();
+		// saves from before give-ups counted have no solved: every play then was a solve
+		ss.stats = job?.stats ? { solved: job.stats.plays, ...job.stats } : newStats();
 
 		if (job?.pzl && !job.pzl.over) {
 			ss.pzl = job.pzl;
@@ -270,11 +272,14 @@ export const onDone = () => {
 
 	const prevAvg = avgScore();
 	const { stats } = ss;
+	// 0 until a game is solved: none is solvable without a turn
+	const prevBest = stats.best;
 
 	stats.plays += 1;
+	stats.solved += 1;
 	stats.total += pzl.turns;
 
-	const best = stats.plays === 1 || pzl.turns < stats.best;
+	const best = !prevBest || pzl.turns < prevBest;
 
 	if (best) {
 		stats.best = pzl.turns;
@@ -283,7 +288,7 @@ export const onDone = () => {
 	pzl.over = 'won';
 	sfx('won');
 
-	ss.message = stats.plays > 1 && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() < prevAvg ? MSG_AVERAGE_IMPROVED : MSG_WON;
+	ss.message = prevBest && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() < prevAvg ? MSG_AVERAGE_IMPROVED : MSG_WON;
 	gameOver();
 };
 
@@ -294,13 +299,17 @@ const gameOver = () => {
 	persist();
 };
 
-// shows the sky as it is; the cells marked wrong stay outlined
+// gives up and shows the sky as it is (the map's planets change over, cell by cell); the cells marked wrong stay
+// outlined. It counts as a play, with a penalty, so giving up can't help the average.
 export const reveal = () => {
 	const pzl = ss.pzl;
 
 	if (!pzl || pzl.over) {
 		return;
 	}
+
+	ss.stats.plays += 1;
+	ss.stats.total += pzl.turns + GIVE_UP_TURNS;
 
 	pzl.over = 'revealed';
 	sfx('drop');

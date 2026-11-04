@@ -1,4 +1,5 @@
 <script>
+	import { cubicOut } from 'svelte/easing';
 	import { MAP, R, SIDES } from './const';
 	import { brushCursor } from './cursor';
 	import Planet from './Planet.svelte';
@@ -46,7 +47,7 @@
 
 				if (v > 0) {
 					const [x, y] = turned(...center(i, j));
-					out.push({ id: `${i}-${j}`, x, y, v, r: (R[v] / 100) * cell, delay: (i + j) * 60 });
+					out.push({ id: `${i}-${j}-${v}`, x, y, v, r: (R[v] / 100) * cell, delay: (i + j) * 60 });
 				}
 			}
 		}
@@ -63,6 +64,23 @@
 		[-E, -HALF, -E, HALF]
 	];
 	const edge = $derived(EDGES[front]);
+
+	// Showing the solution: the planets marked wrong shrink away and the true ones grow in their place, cell by cell
+	// from the north-west corner; a cell marked right stays as it is. Marking and a new puzzle change over at once.
+	const revealing = () => pzl.over === 'revealed';
+	const GAP = 250;
+
+	const grow = (node, { x, y, delay, duration }) =>
+		revealing()
+			? {
+					delay,
+					duration,
+					easing: cubicOut,
+					css: (t) => `transform: translate(${x}px, ${y}px) scale(${t}) translate(${-x}px, ${-y}px); opacity: ${Math.min(1, t * 2)};`
+				}
+			: { duration: 0 };
+
+	const vanish = (node, { delay }) => (revealing() ? { delay, duration: 250, css: (t) => `opacity: ${t * 0.75};` } : { duration: 0 });
 
 	const onClick = (e) => {
 		const id = e.target.dataset?.cell;
@@ -117,7 +135,11 @@
 			/>
 			{#if shown[c.i][c.j] === 0 && pzl.over !== 'revealed'}
 				{@const k = cell * 0.15}
-				<path d="M{x - k} {y - k} L {x + k} {y + k} M {x + k} {y - k} L {x - k} {y + k}" class="cross" />
+				<path
+					d="M{x - k} {y - k} L {x + k} {y + k} M {x + k} {y - k} L {x - k} {y + k}"
+					class="cross"
+					out:vanish={{ delay: (c.i + c.j) * 60 }}
+				/>
 			{/if}
 		{/each}
 
@@ -136,7 +158,9 @@
 	/>
 
 	{#each marks as m (m.id)}
-		<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
+		<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GAP, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
+			<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
+		</g>
 	{/each}
 </svg>
 
