@@ -24,7 +24,7 @@
 <div class="launcher">
 	<p class="economy">
 		You start with <em>${BANK}</em>. Each turn of the board costs <em>${COST_TURN}</em>. Placing a planet is free, but changing your mind is
-		not: that costs <em>${COST_CHANGE}</em> too. Finish in the black.
+		not: that costs <em>${COST_CHANGE}</em> too. Finish in the black — or break the bank trying.
 	</p>
 
 	<div class="pick">
@@ -54,7 +54,7 @@
 		justify-items: center;
 		align-content: center;
 		gap: 34px;
-		width: 370px;
+		width: 350px;
 		padding: 36px 30px 40px;
 		box-sizing: border-box;
 		border-radius: 24px;
@@ -68,7 +68,7 @@
 		font-family: SI;
 		font-size: 20px;
 		line-height: 1.45;
-		text-align: center;
+		text-align: justify;
 		color: #ece8ff;
 	}
 

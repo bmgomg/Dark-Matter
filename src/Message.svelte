@@ -26,8 +26,7 @@
 <style>
 	/* two lines of a long message come out about even, rather than one long and a word or two on the next */
 	.message {
-		width: 400px;
-		text-wrap: balance;
+		width: 365px;
 		text-align: center;
 		font-family: SI;
 		font-size: 20px;
