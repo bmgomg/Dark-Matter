@@ -4,6 +4,7 @@ import {
 	COST_CHANGE,
 	COST_TURN,
 	FLIP_MS,
+	FLIP_PAUSE_MS,
 	LEVELS,
 	MSG_AVERAGE_IMPROVED,
 	MSG_BEST_SCORE,
@@ -175,16 +176,19 @@ export const turnBy = (dir) => {
 	spinTo((ss.target ?? Math.round(ss.angle / 90)) + dir, true);
 };
 
-// Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and the
-// new, empty map flips back
+// Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and,
+// after a little pause edge-on (counted from when it got there, so a slow puzzle doesn't add to it), the new, empty map
+// flips back
 export const playNew = () => {
 	tween(
 		'flip',
 		1,
 		FLIP_MS,
 		async () => {
+			const t0 = performance.now();
 			await newPuzzle();
-			tween('flip', 0, FLIP_MS, null, linear);
+			const wait = Math.max(0, FLIP_PAUSE_MS - (performance.now() - t0));
+			setTimeout(() => tween('flip', 0, FLIP_MS, null, linear), wait);
 		},
 		linear
 	);

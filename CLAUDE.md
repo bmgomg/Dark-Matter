@@ -69,7 +69,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   centres (`ss.rise`, 1 to 0).
 - **A game's end**: on a win the map's planets glow, and swell three times (0.5 s each, linear) in a wave from the
   north-west corner. Play new (`playNew`) flips the map a quarter turn about its upright axis (`ss.flip`, `FLIP_MS`
-  0.5 s, linear) till it's edge-on, makes the next puzzle out of sight, and flips the empty map back (the designer's
+  0.5 s, linear) till it's edge-on, makes the next puzzle out of sight, pauses (`FLIP_PAUSE_MS`, 0.25 s at the least), and flips the empty map back (the designer's
   call: y-axis, linear, 0.5 s each way).
 - A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
   mid-turn, giving the puzzle away.
