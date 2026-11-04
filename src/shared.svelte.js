@@ -431,6 +431,15 @@ export const resetStats = () => {
 	persist();
 };
 
+// the card with the keyboard shortcuts (Keys on the toolbar, or ?)
+export const toggleKeys = () => {
+	if (ss.keys) {
+		delete ss.keys;
+	} else {
+		ss.keys = true;
+	}
+};
+
 // Back: from a game to the launcher, from the launcher to Home
 export const goBack = () => {
 	if (ss.launcher) {

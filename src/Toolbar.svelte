@@ -1,6 +1,6 @@
 <script>
 	import { PROMPT_CLEAR_ALL, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
-	import { goBack, isOver, persistCommon, planetCount, ss } from './shared.svelte';
+	import { goBack, isOver, persistCommon, planetCount, ss, toggleKeys } from './shared.svelte';
 	import { _sound } from './sound.svelte';
 	import TextButton from './Text Button.svelte';
 
@@ -38,6 +38,9 @@
 	/>
 	<TextButton text={['Give', 'Up']} disabled={noSurrender} onClick={() => (ss.prompt = PROMPT_SURRENDER)} />
 	<TextButton text={['Reset', 'Stats']} disabled={noResetStats} onClick={() => (ss.prompt = PROMPT_RESET_STATS)} />
+	{#if ss.keyboard}
+		<TextButton id="keys-button" text={['Keys']} onClick={toggleKeys} />
+	{/if}
 	<TextButton text={['Sound', _sound.sfx ? 'On' : 'Off']} onClick={onSfx} />
 	<TextButton text={['Music', _sound.music ? 'On' : 'Off']} onClick={onMusic} />
 </div>
@@ -45,7 +48,8 @@
 <style>
 	.toolbar {
 		display: grid;
-		grid-template-columns: repeat(6, 1fr);
+		grid-auto-flow: column;
+		grid-auto-columns: 1fr;
 		align-items: center;
 		width: 410px;
 		height: 46px;

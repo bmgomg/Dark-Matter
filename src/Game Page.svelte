@@ -2,6 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import Actions from './Actions.svelte';
 	import Board from './Board.svelte';
+	import Keys from './Keys.svelte';
 	import Launcher from './Launcher.svelte';
 	import Message from './Message.svelte';
 	import Tray from './Tray.svelte';
@@ -48,6 +49,9 @@
 				{/if}
 			</div>
 		</div>
+	{/if}
+	{#if ss.keys}
+		<Keys />
 	{/if}
 	<Toolbar />
 </div>

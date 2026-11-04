@@ -42,7 +42,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   off the map lets the cell go), because the designer kept mistaking a palette below the tray for the tray, both
   rows of planets. `PALETTE_AT_CELL` switches back to the old palette there (`Palette.svelte`). Moving the tray above
   the map was weighed and rejected: it belongs against the gold edge it's seen from. Keys: 1–3 a planet,
-  0 / Delete / Backspace clear, Esc lets the cell go. Any prompt takes the same place (`Actions.svelte`, 50 px tall
+  0 / Delete / Backspace clear, Esc lets the cell go, ? the shortcuts card (`Keys.svelte`, over the page above the
+  toolbar; any key or a tap puts it away). The toolbar's Keys button opens it too, shown only with a keyboard about
+  (`ss.keyboard`: a fine pointer suggests one, a key pressed proves it). Any prompt takes the same place (`Actions.svelte`, 50 px tall
   so the game-over message doesn't shift when Play new fades in): the confirmations, which follow the template (the
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average
   improved, the bank broken, or the revealed one) for `OVER_MS` (3 s), then Play new.
@@ -77,7 +79,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   mid-turn, giving the puzzle away.
 - Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Spectral (`SR`, text; its italic `SI` for hints and the
   launcher's economy paragraph, as in Mixed Results, at the designer's wish; it replaced Quicksand, which has no italic,
-  except in the home page's rules, where the designer preferred Quicksand, `QS`),
+  except in the home page's rules and the shortcuts card, where the designer preferred Quicksand, `QS`),
   Space Mono (`SM`, labels).
 - Splash: the template's BMG one. Sounds: the template's effects sprite; Unmix's music (Eric Matyas, soundimage.org).
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.

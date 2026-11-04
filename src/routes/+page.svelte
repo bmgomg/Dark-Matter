@@ -5,7 +5,7 @@
 	import Space from '../Space.svelte';
 	import Splash from '../Splash.svelte';
 	import { DX, DY } from '../const';
-	import { deselect, mark, ss, turnBy } from '../shared.svelte';
+	import { deselect, mark, ss, toggleKeys, turnBy } from '../shared.svelte';
 	import { _sound } from '../sound.svelte';
 	import { clientRect, post } from '../utils';
 
@@ -37,14 +37,33 @@
 			}
 		};
 
+		// The Keys button shows only with a keyboard about. There's no telling for sure: a fine pointer (a mouse, a
+		// trackpad) suggests one, and a key pressed proves it.
+		ss.keyboard = matchMedia('(any-pointer: fine)').matches;
+
 		// ← → turn the board (as a swipe that way); with a cell selected, 1 2 3 place a planet, 0 (or Delete) clears it,
-		// Esc puts the palette away
+		// Esc puts the palette away; ? shows the shortcuts (Keys.svelte), and any key puts them away
 		const onKeyDown = (e) => {
-			if (ss.home || ss.launcher || e.ctrlKey || e.metaKey || e.altKey) {
+			ss.keyboard = true;
+
+			if (ss.home || e.ctrlKey || e.metaKey || e.altKey) {
 				return;
 			}
 
-			if (e.key === 'ArrowLeft') {
+			if (ss.keys) {
+				if (!['Shift', 'Tab', 'Enter', ' '].includes(e.key)) {
+					delete ss.keys;
+					e.preventDefault();
+				}
+
+				return;
+			}
+
+			if (e.key === '?') {
+				toggleKeys();
+			} else if (ss.launcher) {
+				return;
+			} else if (e.key === 'ArrowLeft') {
 				turnBy(1);
 			} else if (e.key === 'ArrowRight') {
 				turnBy(-1);
