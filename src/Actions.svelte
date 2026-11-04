@@ -63,8 +63,10 @@
 </div>
 
 <style>
+	/* as tall as Play new, so the game-over message, centred, stays put while the button fades in over it */
 	.actions {
 		display: grid;
+		height: 50px;
 		place-items: center;
 	}
 
