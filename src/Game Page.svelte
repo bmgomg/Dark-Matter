@@ -8,7 +8,7 @@
 	import Tray from './Tray.svelte';
 	import Palette from './Palette.svelte';
 	import Scoreboard from './Scoreboard.svelte';
-	import { PALETTE_AT_CELL } from './const';
+	import { PAGE_FADE_MS, PALETTE_AT_CELL } from './const';
 	import { ss } from './shared.svelte';
 	import Toolbar from './Toolbar.svelte';
 
@@ -22,7 +22,7 @@
 	{#if ss.launcher}
 		<div class="ga11 launching" in:fade={{ duration: 250 }} out:fade={{ duration: 150 }}><Launcher /></div>
 	{:else}
-		<div class="ga11 game" in:fade={{ duration: 250 }} out:fade={{ duration: 150 }}>
+		<div class="ga11 game" in:fade={{ duration: PAGE_FADE_MS }} out:fade={{ duration: 150 }}>
 			<Scoreboard />
 
 			<div class="stage" class:dim={ss.generating}>

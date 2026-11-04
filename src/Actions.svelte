@@ -93,9 +93,11 @@
 		gap: 12px;
 	}
 
+	/* about as wide as the map above it; if it takes two lines, they're of a length */
 	.over {
-		width: 420px;
+		width: 360px;
 		text-align: center;
+		text-wrap: balance;
 		font-family: SR;
 		font-size: 21px;
 		color: #d8d2ff;

@@ -11,6 +11,7 @@ import {
 	MSG_BROKE,
 	MSG_REVEALED,
 	MSG_WON,
+	PAGE_FADE_MS,
 	PROMPT_PLAY_NEW,
 	TAP_TURN_MS,
 	TURN_MS
@@ -44,11 +45,14 @@ export const ss = $state({
 const keyOf = (id) => `${APP_STATE} • ${id}`;
 const appKey = () => keyOf(ss.level);
 
-// whether a level has a game under way, begun (a turn made or a cell marked) and not finished
+// whether a puzzle has been begun: a turn made or a cell marked
+const begun = (pzl) => pzl.turns > 0 || pzl.marks.some((row) => row.some((v) => v !== -1));
+
+// whether a level has a game under way, begun and not finished
 export const inProgress = (id) => {
 	try {
 		const pzl = JSON.parse(localStorage.getItem(keyOf(id)))?.pzl;
-		return !!pzl && !pzl.over && (pzl.turns > 0 || pzl.marks.some((row) => row.some((v) => v !== -1)));
+		return !!pzl && !pzl.over && begun(pzl);
 	} catch {
 		return false;
 	}
@@ -128,9 +132,20 @@ export const stopTurning = () => {
 	delete ss.turnFrom;
 };
 
+// what's waiting its moment: the map flipping back from edge-on, or the tray's planets rising
+let pending;
+
 const riseHorizon = (delay = 0) => {
 	ss.rise = 1;
-	setTimeout(() => tween('rise', 0, 700), delay);
+	clearTimeout(pending);
+	pending = setTimeout(() => tween('rise', 0, 700), delay);
+};
+
+// whatever a flip was about to do, it won't
+const stopFlip = () => {
+	clearTimeout(pending);
+	cancelAnimationFrame(tweens.flip);
+	delete tweens.flip;
 };
 
 // the board comes to rest on a quarter turn: count the turns it took and the side now in view
@@ -179,17 +194,24 @@ export const spinTo = (step, tapped = false) => {
 };
 
 // a tap on an arrow, or ← →; dir 1: clockwise from above, so the east side comes round to the front (as a swipe to the left)
+// (not while the map is flipping: a turn costs, and there would be nothing to see for it)
 export const turnBy = (dir) => {
-	if (!ss.pzl) {
+	if (!ss.pzl || ss.flip) {
 		return;
 	}
 
 	spinTo((ss.target ?? Math.round(ss.angle / 90)) + dir, true);
 };
 
-// Play new: the solved map flips a quarter turn till only its gold edge shows, the next puzzle is made while the map
-// can't be seen, and, after a little pause edge-on (counted from when it got there, so a slow puzzle doesn't add to it),
-// the new, empty map flips back. Only then do the tray's new planets rise, so the two don't move at once.
+// The map, edge-on with only its gold edge showing, flips back to flat, a pause after t0 (so a slow puzzle doesn't add
+// to it). Only then do the tray's new planets rise, so the two don't move at once.
+const flipBack = (t0, pause = FLIP_PAUSE_MS) => {
+	clearTimeout(pending);
+	pending = setTimeout(() => tween('flip', 0, FLIP_MS, () => tween('rise', 0, 700), linear), Math.max(0, pause - (performance.now() - t0)));
+};
+
+// Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and
+// the new, empty map flips back.
 export const playNew = () => {
 	tween(
 		'flip',
@@ -197,16 +219,32 @@ export const playNew = () => {
 		FLIP_MS,
 		async () => {
 			const t0 = performance.now();
-			await newPuzzle(false);
-			const wait = Math.max(0, FLIP_PAUSE_MS - (performance.now() - t0));
-			setTimeout(() => tween('flip', 0, FLIP_MS, () => tween('rise', 0, 700), linear), wait);
+			await newPuzzle();
+			flipBack(t0);
 		},
 		linear
 	);
 };
 
-// rise: false to keep the new planets down till the caller raises them
-export const newPuzzle = async (rise = true) => {
+// Coming to the game page for a new puzzle: the map starts edge-on and flips back, as in the second half of Play new.
+// Its pause starts as the page starts fading in, so it's seen for all of it. One dealt earlier and never touched is
+// still new to the player: the launcher offers it under Start.
+const arriveEdgeOn = async () => {
+	const t0 = performance.now();
+
+	stopFlip();
+	ss.flip = 1;
+	ss.rise = 1;
+
+	if (!ss.pzl || ss.pzl.over) {
+		await newPuzzle();
+	}
+
+	flipBack(t0, PAGE_FADE_MS + FLIP_PAUSE_MS);
+};
+
+// the new planets stay down till the map has flipped back (flipBack)
+export const newPuzzle = async () => {
 	const { N, diff } = level();
 	const id = ss.level;
 
@@ -238,19 +276,15 @@ export const newPuzzle = async (rise = true) => {
 	};
 
 	sfx('draw', 1.4, 0.5);
-
-	if (rise) {
-		riseHorizon(250);
-	} else {
-		ss.rise = 1;
-	}
-
+	ss.rise = 1;
 	persist();
 };
 
 // a level's saved game goes on unless it was finished; each level keeps its own stats
 export const onPlay = (id) => {
-	if (id !== ss.level) {
+	const changed = id !== ss.level;
+
+	if (changed) {
 		ss.level = id;
 		delete ss.pzl;
 		delete ss.prompt;
@@ -263,12 +297,19 @@ export const onPlay = (id) => {
 		if (job?.pzl && !job.pzl.over) {
 			ss.pzl = job.pzl;
 			ss.angle = job.pzl.step * 90;
-			riseHorizon(400);
 		}
 	}
 
-	if (!ss.pzl || ss.pzl.over) {
-		newPuzzle();
+	if (ss.pzl && !ss.pzl.over && begun(ss.pzl)) {
+		// a game resumed: the map is simply there, flat
+		stopFlip();
+		ss.flip = 0;
+
+		if (changed || ss.rise) {
+			riseHorizon(400);
+		}
+	} else {
+		arriveEdgeOn();
 	}
 
 	if (!_sound.musicPlayed) {
@@ -280,7 +321,7 @@ export const onPlay = (id) => {
 
 // a tap on a cell picks it for marking and brings up the palette; a tap on it again puts the palette away
 export const select = (i, j) => {
-	if (!ss.pzl || ss.pzl.over) {
+	if (!ss.pzl || ss.pzl.over || ss.flip) {
 		return;
 	}
 

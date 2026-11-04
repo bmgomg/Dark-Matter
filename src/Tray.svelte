@@ -71,9 +71,9 @@
 	// a drag along the tray turns the board with it; a flick goes on to the next quarter, a slow drag settles on the nearest
 	let drag = null;
 
-	// a counted turn plays out first: a drag can't catch the board mid-turn
+	// a counted turn plays out first: a drag can't catch the board mid-turn; nor can one start while the map is flipping
 	const onPointerDown = (e) => {
-		if (drag || !pzl || turning || e.target.closest('button')) {
+		if (drag || !pzl || turning || ss.flip || e.target.closest('button')) {
 			return;
 		}
 

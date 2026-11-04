@@ -27,8 +27,11 @@ export const SWIPE_PX = MAP + 40;
 // a swipe's last stretch, to rest; a whole quarter turn on a tap of an arrow (or ← →)
 export const TURN_MS = 420;
 export const TAP_TURN_MS = 500;
+// how long the game page takes to fade in
+export const PAGE_FADE_MS = 250;
 // Play new: the map flips a quarter turn about its horizontal axis, its gold edge coming towards the player, till it's
-// edge-on, the next sky is charted out of sight, and it flips back, each way in this long, at an even pace
+// edge-on, the next sky is charted out of sight, and it flips back, each way in this long, at an even pace. Coming to
+// the game page for a new puzzle, it starts edge-on and only flips back.
 export const FLIP_MS = 500;
 // how long it stays edge-on, only its gold edge showing, before flipping back, at the least
 export const FLIP_PAUSE_MS = 500;
@@ -44,7 +47,7 @@ export const PROMPT_PLAY_NEW = 'Play new';
 export const MSG_AVERAGE_IMPROVED = 'Average improved!';
 export const MSG_BEST_SCORE = 'Best score!';
 export const MSG_WON = 'No more dark matter!';
-export const MSG_BROKE = 'No more dark matter — but the bank’s broken.';
+export const MSG_BROKE = 'No more dark matter — but you shifted into the red.';
 export const MSG_REVEALED = 'This is how the sky really lies.';
 
 // Each game starts with a bank. Every quarter turn costs, and so does changing your mind about a cell (another size,
@@ -56,4 +59,4 @@ export const COST_CHANGE = 1;
 export const PALETTE_AT_CELL = true;
 export const MSG_THINK_TWICE = `Think twice — changing your mind costs $${COST_CHANGE}.`;
 // how long the game-over message stays before Play new takes its place
-export const OVER_MS = 3000;
+export const OVER_MS = 4500;
