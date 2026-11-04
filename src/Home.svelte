@@ -16,7 +16,7 @@
 		[0, 'Map every planet, then tap <em>Done</em>.']
 	];
 
-	const BUTTON = 'width: 92px; padding: 10px 0 9px; font-size: 13px; letter-spacing: 0.2em; line-height: 1.25;';
+	const BUTTON = 'width: 120px; padding: 10px 0 9px; font-size: 13px; letter-spacing: 0.2em; line-height: 1.25;';
 	const LAST = 'background: #ffd77a; color: #14102e;';
 </script>
 
@@ -143,7 +143,7 @@
 		align-self: start;
 		margin-top: 34px;
 		display: grid;
-		grid-auto-flow: column;
-		gap: 10px;
+		grid-template-columns: repeat(2, auto);
+		gap: 12px 14px;
 	}
 </style>
