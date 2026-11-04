@@ -5,52 +5,68 @@
 	import Planet from './Planet.svelte';
 	import { persistCommon, sideAt, spinTo, ss, stopTurning, turnBy } from './shared.svelte';
 
-	// The view from the player's seat, edge-on: the tray the planets stand on, each lane showing the planets
-	// that peek over the ones in front. Swiping it turns the board: the planets slide along with the finger and off
-	// the tray's end, and the next side's lineup slides in from the other end, all at one speed, so no depth shows.
+	// The view from the player's seat, edge-on: each lane seen along its line of sight, the planets centred on it, a
+	// bigger one behind showing around the ones in front of it, like an annular eclipse. Swiping it turns the board:
+	// the planets slide along with the finger and off the tray's end, all at one speed, so no depth shows. The next
+	// side's lineup slides in from the other end only once a turn is made (released, and counted), so a drag can't
+	// peek at it and come back.
 
 	const H = 96;
-	const GROUND = 86;
+	// where a large planet's bottom comes: the old floor line, which the separator below is spaced from
+	const BOTTOM = 86;
 	const HALF = MAP / 2;
 
 	const pzl = $derived(ss.pzl);
 	const N = $derived(pzl.N);
 	const lane = $derived(MAP / N);
-	const side = $derived(sideAt(ss.angle));
+	// the line of sight, through every planet's centre: as low as a large planet allows
+	const AXIS = $derived(BOTTOM - (R[3] / 100) * lane);
+	const side = $derived(sideAt(pzl.step * 90));
+	// a turn under way to another side, after a release or a tap: it counts, so the next lineup may come in
+	const turning = $derived(ss.target !== undefined && ss.target !== pzl.step);
 
 	const mod4 = (k) => ((k % 4) + 4) % 4;
 
-	// the lineup a side shows, shifted along the tray by dx
-	const lineup = (s, dx) => {
+	// the lineup a side shows, shifted along the tray by dx; tag tells an incoming lineup from the outgoing one
+	const lineup = (s, dx, tag = '') => {
 		const out = [];
 
 		elevation(pzl.sol, s).forEach((visible, c) => {
 			const x = -HALF + (c + 0.5) * lane + dx;
 
-			// back to front, so the nearer ones are drawn over the ones they stand before
+			// back to front, so the nearer ones are drawn over the ones behind them; a new puzzle's grow from their centres
 			for (let k = visible.length - 1; k >= 0; k--) {
 				const v = visible[k];
-				const r = (R[v] / 100) * lane;
-				out.push({ id: `${s}-${c}-${k}`, x, r, v, y: GROUND - r + ss.rise * (2 * r + 10) });
+				const r = (R[v] / 100) * lane * (1 - ss.rise);
+				out.push({ id: `${tag}${s}-${c}-${k}`, x, r, v, y: AXIS });
 			}
 		});
 
 		return out;
 	};
 
-	// turning clockwise (a swipe to the left) moves this side's lineup off to the left and brings the next in from the right
+	// This side's lineup moves along with the board, off the tray's end as it turns away. Turning clockwise (a swipe to
+	// the left) takes it off to the left; once a turn to another side is made, that side's lineup slides in from the
+	// other end, from off the tray all the way in, over the turn's whole run (from turnFrom to the target).
 	const planets = $derived.by(() => {
 		const q = ss.angle / 90;
-		const b = Math.floor(q);
-		const f = q - b;
-		return f < 1e-6 ? lineup(mod4(b), 0) : [...lineup(mod4(b), -f * SWIPE_PX), ...lineup(mod4(b + 1), (1 - f) * SWIPE_PX)];
+		const out = lineup(mod4(pzl.step), -(q - pzl.step) * SWIPE_PX);
+
+		if (turning) {
+			const from = ss.turnFrom / 90;
+			const k = ss.target === from ? 1 : Math.min(1, Math.max(0, (q - from) / (ss.target - from)));
+			out.push(...lineup(mod4(ss.target), Math.sign(ss.target - pzl.step) * (1 - k) * SWIPE_PX, 'in'));
+		}
+
+		return out;
 	});
 
 	// a drag along the tray turns the board with it; a flick goes on to the next quarter, a slow drag settles on the nearest
 	let drag = null;
 
+	// a counted turn plays out first: a drag can't catch the board mid-turn
 	const onPointerDown = (e) => {
-		if (drag || !pzl || e.target.closest('button')) {
+		if (drag || !pzl || turning || e.target.closest('button')) {
 			return;
 		}
 
@@ -115,22 +131,23 @@
 >
 	<svg viewBox="-225 0 450 {H}" aria-hidden="true">
 		<defs>
-			<radialGradient id="dawn" cx="0.5" cy="1" r="0.5">
-				<stop offset="0" stop-color="#ffcf7a" stop-opacity="0.3" />
-				<stop offset="0.6" stop-color="#ff9f6a" stop-opacity="0.1" />
+			<!-- a faint glow along the line of sight -->
+			<radialGradient id="sight">
+				<stop offset="0" stop-color="#ffcf7a" stop-opacity="0.16" />
+				<stop offset="0.6" stop-color="#b06bff" stop-opacity="0.06" />
 				<stop offset="1" stop-color="#b06bff" stop-opacity="0" />
 			</radialGradient>
-			<!-- the planets show only over the tray, and above it -->
+			<!-- the planets show only within the tray's ends -->
 			<clipPath id="on-tray">
-				<rect x={-HALF - 14} y="-40" width={MAP + 28} height={GROUND + 40} />
+				<rect x={-HALF - 14} y="-40" width={MAP + 28} height={H + 80} />
 			</clipPath>
 		</defs>
 
-		<ellipse cx="0" cy={GROUND} rx={HALF + 40} ry="56" fill="url(#dawn)" clip-path="url(#on-tray)" />
+		<ellipse cx="0" cy={AXIS} rx={HALF + 40} ry="44" fill="url(#sight)" />
 
 		{#each { length: N - 1 }, c (c)}
 			{@const x = -HALF + (c + 1) * lane}
-			<line x1={x} y1="20" x2={x} y2={GROUND} class="lane" />
+			<line x1={x} y1="8" x2={x} y2={H - 12} class="lane" />
 		{/each}
 
 		<g clip-path="url(#on-tray)">
@@ -141,10 +158,22 @@
 	</svg>
 
 	<!-- as a swipe that way: the left one turns the board clockwise, the right one counterclockwise -->
-	<button class="turn left" aria-label="Turn the board clockwise" aria-keyshortcuts="ArrowLeft" onclick={() => turnBy(1)}>
+	<button
+		class="turn left"
+		style:margin-top="{AXIS - 22}px"
+		aria-label="Turn the board clockwise"
+		aria-keyshortcuts="ArrowLeft"
+		onclick={() => turnBy(1)}
+	>
 		<Icon name="left" />
 	</button>
-	<button class="turn right" aria-label="Turn the board counterclockwise" aria-keyshortcuts="ArrowRight" onclick={() => turnBy(-1)}>
+	<button
+		class="turn right"
+		style:margin-top="{AXIS - 22}px"
+		aria-label="Turn the board counterclockwise"
+		aria-keyshortcuts="ArrowRight"
+		onclick={() => turnBy(-1)}
+	>
 		<Icon name="right" />
 	</button>
 </div>
@@ -179,10 +208,9 @@
 
 	.turn {
 		grid-area: 1/1;
-		align-self: end;
+		align-self: start;
 		width: 44px;
 		height: 44px;
-		margin-bottom: 12px;
 		padding: 0;
 		border: none;
 		background: none;

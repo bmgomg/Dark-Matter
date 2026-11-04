@@ -35,14 +35,20 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   message ("No more dark matter!", or best / average improved, or the revealed one) for `OVER_MS` (3 s), then Play new.
 - **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge as a 2D being sees it), with no
   line under the planets (a faint separator sets the palette off below instead), its lanes under
-  the map's columns at the same scale. Swiping it turns the board, as decided with the designer: the planets follow
-  the finger and slide off the tray's end, the next side's lineup slides in from the other end (a carousel), all at
-  one speed, so no depth shows. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
+  the map's columns at the same scale. The planets are centred on one line of sight (`AXIS`: as low as a large planet allows, its bottom on the old floor
+  line, so the separator's spacing holds), not standing on a
+  floor: a bigger one behind shows as a ring around the ones in front, like an annular eclipse (the designer's call;
+  the hiding rule holds exactly, and the home page's rule says "shows around it"). Swiping it turns the board, as decided with the designer: the planets follow
+  the finger and slide off the tray's end, all at one speed, so no depth shows. The next side's lineup slides in from
+  the other end only after a release that turns the board (counted), over the turn's whole run (`ss.turnFrom` to
+  `ss.target`); a drag shows only the current side's, so it can't peek at the next side and come back (the designer
+  found that loophole on a wide screen). A drag can't start while a counted turn plays out. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
   drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
   the tray's ends, and ← →, turn it as a swipe that way (left: clockwise); their arrows are Hexodus's shapes
-  (`Icon.svelte`), bare, without its rings. A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
-  turn `TAP_TURN_MS` (0.5 s, linear), slowed at the designer's request. A new puzzle's planets rise from below the
-  tray (`ss.rise`).
+  (`Icon.svelte`), bare, without its rings, upside down, each tilted 35° outwards (left counterclockwise, right
+  clockwise) to hint at the way the lineup slides. A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
+  turn `TAP_TURN_MS` (0.5 s, linear), slowed at the designer's request. A new puzzle's planets grow from their
+  centres (`ss.rise`, 1 to 0).
 - A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
   mid-turn, giving the puzzle away.
 - Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Quicksand (`QS`, text), Space Mono (`SM`, labels).

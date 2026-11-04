@@ -103,6 +103,7 @@ export const stopTurning = () => {
 	cancelAnimationFrame(tweens.angle);
 	delete tweens.angle;
 	delete ss.target;
+	delete ss.turnFrom;
 };
 
 const riseHorizon = (delay = 0) => {
@@ -117,6 +118,7 @@ const onSettled = () => {
 
 	ss.angle = step * 90;
 	delete ss.target;
+	delete ss.turnFrom;
 
 	if (!pzl || step === pzl.step) {
 		return;
@@ -129,13 +131,15 @@ const onSettled = () => {
 	persist();
 };
 
-// the board eases to rest on a quarter turn: quickly after a swipe, slowly and evenly after a tap
+// the board eases to rest on a quarter turn: quickly after a swipe, slowly and evenly after a tap;
+// turnFrom: the angle it set off from, for the tray to slide the next lineup in over the whole of the turn
 export const spinTo = (step, tapped = false) => {
-	if (ss.target !== step && step !== Math.round(ss.angle / 90)) {
+	if (ss.target !== step && step !== ss.pzl?.step) {
 		whoosh();
 	}
 
 	ss.target = step;
+	ss.turnFrom = ss.angle;
 	tween('angle', step * 90, tapped ? TAP_TURN_MS : TURN_MS, onSettled, tapped ? linear : easeOut);
 };
 

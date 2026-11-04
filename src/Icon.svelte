@@ -35,10 +35,23 @@
 		return 'M' + pts.map(([x, y]) => `${(x + dx).toFixed(2)} ${(y + dy).toFixed(2)}`).join(' L') + ' Z';
 	};
 
+	const TURN_SHAPE = { cx: 5, cy: 11, r: 10, a0: -62, sweep: 112, w0: 0.9, w1: 4.2, hw: 10, hl: 6 };
+
+	// turns an outline deg clockwise on screen, about the grid's centre
+	const tilted = (pts, deg) => {
+		const t = (deg * Math.PI) / 180;
+		const [c, s] = [Math.cos(t), Math.sin(t)];
+		return pts.map(([x, y]) => [12 + (x - 12) * c - (y - 12) * s, 12 + (x - 12) * s + (y - 12) * c]);
+	};
+
 	// a turn: a shallow arc, thin at the bottom and curving up into the head (Hexodus's, turned upside down and
-	// mirrored); left bows out to the left, right is its mirror image
-	const TURN = { cx: 5, cy: 11, r: 10, a0: -62, sweep: 112, w0: 0.9, w1: 4.2, hw: 10, hl: 6 };
-	const left = crescent(TURN).map(([x, y]) => [24 - x, 24 - y]);
+	// mirrored); left bows out to the left, tilted outwards (counterclockwise) to hint at the lineup sliding that way;
+	// right is its mirror image
+	const TILT = 35;
+	const left = tilted(
+		crescent(TURN_SHAPE).map(([x, y]) => [24 - x, 24 - y]),
+		-TILT
+	);
 	const ICONS = { left: centred(left), right: centred(left.map(([x, y]) => [24 - x, y])) };
 
 	const { name, size = 30 } = $props();
