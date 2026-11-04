@@ -2,6 +2,20 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"name": "Edge",
+			"request": "launch",
+			"type": "msedge",
+			"url": "http://localhost:1119",
+			"webRoot": "${workspaceFolder}"
+		},
+		{
+			"name": "Integrated Browser",
+			"request": "launch",
+			"type": "editor-browser",
+			"url": "http://localhost:1119",
+			"webRoot": "${workspaceFolder}"
+		},
+		{
 			// starts the dev server task if it isn't running yet, then opens Chrome on it
 			"name": "Chrome + dev server",
 			"type": "chrome",
