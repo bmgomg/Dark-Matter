@@ -347,7 +347,7 @@ export const reveal = () => {
 	ss.stats.total += Math.min(0, balance());
 
 	pzl.over = 'revealed';
-	sfx('drop');
+	sfx('lost');
 	ss.message = MSG_REVEALED;
 	gameOver();
 };

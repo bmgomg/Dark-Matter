@@ -10,7 +10,7 @@
 	onMount(loadCommon);
 
 	const RULES = [
-		[1, 'Planets of three sizes hide on a square board, at most one to a cell.'],
+		[1, 'Planets of three sizes hide in the cells of a square board.'],
 		[2, 'You see the board <em>edge-on</em>, one side at a time. Swipe the edge to turn the board.'],
 		[3, 'A planet eclipses anything its size or smaller behind it. A bigger one still shows around it.'],
 		[0, 'Map every planet. The game ends once your map is right.']
