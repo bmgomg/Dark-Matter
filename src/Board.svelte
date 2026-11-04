@@ -1,6 +1,6 @@
 <script>
 	import { cubicOut } from 'svelte/easing';
-	import { MAP, PALETTE_AT_CELL, R, SIDES } from './const';
+	import { FLIP_PERSPECTIVE, MAP, PALETTE_AT_CELL, R, SIDES } from './const';
 	import Picker from './Picker.svelte';
 	import Planet from './Planet.svelte';
 	import { deselect, isOver, select, sideAt, ss } from './shared.svelte';
@@ -116,83 +116,114 @@
 	};
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
-<svg
-	class="board"
-	class:locked={isOver()}
-	viewBox="-225 -175 450 350"
-	style:transform={ss.flip ? `perspective(1000px) rotateY(${ss.flip * 90}deg)` : null}
-	role="grid"
-	tabindex="-1"
-	aria-label="Your map, viewed from the {SIDES[front]}. Tap a cell to mark it."
-	onclick={onClick}
->
-	<defs>
-		<radialGradient id="cell-fill" cx="0.5" cy="0.45" r="0.75">
-			<stop offset="0" stop-color="#4a43b8" stop-opacity="0.5" />
-			<stop offset="1" stop-color="#211d5c" stop-opacity="0.8" />
-		</radialGradient>
-		<linearGradient id="sheen" gradientUnits="userSpaceOnUse" x1="-170" y1="-170" x2="170" y2="170">
-			<stop offset="0" stop-color="#fff" stop-opacity="0" />
-			<stop offset="0.44" stop-color="#fff" stop-opacity="0.06" />
-			<stop offset="0.5" stop-color="#fff" stop-opacity="0.11" />
-			<stop offset="0.56" stop-color="#fff" stop-opacity="0.04" />
-			<stop offset="1" stop-color="#fff" stop-opacity="0" />
-		</linearGradient>
-	</defs>
+<div class="flipper">
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<svg
+		class="board"
+		class:locked={isOver()}
+		viewBox="-225 -175 450 350"
+		style:transform={ss.flip ? `perspective(${FLIP_PERSPECTIVE}px) rotateX(${ss.flip * 90}deg)` : null}
+		role="grid"
+		tabindex="-1"
+		aria-label="Your map, viewed from the {SIDES[front]}. Tap a cell to mark it."
+		onclick={onClick}
+	>
+		<defs>
+			<radialGradient id="cell-fill" cx="0.5" cy="0.45" r="0.75">
+				<stop offset="0" stop-color="#4a43b8" stop-opacity="0.5" />
+				<stop offset="1" stop-color="#211d5c" stop-opacity="0.8" />
+			</radialGradient>
+			<linearGradient id="sheen" gradientUnits="userSpaceOnUse" x1="-170" y1="-170" x2="170" y2="170">
+				<stop offset="0" stop-color="#fff" stop-opacity="0" />
+				<stop offset="0.44" stop-color="#fff" stop-opacity="0.06" />
+				<stop offset="0.5" stop-color="#fff" stop-opacity="0.11" />
+				<stop offset="0.56" stop-color="#fff" stop-opacity="0.04" />
+				<stop offset="1" stop-color="#fff" stop-opacity="0" />
+			</linearGradient>
+		</defs>
 
-	<g transform="rotate({ss.angle})">
-		<rect x={-HALF - 8} y={-HALF - 8} width={MAP + 16} height={MAP + 16} rx="14" class="plate" />
+		<g transform="rotate({ss.angle})">
+			<rect x={-HALF - 8} y={-HALF - 8} width={MAP + 16} height={MAP + 16} rx="14" class="plate" />
 
-		{#each cells as c (c.id)}
-			{@const [x, y] = center(c.i, c.j)}
-			<rect
-				x={x - cell / 2 + 3}
-				y={y - cell / 2 + 3}
-				width={cell - 6}
-				height={cell - 6}
-				rx="7"
-				class="cell"
-				class:sel={c.id === sel}
-				data-cell={c.id}
-				role="gridcell"
-				aria-label="Row {c.i + 1}, column {c.j + 1}"
-			/>
+			{#each cells as c (c.id)}
+				{@const [x, y] = center(c.i, c.j)}
+				<rect
+					x={x - cell / 2 + 3}
+					y={y - cell / 2 + 3}
+					width={cell - 6}
+					height={cell - 6}
+					rx="7"
+					class="cell"
+					class:sel={c.id === sel}
+					data-cell={c.id}
+					role="gridcell"
+					aria-label="Row {c.i + 1}, column {c.j + 1}"
+				/>
+			{/each}
+
+			<line x1={edge[0]} y1={edge[1]} x2={edge[2]} y2={edge[3]} class="front" />
+		</g>
+
+		<rect
+			x={-HALF - 8}
+			y={-HALF - 8}
+			width={MAP + 16}
+			height={MAP + 16}
+			rx="14"
+			fill="url(#sheen)"
+			class="nope"
+			transform="rotate({ss.angle})"
+		/>
+
+		{#each marks as m (m.id)}
+			<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GAP, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
+				<g class:beat={won} style="--delay: {m.delay}ms;">
+					<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
+				</g>
+			</g>
 		{/each}
 
-		<line x1={edge[0]} y1={edge[1]} x2={edge[2]} y2={edge[3]} class="front" />
-	</g>
+		{#if PALETTE_AT_CELL && selAt && !isOver()}
+			<Picker x={at[0]} y={at[1]} {cell} id={ss.sel ? ss.sel[0] * N + ss.sel[1] : -1} />
+		{/if}
+	</svg>
 
-	<rect
-		x={-HALF - 8}
-		y={-HALF - 8}
-		width={MAP + 16}
-		height={MAP + 16}
-		rx="14"
-		fill="url(#sheen)"
-		class="nope"
-		transform="rotate({ss.angle})"
-	/>
-
-	{#each marks as m (m.id)}
-		<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GAP, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
-			<g class:beat={won} style="--delay: {m.delay}ms;">
-				<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
-			</g>
-		</g>
-	{/each}
-
-	{#if PALETTE_AT_CELL && selAt && !isOver()}
-		<Picker x={at[0]} y={at[1]} {cell} id={ss.sel ? ss.sel[0] * N + ss.sel[1] : -1} />
+	<!-- A flip tips the near edge towards the player. This is the plate's thickness on that edge: square to the map, so
+	     unseen while it's flat, and full on when it's edge-on, when the map itself has no height left to show. -->
+	{#if ss.flip}
+		<div
+			class="rim"
+			style:width="{MAP + 3}px"
+			style:transform="perspective({FLIP_PERSPECTIVE}px) rotateX({ss.flip * 90}deg) translateY({E}px) rotateX(-90deg)"
+		></div>
 	{/if}
-</svg>
+</div>
 
 <style>
+	/* the map and the rim, one over the other, with one centre to flip about */
+	.flipper {
+		display: grid;
+		place-items: center;
+	}
+
+	.board,
+	.rim {
+		grid-area: 1 / 1;
+	}
+
 	.board {
 		width: 450px;
 		height: 350px;
 		overflow: visible;
 		outline: none;
+	}
+
+	.rim {
+		height: 5px;
+		border-radius: 3px;
+		background: #ffd77a;
+		box-shadow: 0 0 10px #ffd77a;
+		pointer-events: none;
 	}
 
 	.plate {

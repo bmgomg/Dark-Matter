@@ -187,9 +187,9 @@ export const turnBy = (dir) => {
 	spinTo((ss.target ?? Math.round(ss.angle / 90)) + dir, true);
 };
 
-// Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and,
-// after a little pause edge-on (counted from when it got there, so a slow puzzle doesn't add to it), the new, empty map
-// flips back. Only then do the tray's new planets rise, so the two don't move at once.
+// Play new: the solved map flips a quarter turn till only its gold edge shows, the next puzzle is made while the map
+// can't be seen, and, after a little pause edge-on (counted from when it got there, so a slow puzzle doesn't add to it),
+// the new, empty map flips back. Only then do the tray's new planets rise, so the two don't move at once.
 export const playNew = () => {
 	tween(
 		'flip',
