@@ -83,8 +83,8 @@
 	.over {
 		width: 420px;
 		text-align: center;
-		font-family: QS;
-		font-size: 19px;
+		font-family: SR;
+		font-size: 21px;
 		color: #d8d2ff;
 	}
 

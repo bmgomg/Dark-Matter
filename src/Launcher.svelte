@@ -65,8 +65,8 @@
 
 	.economy {
 		margin: 0;
-		font-family: QS;
-		font-size: 18px;
+		font-family: SI;
+		font-size: 20px;
 		line-height: 1.45;
 		text-align: center;
 		color: #ece8ff;

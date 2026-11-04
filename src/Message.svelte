@@ -29,8 +29,8 @@
 		width: 400px;
 		text-wrap: balance;
 		text-align: center;
-		font-family: QS;
-		font-size: 18px;
+		font-family: SI;
+		font-size: 20px;
 		line-height: 1.35;
 		color: #d8d2ff;
 	}

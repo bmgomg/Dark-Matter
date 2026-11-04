@@ -69,7 +69,10 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   centres (`ss.rise`, 1 to 0).
 - A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
   mid-turn, giving the puzzle away.
-- Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Quicksand (`QS`, text), Space Mono (`SM`, labels).
+- Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Spectral (`SR`, text; its italic `SI` for hints and the
+  launcher's economy paragraph, as in Mixed Results, at the designer's wish; it replaced Quicksand, which has no italic,
+  except in the home page's rules, where the designer preferred Quicksand, `QS`),
+  Space Mono (`SM`, labels).
 - Splash: the template's BMG one. Sounds: the template's effects sprite; Unmix's music (Eric Matyas, soundimage.org).
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
 

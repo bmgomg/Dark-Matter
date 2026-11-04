@@ -108,8 +108,8 @@
 	}
 
 	.sign {
-		font-family: QS;
-		font-size: 26px;
+		font-family: SR;
+		font-size: 28px;
 		line-height: 1;
 		color: #b8b0ff;
 	}

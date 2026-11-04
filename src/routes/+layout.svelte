@@ -11,7 +11,7 @@
 			padding: 0;
 			height: 100dvh;
 			width: 100%;
-			font-family: QS;
+			font-family: SR;
 			background: #05050f;
 			color: #ece8ff;
 			overflow: hidden;
@@ -33,6 +33,18 @@
 			src: url('$lib/fonts/Cinzel.ttf');
 		}
 
+		/* text, and its italic for hints and asides, as in Mixed Results */
+		@font-face {
+			font-family: SR;
+			src: url('$lib/fonts/Spectral Regular.ttf');
+		}
+
+		@font-face {
+			font-family: SI;
+			src: url('$lib/fonts/Spectral Italic.ttf');
+		}
+
+		/* the home page's rules: rounder and friendlier than Spectral there (the designer's call) */
 		@font-face {
 			font-family: QS;
 			src: url('$lib/fonts/Quicksand.ttf');
