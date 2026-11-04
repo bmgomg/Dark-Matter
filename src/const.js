@@ -59,4 +59,4 @@ export const COST_CHANGE = 1;
 export const PALETTE_AT_CELL = true;
 export const MSG_THINK_TWICE = `Think twice — changing your mind costs $${COST_CHANGE}.`;
 // how long the game-over message stays before Play new takes its place
-export const OVER_MS = 4500;
+export const OVER_MS = 4000;
