@@ -1,45 +1,30 @@
 <script>
 	import { NAMES, R } from './const';
 	import Planet from './Planet.svelte';
-	import { persistCommon, ss } from './shared.svelte';
-	import { tap } from './sound.svelte';
+	import { mark, selMark } from './shared.svelte';
 
-	// what a tap on the board marks: a planet of one of the sizes, or an empty cell. No Done: the game ends when the
-	// map matches the sky.
-	const BRUSHES = [1, 2, 3, 0];
+	// Up while a cell is selected: a planet of one of the sizes for it, or Clear. The cell's own planet is lit and
+	// can't be picked again, and Clear can't be picked for a blank cell: neither would change anything.
+	const SWATCHES = [1, 2, 3, 0];
 
-	const pick = (v) => {
-		if (ss.brush !== v) {
-			tap();
-			ss.brush = v;
-			persistCommon();
-		}
-	};
+	const current = $derived(selMark());
+	const idle = (v) => (v ? v === current : current < 1);
 </script>
 
-<div class="palette">
-	<div class="brushes" role="radiogroup" aria-label="Mark with">
-		{#each BRUSHES as v (v)}
-			<button
-				class="brush"
-				class:picked={ss.brush === v}
-				role="radio"
-				aria-checked={ss.brush === v}
-				aria-label={NAMES[v]}
-				onclick={() => pick(v)}
-			>
-				<svg viewBox="-50 -50 100 100">
-					<circle r="46" class="ring" />
-					{#if v}
-						<Planet x={0} y={0} r={R[v]} size={v} />
-					{:else}
-						<path d="M-14 -14 L 14 14 M 14 -14 L -14 14" class="cross" />
-					{/if}
-				</svg>
-				<span>{NAMES[v]}</span>
-			</button>
-		{/each}
-	</div>
+<div class="palette" role="group" aria-label="Mark the cell">
+	{#each SWATCHES as v (v)}
+		<button class="swatch" class:picked={v && v === current} disabled={idle(v)} aria-label={NAMES[v]} onclick={() => mark(v)}>
+			<svg viewBox="-50 -50 100 100">
+				<circle r="46" class="ring" />
+				{#if v}
+					<Planet x={0} y={0} r={R[v]} size={v} />
+				{:else}
+					<path d="M-14 -14 L 14 14 M 14 -14 L -14 14" class="cross" />
+				{/if}
+			</svg>
+			<span>{NAMES[v]}</span>
+		</button>
+	{/each}
 </div>
 
 <style>
@@ -47,16 +32,10 @@
 		display: grid;
 		grid-auto-flow: column;
 		justify-content: center;
-		gap: 26px;
-	}
-
-	.brushes {
-		display: grid;
-		grid-auto-flow: column;
 		gap: 12px;
 	}
 
-	.brush {
+	.swatch {
 		display: grid;
 		justify-items: center;
 		gap: 2px;
@@ -70,14 +49,26 @@
 		letter-spacing: 0.2em;
 		text-transform: uppercase;
 		-webkit-tap-highlight-color: transparent;
-		transition: transform 0.1s;
+		transition:
+			transform 0.1s,
+			opacity 0.2s;
 	}
 
-	.brush:active {
+	.swatch:active {
 		transform: scale(0.9);
 	}
 
-	.brush svg {
+	.swatch:disabled {
+		cursor: default;
+		transform: none;
+	}
+
+	/* Clear for a blank cell */
+	.swatch:disabled:not(.picked) {
+		opacity: 0.3;
+	}
+
+	.swatch svg {
 		width: 62px;
 		height: 62px;
 		overflow: visible;
@@ -94,10 +85,11 @@
 			fill 0.2s;
 	}
 
-	.brush:hover .ring {
+	.swatch:not(:disabled):hover .ring {
 		stroke-opacity: 0.7;
 	}
 
+	/* the cell's own planet */
 	.picked {
 		color: #ffd77a;
 	}

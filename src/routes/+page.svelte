@@ -5,7 +5,7 @@
 	import Space from '../Space.svelte';
 	import Splash from '../Splash.svelte';
 	import { DX, DY } from '../const';
-	import { ss, turnBy } from '../shared.svelte';
+	import { deselect, mark, ss, turnBy } from '../shared.svelte';
 	import { _sound } from '../sound.svelte';
 	import { clientRect, post } from '../utils';
 
@@ -37,9 +37,10 @@
 			}
 		};
 
-		// ← → turn the board (as a swipe that way), 1 2 3 pick a planet, 0 an empty mark
+		// ← → turn the board (as a swipe that way); with a cell selected, 1 2 3 place a planet, 0 (or Delete) clears it,
+		// Esc puts the palette away
 		const onKeyDown = (e) => {
-			if (ss.home || e.ctrlKey || e.metaKey || e.altKey) {
+			if (ss.home || ss.launcher || e.ctrlKey || e.metaKey || e.altKey) {
 				return;
 			}
 
@@ -47,8 +48,12 @@
 				turnBy(1);
 			} else if (e.key === 'ArrowRight') {
 				turnBy(-1);
-			} else if (['0', '1', '2', '3'].includes(e.key)) {
-				ss.brush = +e.key;
+			} else if (ss.sel && !ss.prompt && ['0', '1', '2', '3'].includes(e.key)) {
+				mark(+e.key);
+			} else if (ss.sel && !ss.prompt && ['Delete', 'Backspace'].includes(e.key)) {
+				mark(0);
+			} else if (ss.sel && e.key === 'Escape') {
+				deselect();
 			} else {
 				return;
 			}

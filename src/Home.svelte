@@ -1,10 +1,10 @@
 <script>
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
-	import { LEVELS, R, TAGLINE, TITLE } from './const';
+	import { R, TAGLINE, TITLE } from './const';
 	import Emblem from './Emblem.svelte';
 	import Planet from './Planet.svelte';
-	import { loadCommon, onPlay, ss } from './shared.svelte';
+	import { loadCommon, ss } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
 
 	onMount(loadCommon);
@@ -16,8 +16,11 @@
 		[0, 'Map every planet. The game ends once your map is right.']
 	];
 
-	const BUTTON = 'width: 120px; padding: 10px 0 9px; font-size: 13px; letter-spacing: 0.2em; line-height: 1.25;';
-	const LAST = 'background: #ffd77a; color: #14102e;';
+	// to the launcher, to pick the board and the difficulty
+	const play = () => {
+		ss.launcher = true;
+		delete ss.home;
+	};
 </script>
 
 {#if ss.home}
@@ -50,10 +53,8 @@
 			{/each}
 		</ul>
 
-		<div class="levels">
-			{#each LEVELS as l (l.id)}
-				<TextButton text={[l.label, l.sub]} framed style={BUTTON + (l.id === ss.level ? LAST : '')} onClick={() => onPlay(l.id)} />
-			{/each}
+		<div class="play">
+			<TextButton text={['play']} framed style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em;" onClick={play} />
 		</div>
 	</div>
 {/if}
@@ -139,11 +140,8 @@
 		fill: #ffd77a;
 	}
 
-	.levels {
+	.play {
 		align-self: start;
-		margin-top: 34px;
-		display: grid;
-		grid-template-columns: repeat(2, auto);
-		gap: 12px 14px;
+		margin-top: 40px;
 	}
 </style>

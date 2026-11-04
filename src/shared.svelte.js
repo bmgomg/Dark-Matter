@@ -1,9 +1,12 @@
 import {
 	APP_STATE,
-	GIVE_UP_TURNS,
+	BANK,
+	COST_CHANGE,
+	COST_TURN,
 	LEVELS,
 	MSG_AVERAGE_IMPROVED,
 	MSG_BEST_SCORE,
+	MSG_BROKE,
 	MSG_REVEALED,
 	MSG_WON,
 	PROMPT_PLAY_NEW,
@@ -11,24 +14,25 @@ import {
 	TURN_MS
 } from './const';
 import { generate } from './logic';
-import { _sound, sfx, whoosh } from './sound.svelte';
+import { _sound, sfx, tap, whoosh } from './sound.svelte';
 
 // the side facing the player at a board angle, 0..3 (South, East, North, West)
 export const sideAt = (deg) => ((Math.round(deg / 90) % 4) + 4) % 4;
 
 export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 
-// pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, seen, over }
-//   marks: -1 blank (counts as empty), 0 marked empty, 1..3 a sphere
+// pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, changes, seen, over }
+//   marks: -1 never marked, 0 cleared (both blank, which counts as empty), 1..3 a planet
+//   turns, changes: what the game has cost so far, in quarter turns and changes of mind
 //   step: quarter turns clockwise so far, net (the board's angle at rest is step × 90°)
 //   over: 'won' or 'revealed'
 // angle: the board's angle on screen, in degrees clockwise; between steps while it turns
 // rise: 1 while the horizon's spheres are still below it (a new puzzle), easing to 0
+// sel: the cell being marked, [i, j], while the palette is up
 export const ss = $state({
 	home: true,
 	scale: 1,
 	stats: newStats(),
-	brush: 1,
 	angle: 0,
 	rise: 0
 });
@@ -41,8 +45,12 @@ export const level = () => LEVELS.find((l) => l.id === ss.level);
 
 export const isOver = () => !!ss.pzl?.over;
 
+// what the game has cost so far, and what's left of the bank
+export const cost = () => (ss.pzl ? ss.pzl.turns * COST_TURN + ss.pzl.changes * COST_CHANGE : 0);
+export const balance = () => BANK - cost();
+
 export const persistCommon = () => {
-	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music, brush: ss.brush, swiped: ss.swiped });
+	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music, swiped: ss.swiped });
 	localStorage.setItem(APP_STATE, json);
 };
 
@@ -52,7 +60,6 @@ export const loadCommon = () => {
 	if (job) {
 		_sound.sfx = job.sfx;
 		_sound.music = job.music;
-		ss.brush = job.brush ?? 1;
 		ss.swiped = job.swiped;
 	}
 };
@@ -181,6 +188,7 @@ export const newPuzzle = async () => {
 	}
 
 	delete ss.generating;
+	delete ss.sel;
 	stopTurning();
 
 	ss.angle = 0;
@@ -191,6 +199,7 @@ export const newPuzzle = async () => {
 		marks: Array.from({ length: N }, () => Array(N).fill(-1)),
 		step: 0,
 		turns: 0,
+		changes: 0,
 		seen: [true, false, false, false]
 	};
 
@@ -206,10 +215,10 @@ export const onPlay = (id) => {
 		delete ss.pzl;
 		delete ss.prompt;
 		delete ss.message;
+		delete ss.sel;
 
 		const job = JSON.parse(localStorage.getItem(appKey()));
-		// saves from before give-ups counted have no solved: every play then was a solve
-		ss.stats = job?.stats ? { solved: job.stats.plays, ...job.stats } : newStats();
+		ss.stats = job?.stats ?? newStats();
 
 		if (job?.pzl && !job.pzl.over) {
 			ss.pzl = job.pzl;
@@ -229,16 +238,53 @@ export const onPlay = (id) => {
 	delete ss.home;
 };
 
-export const paint = (i, j) => {
-	const pzl = ss.pzl;
-
-	if (!pzl || pzl.over) {
+// a tap on a cell picks it for marking and brings up the palette; a tap on it again puts the palette away
+export const select = (i, j) => {
+	if (!ss.pzl || ss.pzl.over) {
 		return;
 	}
 
-	const clear = pzl.marks[i][j] === ss.brush;
-	pzl.marks[i][j] = clear ? -1 : ss.brush;
-	sfx(clear ? 'click' : 'plop');
+	tap();
+
+	if (ss.sel?.[0] === i && ss.sel?.[1] === j) {
+		delete ss.sel;
+	} else {
+		ss.sel = [i, j];
+	}
+};
+
+export const deselect = () => delete ss.sel;
+
+// the selected cell's mark: 1..3 a planet, -1 or 0 blank
+export const selMark = () => (ss.sel && ss.pzl ? ss.pzl.marks[ss.sel[0]][ss.sel[1]] : -1);
+
+// marks the selected cell with a planet (1..3) or clears it (0). The first mark in a cell is free; any change after
+// that costs, a clearing too: a blank is an answer as well ("nothing here").
+export const mark = (v) => {
+	const pzl = ss.pzl;
+
+	if (!pzl || pzl.over || !ss.sel) {
+		return;
+	}
+
+	const [i, j] = ss.sel;
+	const was = pzl.marks[i][j];
+
+	// the same mark again, or clearing a blank cell, changes nothing
+	if (v === was || (!v && was < 1)) {
+		return;
+	}
+
+	pzl.marks[i][j] = v;
+	delete ss.sel;
+
+	if (was === -1) {
+		sfx('plop');
+	} else {
+		pzl.changes += 1;
+		sfx(v ? 'plop' : 'click');
+		sfx('coin1');
+	}
 
 	if (matches(pzl)) {
 		win();
@@ -248,44 +294,48 @@ export const paint = (i, j) => {
 	persist();
 };
 
-// the map is the sky: every planet in place, the rest blank or marked empty
+// the map is the sky: every planet in place, the rest blank
 const matches = (pzl) => pzl.sol.every((row, i) => row.every((v, j) => Math.max(0, pzl.marks[i][j]) === v));
 
 export const avgScore = () => (ss.stats.plays ? ss.stats.total / ss.stats.plays : 0);
 
-// the game ends the moment the map matches the sky: there's no Done to tap, and no telling which cells are off
+// The game ends the moment the map matches the sky: there's no Done to tap, and no telling which cells are off.
+// It scores the balance left; the best is only from games solved.
 const win = () => {
 	const pzl = ss.pzl;
 	const prevAvg = avgScore();
 	const { stats } = ss;
-	// a best only once a game is solved (a lucky guess can solve one without a turn, so 0 is a score)
+	const score = balance();
 	const hadBest = stats.solved > 0;
 
 	stats.plays += 1;
 	stats.solved += 1;
-	stats.total += pzl.turns;
+	stats.total += score;
 
-	const best = !hadBest || pzl.turns < stats.best;
+	const best = !hadBest || score > stats.best;
 
 	if (best) {
-		stats.best = pzl.turns;
+		stats.best = score;
 	}
 
 	pzl.over = 'won';
 	sfx('won');
 
-	ss.message = hadBest && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() < prevAvg ? MSG_AVERAGE_IMPROVED : MSG_WON;
+	ss.message =
+		hadBest && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() > prevAvg ? MSG_AVERAGE_IMPROVED : score < 0 ? MSG_BROKE : MSG_WON;
 	gameOver();
 };
 
 // the game-over message holds the button's place for a while, then gives way to Play new
 const gameOver = () => {
+	delete ss.sel;
 	ss.prompt = PROMPT_PLAY_NEW;
 	ss.overAt = Date.now();
 	persist();
 };
 
-// gives up and shows the sky as it is (the map's planets change over, cell by cell). It counts as a play, with a penalty, so giving up can't help the average.
+// gives up and shows the sky as it is (the map's planets change over, cell by cell). It counts as a play, scoring
+// no more than breaking even: $0, or the balance if it's below that.
 export const reveal = () => {
 	const pzl = ss.pzl;
 
@@ -294,7 +344,7 @@ export const reveal = () => {
 	}
 
 	ss.stats.plays += 1;
-	ss.stats.total += pzl.turns + GIVE_UP_TURNS;
+	ss.stats.total += Math.min(0, balance());
 
 	pzl.over = 'revealed';
 	sfx('drop');
@@ -307,13 +357,20 @@ export const resetStats = () => {
 	persist();
 };
 
-export const goHome = () => {
+// Back: from a game to the launcher, from the launcher to Home
+export const goBack = () => {
+	if (ss.launcher) {
+		ss.home = true;
+		return;
+	}
+
 	delete ss.prompt;
+	delete ss.sel;
 	stopTurning();
 
 	if (ss.pzl) {
 		ss.angle = ss.pzl.step * 90;
 	}
 
-	ss.home = true;
+	ss.launcher = true;
 };

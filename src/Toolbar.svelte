@@ -1,11 +1,11 @@
 <script>
 	import { PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
-	import { goHome, isOver, persistCommon, ss } from './shared.svelte';
+	import { goBack, isOver, persistCommon, ss } from './shared.svelte';
 	import { _sound } from './sound.svelte';
 	import TextButton from './Text Button.svelte';
 
-	const noSurrender = $derived(!ss.pzl || isOver() || ss.prompt === PROMPT_SURRENDER);
-	const noResetStats = $derived(ss.stats.plays === 0 || ss.prompt === PROMPT_RESET_STATS);
+	const noSurrender = $derived(ss.launcher || !ss.pzl || isOver() || ss.prompt === PROMPT_SURRENDER);
+	const noResetStats = $derived(ss.launcher || ss.stats.plays === 0 || ss.prompt === PROMPT_RESET_STATS);
 
 	const onSfx = () => {
 		_sound.sfx = 1 - _sound.sfx;
@@ -26,7 +26,7 @@
 </script>
 
 <div class="toolbar">
-	<TextButton text={['Home']} onClick={goHome} />
+	<TextButton text={['Back']} onClick={goBack} />
 	<TextButton text={['Give', 'Up']} disabled={noSurrender} onClick={() => (ss.prompt = PROMPT_SURRENDER)} />
 	<TextButton text={['Reset', 'Stats']} disabled={noResetStats} onClick={() => (ss.prompt = PROMPT_RESET_STATS)} />
 	<TextButton text={['Sound', _sound.sfx ? 'On' : 'Off']} onClick={onSfx} />

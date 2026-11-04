@@ -1,4 +1,4 @@
-export const APP_STATE = 'BMG • Matter of Perspective V1';
+export const APP_STATE = 'BMG • Matter of Perspective V2';
 export const DX = 450;
 export const DY = 800;
 
@@ -15,7 +15,7 @@ export const LEVELS = [
 
 // sphere radius by size, in hundredths of a cell; the same in the board and the horizon
 export const R = [0, 17, 29, 44];
-export const NAMES = ['empty', 'small', 'medium', 'large'];
+export const NAMES = ['clear', 'small', 'medium', 'large'];
 // the side facing the player after r clockwise turns of the board
 export const SIDES = ['South', 'East', 'North', 'West'];
 
@@ -34,8 +34,14 @@ export const PROMPT_PLAY_NEW = 'Play new';
 export const MSG_AVERAGE_IMPROVED = 'Average improved!';
 export const MSG_BEST_SCORE = 'Best score!';
 export const MSG_WON = 'No more dark matter!';
+export const MSG_BROKE = 'No more dark matter — but the bank\'s broken.';
 export const MSG_REVEALED = 'This is how the sky really lies.';
-// a game given up counts as played, scoring its turns and this many more
-export const GIVE_UP_TURNS = 4;
+
+// Each game starts with a bank. Every quarter turn costs, and so does changing your mind about a cell (another size,
+// or clearing it); the first mark in a blank cell is free. A game given up scores no more than breaking even.
+export const BANK = 10;
+export const COST_TURN = 1;
+export const COST_CHANGE = 1;
+export const MSG_THINK_TWICE = `Think twice — changing your mind costs $${COST_CHANGE}.`;
 // how long the game-over message stays before Play new takes its place
 export const OVER_MS = 3000;

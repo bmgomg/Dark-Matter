@@ -1,9 +1,8 @@
 <script>
 	import { cubicOut } from 'svelte/easing';
 	import { MAP, R, SIDES } from './const';
-	import { brushCursor } from './cursor';
 	import Planet from './Planet.svelte';
-	import { isOver, paint, sideAt, ss } from './shared.svelte';
+	import { isOver, select, sideAt, ss } from './shared.svelte';
 
 	// The player's map, seen from above, the side they're viewing from at the bottom. It turns with the board,
 	// following the swipe on the tray below; the planets on it stay upright, lit from the upper left.
@@ -16,8 +15,8 @@
 	const front = $derived(sideAt(ss.angle));
 	const shown = $derived(pzl.over === 'revealed' ? pzl.sol : pzl.marks);
 	const won = $derived(pzl.over === 'won');
-	// the pointer over a cell: an arrow carrying the brush picked
-	const cursor = $derived(brushCursor(ss.brush));
+	// the cell being marked, pulsing while the palette is up
+	const sel = $derived(ss.sel ? ss.sel[0] * N + ss.sel[1] : -1);
 
 	// a point of the map turned with the board, clockwise on screen
 	const turned = (x, y) => {
@@ -80,13 +79,11 @@
 				}
 			: { duration: 0 };
 
-	const vanish = (node, { delay }) => (revealing() ? { delay, duration: 250, css: (t) => `opacity: ${t * 0.75};` } : { duration: 0 });
-
 	const onClick = (e) => {
 		const id = e.target.dataset?.cell;
 
 		if (id !== undefined) {
-			paint(Math.floor(id / N), id % N);
+			select(Math.floor(id / N), id % N);
 		}
 	};
 </script>
@@ -99,7 +96,6 @@
 	role="grid"
 	tabindex="-1"
 	aria-label="Your map, viewed from the {SIDES[front]}. Tap a cell to mark it."
-	style:--brush={cursor}
 	onclick={onClick}
 >
 	<defs>
@@ -128,18 +124,11 @@
 				height={cell - 6}
 				rx="7"
 				class="cell"
+				class:sel={c.id === sel}
 				data-cell={c.id}
 				role="gridcell"
 				aria-label="Row {c.i + 1}, column {c.j + 1}"
 			/>
-			{#if shown[c.i][c.j] === 0 && pzl.over !== 'revealed'}
-				{@const k = cell * 0.15}
-				<path
-					d="M{x - k} {y - k} L {x + k} {y + k} M {x + k} {y - k} L {x - k} {y + k}"
-					class="cross"
-					out:vanish={{ delay: (c.i + c.j) * 60 }}
-				/>
-			{/if}
 		{/each}
 
 		<line x1={edge[0]} y1={edge[1]} x2={edge[2]} y2={edge[3]} class="front" />
@@ -184,7 +173,7 @@
 		stroke: #8f86ff;
 		stroke-width: 1;
 		stroke-opacity: 0.5;
-		cursor: var(--brush, pointer);
+		cursor: pointer;
 		transition: fill 0.15s;
 	}
 
@@ -198,13 +187,23 @@
 		cursor: default;
 	}
 
-	.cross {
-		fill: none;
-		stroke: #d8d2ff;
-		stroke-width: 3.5;
-		stroke-linecap: round;
-		opacity: 0.75;
-		pointer-events: none;
+	/* the cell being marked */
+	.board .cell.sel {
+		fill: #5a4fe0;
+		stroke: #ffd77a;
+		stroke-opacity: 1;
+		stroke-width: 2.5;
+		animation: sel 0.9s ease-in-out infinite alternate;
+	}
+
+	@keyframes sel {
+		from {
+			filter: drop-shadow(0 0 2px #ffd77a88);
+		}
+		to {
+			filter: drop-shadow(0 0 9px #ffd77a);
+			stroke-width: 3.5;
+		}
 	}
 
 	.front {
@@ -230,7 +229,8 @@
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.board :global(.pulse) {
+		.board :global(.pulse),
+		.board .cell.sel {
 			animation: none;
 		}
 	}

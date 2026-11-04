@@ -1,15 +1,12 @@
 <script>
-	import { fade } from 'svelte/transition';
-	import { isOver, ss } from './shared.svelte';
+	import { MSG_THINK_TWICE } from './const';
+	import { ss } from './shared.svelte';
 
-	// the line above the board: what to do next; the game-over message is down by the buttons
+	// Down by the palette: with a cell selected, the warning that changing a mark costs; otherwise what to do next,
+	// in the palette's place. The game-over message is the prompts' (Actions).
 	const message = $derived.by(() => {
-		if (isOver()) {
-			return '';
-		}
-
-		if (ss.message) {
-			return ss.message;
+		if (ss.sel) {
+			return MSG_THINK_TWICE;
 		}
 
 		if (ss.generating) {
@@ -20,30 +17,19 @@
 			return 'Swipe the planets below the map to turn it.';
 		}
 
-		return 'Map every planet. Blank cells count as empty.';
+		return 'Tap a cell to place a planet. Blank cells count as empty.';
 	});
 </script>
 
-<div class="message-line">
-	{#key message}
-		<div class="message" in:fade={{ duration: 250 }}>{message}</div>
-	{/key}
-</div>
+<div class="message">{message}</div>
 
 <style>
-	.message-line {
-		display: grid;
-		height: 34px;
-		align-items: center;
-	}
-
 	.message {
-		grid-area: 1/1;
-		justify-self: center;
 		width: 400px;
 		text-align: center;
 		font-family: QS;
 		font-size: 18px;
+		line-height: 1.35;
 		color: #d8d2ff;
 	}
 </style>
