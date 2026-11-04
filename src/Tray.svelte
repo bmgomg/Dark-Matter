@@ -3,7 +3,7 @@
 	import { elevation } from './logic';
 	import Icon from './Icon.svelte';
 	import Planet from './Planet.svelte';
-	import { persistCommon, sideAt, spinTo, ss, stopTurning, turnBy } from './shared.svelte';
+	import { sideAt, spinTo, ss, stopTurning, turnBy } from './shared.svelte';
 
 	// The view from the player's seat, edge-on: each lane seen along its line of sight, the planets centred on it, a
 	// bigger one behind showing around the ones in front of it, like an annular eclipse. Swiping it turns the board:
@@ -110,11 +110,6 @@
 		if (!moved) {
 			spinTo(Math.round(ss.angle / 90));
 			return;
-		}
-
-		if (!ss.swiped) {
-			ss.swiped = true;
-			persistCommon();
 		}
 
 		const [[x0, t0], [x1, t1]] = [last[0], last.at(-1)];

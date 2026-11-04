@@ -1,6 +1,6 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { OVER_MS, PROMPT_PLAY_NEW, PROMPT_RESET_STATS, PROMPT_SURRENDER, PROMPT_WRONG } from './const';
+	import { OVER_MS, PROMPT_PLAY_NEW, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
 	import { isOver, newPuzzle, resetStats, reveal, ss } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
 
@@ -35,12 +35,7 @@
 </script>
 
 <div class="actions">
-	{#if ss.prompt === PROMPT_WRONG}
-		<div class="pair" in:fade={{ duration: 200 }}>
-			<TextButton text={['keep looking']} framed style={PILL} onClick={() => delete ss.prompt} />
-			<TextButton text={['show solution']} framed style={PILL} onClick={reveal} />
-		</div>
-	{:else if ss.prompt === PROMPT_SURRENDER}
+	{#if ss.prompt === PROMPT_SURRENDER}
 		<div class="pair" in:fade={{ duration: 200 }}>
 			<TextButton text={[PROMPT_SURRENDER]} framed style={PILL} onClick={reveal} />
 			<TextButton text={['no']} framed style={PILL} onClick={dismiss} />

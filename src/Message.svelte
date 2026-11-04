@@ -2,7 +2,7 @@
 	import { fade } from 'svelte/transition';
 	import { isOver, ss } from './shared.svelte';
 
-	// the line above the board: what to do next, or how a Done went; the game-over message is down by the buttons
+	// the line above the board: what to do next; the game-over message is down by the buttons
 	const message = $derived.by(() => {
 		if (isOver()) {
 			return '';
@@ -17,10 +17,10 @@
 		}
 
 		if (!ss.swiped) {
-			return 'Swipe the tray to turn the board.';
+			return 'Swipe the planets below the map to turn it.';
 		}
 
-		return 'Map every planet, then tap Done.';
+		return 'Map every planet. Blank cells count as empty.';
 	});
 </script>
 

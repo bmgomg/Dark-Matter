@@ -5,11 +5,11 @@
 
 	// Scoring is still open: for now it counts quarter turns, and the stats are per level, in turns.
 	// The level's stats, led by its difficulty (the board's size shows on the board): plays (given-up games count,
-	// with a penalty), solved, avg and best. Best is 0 until a game is solved.
+	// with a penalty), solved, avg and best. Best shows once a game is solved.
 	const pzl = $derived(ss.pzl);
 	const side = $derived(sideAt(ss.angle));
 	const turns = $derived(pzl?.turns ?? 0);
-	const fmt = (v) => (ss.stats.plays && v ? (Math.round(v * 10) / 10).toString() : '–');
+	const fmt = (v, shown) => (shown ? (Math.round(v * 10) / 10).toString() : '–');
 </script>
 
 <div class="scoreboard">
@@ -17,8 +17,8 @@
 		<span class="label level">{level()?.sub}</span>
 		<div class="stat"><span class="label">plays</span><span class="value"><NumberFlow value={ss.stats.plays} /></span></div>
 		<div class="stat"><span class="label">solved</span><span class="value"><NumberFlow value={ss.stats.solved} /></span></div>
-		<div class="stat"><span class="label">avg</span><span class="value">{fmt(avgScore())}</span></div>
-		<div class="stat"><span class="label">best</span><span class="value">{fmt(ss.stats.best)}</span></div>
+		<div class="stat"><span class="label">avg</span><span class="value">{fmt(avgScore(), ss.stats.plays)}</span></div>
+		<div class="stat"><span class="label">best</span><span class="value">{fmt(ss.stats.best, ss.stats.solved)}</span></div>
 	</div>
 
 	<div class="turns">

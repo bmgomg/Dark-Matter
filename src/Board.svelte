@@ -34,7 +34,7 @@
 		Array.from({ length: N * N }, (_, id) => {
 			const i = Math.floor(id / N);
 			const j = id % N;
-			return { id, i, j, wrong: pzl.wrong.some(([a, b]) => a === i && b === j) };
+			return { id, i, j };
 		})
 	);
 
@@ -128,7 +128,6 @@
 				height={cell - 6}
 				rx="7"
 				class="cell"
-				class:wrong={c.wrong}
 				data-cell={c.id}
 				role="gridcell"
 				aria-label="Row {c.i + 1}, column {c.j + 1}"
@@ -197,13 +196,6 @@
 
 	.locked .cell {
 		cursor: default;
-	}
-
-	.cell.wrong {
-		stroke: #ff6b7d;
-		stroke-width: 3.5;
-		stroke-opacity: 1;
-		filter: drop-shadow(0 0 4px #ff6b7d);
 	}
 
 	.cross {

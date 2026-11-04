@@ -15,10 +15,11 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 - Planets of three sizes (small, medium, large) on an N × N board, at most one per cell.
 - The player sees the board only edge-on, one side at a time, and turns it a quarter at a time.
 - A planet hides anything its size or smaller behind it; a bigger one behind still shows over it.
-- The player marks each cell small, medium, large or empty (blank counts as empty), then taps Done. Wrong cells are
-  outlined, with Keep looking / Show solution. Give Up shows the solution too, after a confirmation ("Average will be
-  affected — give up?" / No). Showing the solution either way is giving up: it counts as a play, scoring its turns plus
-  `GIVE_UP_TURNS` (4), so giving up can't help the average; best is only from solved games. The map changes over to
+- The player marks each cell small, medium, large or empty (blank counts as empty). The game ends the moment the map
+  matches the solution: no Done button (the designer's call). It never says which cells are off, so guessing can't
+  stand in for turning (the old wrong-cell outlines after a Done let it). Give Up shows the solution, after a
+  confirmation ("Average will be affected — give up?" / No). It counts as a play, scoring its turns plus
+  `GIVE_UP_TURNS` (4), so giving up can't help the average; best is only from solved games (`stats.solved`). The map changes over to
   the solution through a transition: the wrong planets and crosses shrink and fade, then the true ones grow in, cell
   by cell from the north-west corner.
 
@@ -33,10 +34,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   mark it; the map itself doesn't swipe. No compass letters and no "from the South" label: the designer found them
   unhelpful (the turning map shows the orientation). Over a cell the pointer is an arrow carrying the picked brush
   (`cursor.js`: the planet, sized in the board's ratios, or the cross; the planets' art copied in from Defs).
-- **The palette** (`Palette.svelte`): the brushes (small, medium, large, empty) and Done at the end of the row.
-- **Messages**: the hint line above the map (`Message.svelte`: what to do next, or how many cells are off). Any
-  prompt takes the palette's place (`Actions.svelte`): Keep looking / Show solution after a wrong Done; the
-  confirmations, which follow the template (the question is the yes button, beside No); and at a game's end its
+- **The palette** (`Palette.svelte`): the brushes (small, medium, large, empty).
+- **Messages**: the hint line above the map (`Message.svelte`: what to do next). Any prompt takes the
+  palette's place (`Actions.svelte`): the confirmations, which follow the template (the question is the yes button, beside No); and at a game's end its
   message ("No more dark matter!", or best / average improved, or the revealed one) for `OVER_MS` (3 s), then Play new.
 - **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge as a 2D being sees it), with no
   lane lines (the designer dropped the dashed ones) and no line under the planets (a faint separator sets the palette off below instead), its lanes under
@@ -86,7 +86,7 @@ idea left open was showing it up front as the challenge ("par 1: two sides are e
 - `src/logic.js`: the prototype's rules, solver tiers and generator, as-is (`generate`, `tierOf`, `elevation`), tested
   in `src/logic.test.js` (`npm test`).
 - `src/shared.svelte.js`: the store `ss`, per-level saves (`APP_STATE • <level id>`: stats and the puzzle), turning
-  (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), marking, Done, reveal. `pzl.step` is the net count of clockwise quarter turns.
+  (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), marking (a match ends the game), reveal. `pzl.step` is the net count of clockwise quarter turns.
 - `src/const.js`: title, levels, sizes, sides, swipe and turn timing, prompts.
 - `scripts/build-itch.js`: `npm run build:itch`, a static build without the PWA parts, zipped for itch.io.
 

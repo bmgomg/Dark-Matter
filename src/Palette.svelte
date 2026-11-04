@@ -1,10 +1,11 @@
 <script>
 	import { NAMES, R } from './const';
 	import Planet from './Planet.svelte';
-	import { onDone, persistCommon, ss } from './shared.svelte';
+	import { persistCommon, ss } from './shared.svelte';
 	import { tap } from './sound.svelte';
 
-	// what a tap on the board marks: a planet of one of the sizes, or an empty cell; then Done, at the end of the row
+	// what a tap on the board marks: a planet of one of the sizes, or an empty cell. No Done: the game ends when the
+	// map matches the sky.
 	const BRUSHES = [1, 2, 3, 0];
 
 	const pick = (v) => {
@@ -39,14 +40,6 @@
 			</button>
 		{/each}
 	</div>
-
-	<button class="brush done" aria-label="Done" disabled={!ss.pzl || ss.generating} onclick={onDone}>
-		<svg viewBox="-50 -50 100 100">
-			<circle r="46" class="ring" />
-			<path d="M-18 1 L -5 14 L 19 -12" class="check" />
-		</svg>
-		<span>done</span>
-	</button>
 </div>
 
 <style>
@@ -121,34 +114,5 @@
 		stroke: #d8d2ff;
 		stroke-width: 5;
 		stroke-linecap: round;
-	}
-
-	.done {
-		color: #ffd77a;
-	}
-
-	.done .ring {
-		fill: #ffd77a1f;
-		stroke: #ffd77a;
-		stroke-opacity: 0.9;
-		stroke-width: 2;
-		filter: drop-shadow(0 0 8px #ffd77a66);
-	}
-
-	.done:hover .ring {
-		fill: #ffd77a3d;
-	}
-
-	.done:disabled {
-		opacity: 0.3;
-		pointer-events: none;
-	}
-
-	.check {
-		fill: none;
-		stroke: #ffd77a;
-		stroke-width: 6;
-		stroke-linecap: round;
-		stroke-linejoin: round;
 	}
 </style>

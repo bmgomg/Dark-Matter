@@ -30,13 +30,12 @@ export const TAP_TURN_MS = 500;
 
 export const PROMPT_SURRENDER = 'Average will be affected — give up?';
 export const PROMPT_RESET_STATS = 'Reset stats — are you sure?';
-export const PROMPT_WRONG = 'wrong';
 export const PROMPT_PLAY_NEW = 'Play new';
 export const MSG_AVERAGE_IMPROVED = 'Average improved!';
 export const MSG_BEST_SCORE = 'Best score!';
 export const MSG_WON = 'No more dark matter!';
 export const MSG_REVEALED = 'This is how the sky really lies.';
-// a game given up (or its solution shown after a wrong Done) counts as played, scoring its turns and this many more
+// a game given up counts as played, scoring its turns and this many more
 export const GIVE_UP_TURNS = 4;
 // how long the game-over message stays before Play new takes its place
 export const OVER_MS = 3000;

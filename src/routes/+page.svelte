@@ -5,7 +5,7 @@
 	import Space from '../Space.svelte';
 	import Splash from '../Splash.svelte';
 	import { DX, DY } from '../const';
-	import { onDone, ss, turnBy } from '../shared.svelte';
+	import { ss, turnBy } from '../shared.svelte';
 	import { _sound } from '../sound.svelte';
 	import { clientRect, post } from '../utils';
 
@@ -37,7 +37,7 @@
 			}
 		};
 
-		// ← → turn the board (as a swipe that way), 1 2 3 pick a planet, 0 an empty mark, Enter is Done
+		// ← → turn the board (as a swipe that way), 1 2 3 pick a planet, 0 an empty mark
 		const onKeyDown = (e) => {
 			if (ss.home || e.ctrlKey || e.metaKey || e.altKey) {
 				return;
@@ -49,8 +49,6 @@
 				turnBy(-1);
 			} else if (['0', '1', '2', '3'].includes(e.key)) {
 				ss.brush = +e.key;
-			} else if (e.key === 'Enter' && !ss.prompt && !e.target.closest?.('[role=button]')) {
-				onDone();
 			} else {
 				return;
 			}

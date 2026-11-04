@@ -7,7 +7,6 @@ import {
 	MSG_REVEALED,
 	MSG_WON,
 	PROMPT_PLAY_NEW,
-	PROMPT_WRONG,
 	TAP_TURN_MS,
 	TURN_MS
 } from './const';
@@ -19,7 +18,7 @@ export const sideAt = (deg) => ((Math.round(deg / 90) % 4) + 4) % 4;
 
 export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 
-// pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, seen, wrong, over }
+// pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, seen, over }
 //   marks: -1 blank (counts as empty), 0 marked empty, 1..3 a sphere
 //   step: quarter turns clockwise so far, net (the board's angle at rest is step × 90°)
 //   over: 'won' or 'revealed'
@@ -125,9 +124,22 @@ const onSettled = () => {
 		return;
 	}
 
+	// after the game, the board still turns, to look the sky over, but the turns no longer count
+	if (pzl.over) {
+		pzl.step = step;
+		persist();
+		return;
+	}
+
 	pzl.turns += Math.abs(step - pzl.step);
 	pzl.step = step;
 	pzl.seen[sideAt(ss.angle)] = true;
+
+	// the player knows how to turn the board now, whichever way they did it: the hint moves on
+	if (!ss.swiped) {
+		ss.swiped = true;
+		persistCommon();
+	}
 
 	persist();
 };
@@ -179,8 +191,7 @@ export const newPuzzle = async () => {
 		marks: Array.from({ length: N }, () => Array(N).fill(-1)),
 		step: 0,
 		turns: 0,
-		seen: [true, false, false, false],
-		wrong: []
+		seen: [true, false, false, false]
 	};
 
 	sfx('draw', 1.4, 0.5);
@@ -229,57 +240,32 @@ export const paint = (i, j) => {
 	pzl.marks[i][j] = clear ? -1 : ss.brush;
 	sfx(clear ? 'click' : 'plop');
 
-	if (pzl.wrong.length) {
-		pzl.wrong = [];
+	if (matches(pzl)) {
+		win();
+		return;
 	}
 
-	if (ss.prompt === PROMPT_WRONG) {
-		delete ss.prompt;
-	}
-
-	delete ss.message;
 	persist();
 };
 
+// the map is the sky: every planet in place, the rest blank or marked empty
+const matches = (pzl) => pzl.sol.every((row, i) => row.every((v, j) => Math.max(0, pzl.marks[i][j]) === v));
+
 export const avgScore = () => (ss.stats.plays ? ss.stats.total / ss.stats.plays : 0);
 
-export const onDone = () => {
+// the game ends the moment the map matches the sky: there's no Done to tap, and no telling which cells are off
+const win = () => {
 	const pzl = ss.pzl;
-
-	if (!pzl || pzl.over) {
-		return;
-	}
-
-	const wrong = [];
-
-	for (let i = 0; i < pzl.N; i++) {
-		for (let j = 0; j < pzl.N; j++) {
-			if (Math.max(0, pzl.marks[i][j]) !== pzl.sol[i][j]) {
-				wrong.push([i, j]);
-			}
-		}
-	}
-
-	pzl.wrong = wrong;
-
-	if (wrong.length) {
-		sfx('lost', 1, 0.7);
-		ss.message = wrong.length === 1 ? 'One cell is off.' : `${wrong.length} cells are off.`;
-		ss.prompt = PROMPT_WRONG;
-		persist();
-		return;
-	}
-
 	const prevAvg = avgScore();
 	const { stats } = ss;
-	// 0 until a game is solved: none is solvable without a turn
-	const prevBest = stats.best;
+	// a best only once a game is solved (a lucky guess can solve one without a turn, so 0 is a score)
+	const hadBest = stats.solved > 0;
 
 	stats.plays += 1;
 	stats.solved += 1;
 	stats.total += pzl.turns;
 
-	const best = !prevBest || pzl.turns < prevBest;
+	const best = !hadBest || pzl.turns < stats.best;
 
 	if (best) {
 		stats.best = pzl.turns;
@@ -288,7 +274,7 @@ export const onDone = () => {
 	pzl.over = 'won';
 	sfx('won');
 
-	ss.message = prevBest && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() < prevAvg ? MSG_AVERAGE_IMPROVED : MSG_WON;
+	ss.message = hadBest && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() < prevAvg ? MSG_AVERAGE_IMPROVED : MSG_WON;
 	gameOver();
 };
 
@@ -299,8 +285,7 @@ const gameOver = () => {
 	persist();
 };
 
-// gives up and shows the sky as it is (the map's planets change over, cell by cell); the cells marked wrong stay
-// outlined. It counts as a play, with a penalty, so giving up can't help the average.
+// gives up and shows the sky as it is (the map's planets change over, cell by cell). It counts as a play, with a penalty, so giving up can't help the average.
 export const reveal = () => {
 	const pzl = ss.pzl;
 
