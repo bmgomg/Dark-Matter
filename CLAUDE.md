@@ -47,9 +47,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   (`ss.keyboard`: a fine pointer suggests one, a key pressed proves it). Any prompt takes the same place (`Actions.svelte`, 50 px tall
   so the game-over message doesn't shift when Play new fades in): the confirmations, which follow the template (the
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average
-  improved, redshifted, or the revealed one) for `OVER_MS` (4.5 s), then Play new.
+  improved, into the red, or the revealed one) for `OVER_MS` (4 s), then Play new.
 - **The launcher** (`Launcher.svelte`, as in Triangula; Home's Play opens it): a glass panel with the economy
-  paragraph, Board (4×4 / 5×5) and Difficulty (easy / hard) pills, and Start, or Resume when the picked level has a
+  paragraph, Board (4×4 / 5×5) and Difficulty (Easy / Not Easy: `DIFF_NAMES`, what the player reads; the code and the saves still say `hard`) pills, and Start, or Resume when the picked level has a
   game begun (a turn or a mark) and not finished (`inProgress`). No stats there (the designer's call). It opens on
   the last level played; an untouched new puzzle is kept, under Start. The toolbar's first button is
   Back (text, like the rest: no icons in the toolbar): a game → the launcher → Home.
@@ -99,7 +99,7 @@ Back; `clearAll`) clears every planet on the map at `COST_CHANGE` each, as by ha
 ("Clear 3 planets — $3?" / No; the designer's call: a convenience, not a loophole). The scoreboard: the level's
 stats, led by its difficulty (plays, solved, average and best balance; the best only from games solved), then
 BANK − COST = BALANCE (`Money.svelte`, NumberFlow dollars; the balance red below zero). A win scores the balance,
-which may be negative ("…but you've redshifted"). A give-up counts as a play scoring $0, or the balance if lower,
+which may be negative ("…but you shifted into the red"). A give-up counts as a play scoring $0, or the balance if lower,
 so it never beats breaking even. No board size shown: the board shows it. The sides seen are still recorded
 (`pzl.seen`) but not shown. The saves' key went to V2 with the bank (turn-based stats couldn't carry over).
 

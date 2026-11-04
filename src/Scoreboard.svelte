@@ -45,11 +45,14 @@
 		margin-top: 20px;
 	}
 
+	/* a fixed span, as wide as the toolbar's divider, so it holds still as the numbers grow, and fits at their longest */
 	.stats {
 		display: grid;
 		grid-auto-flow: column;
+		justify-content: space-between;
 		align-items: center;
-		gap: 26px;
+		column-gap: 5px;
+		width: 410px;
 	}
 
 	.stat {
@@ -69,12 +72,14 @@
 
 	.level {
 		color: #ffd77a;
+		white-space: nowrap;
 	}
 
 	.value {
 		font-family: SM;
 		font-size: 14px;
 		color: #ece8ff;
+		white-space: nowrap;
 	}
 
 	/* bank − cost = balance, each sum under its label */

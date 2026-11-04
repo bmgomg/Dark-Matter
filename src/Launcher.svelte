@@ -1,5 +1,5 @@
 <script>
-	import { BANK, COST_CHANGE, COST_TURN, LEVELS } from './const';
+	import { BANK, COST_CHANGE, COST_TURN, DIFF_NAMES, LEVELS } from './const';
 	import { inProgress, level, onPlay, ss } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
 
@@ -11,7 +11,7 @@
 	let N = $state(level()?.N ?? 4);
 	let diff = $state(level()?.diff ?? 'easy');
 
-	const OP = 'width: 92px; padding: 10px 0 9px; font-size: 14px; letter-spacing: 0.2em;';
+	const OP = 'width: 120px; padding: 10px 0 9px; font-size: 14px; letter-spacing: 0.17em;';
 	const PICKED = 'background: #ffd77a; color: #14102e;';
 
 	const id = $derived(LEVELS.find((l) => l.N === N && l.diff === diff).id);
@@ -42,7 +42,7 @@
 		<div class="label">difficulty</div>
 		<div class="ops" role="radiogroup" aria-label="Difficulty">
 			{#each DIFFS as d (d)}
-				<TextButton text={[d]} framed style={OP + (d === diff ? PICKED : '')} onClick={() => (diff = d)} />
+				<TextButton text={[DIFF_NAMES[d]]} framed style={OP + (d === diff ? PICKED : '')} onClick={() => (diff = d)} />
 			{/each}
 		</div>
 	</div>
