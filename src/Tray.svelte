@@ -46,16 +46,23 @@
 	};
 
 	// This side's lineup moves along with the board, off the tray's end as it turns away. Turning clockwise (a swipe to
-	// the left) takes it off to the left; once a turn to another side is made, that side's lineup slides in from the
-	// other end, from off the tray all the way in, over the turn's whole run (from turnFrom to the target).
+	// the left) takes it off to the left. Once a turn to another side is made, that side's lineup slides in from the
+	// other end, from off the tray all the way in, arriving as the turn ends. It sets off only once the old lineup is
+	// LAG of the way out, as after a swipe let go of partway: a tap's turn starts from rest, and without the wait the
+	// new lineup would chase the old one in.
+	const LAG = 0.4;
+
 	const planets = $derived.by(() => {
 		const q = ss.angle / 90;
 		const out = lineup(mod4(pzl.step), -(q - pzl.step) * SWIPE_PX);
 
 		if (turning) {
-			const from = ss.turnFrom / 90;
-			const k = ss.target === from ? 1 : Math.min(1, Math.max(0, (q - from) / (ss.target - from)));
-			out.push(...lineup(mod4(ss.target), Math.sign(ss.target - pzl.step) * (1 - k) * SWIPE_PX, 'in'));
+			const span = ss.target - pzl.step;
+			// how far through the whole turn the board is, and was when the turn was made
+			const done = (q - pzl.step) / span;
+			const start = Math.max(LAG, (ss.turnFrom / 90 - pzl.step) / span);
+			const k = start >= 1 ? 1 : Math.min(1, Math.max(0, (done - start) / (1 - start)));
+			out.push(...lineup(mod4(ss.target), Math.sign(span) * (1 - k) * SWIPE_PX, 'in'));
 		}
 
 		return out;

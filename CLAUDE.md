@@ -40,8 +40,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   floor: a bigger one behind shows as a ring around the ones in front, like an annular eclipse (the designer's call;
   the hiding rule holds exactly, and the home page's rule says "shows around it"). Swiping it turns the board, as decided with the designer: the planets follow
   the finger and slide off the tray's end, all at one speed, so no depth shows. The next side's lineup slides in from
-  the other end only after a release that turns the board (counted), over the turn's whole run (`ss.turnFrom` to
-  `ss.target`); a drag shows only the current side's, so it can't peek at the next side and come back (the designer
+  the other end only after a release that turns the board (counted), arriving as the turn ends. It sets off only once
+  the old lineup is `LAG` (40%) of the way out, so a tap's turn, which starts from rest, plays like a swipe let go of
+  partway: the old lineup leaves, then the new one comes in (the designer's call). A drag shows only the current side's, so it can't peek at the next side and come back (the designer
   found that loophole on a wide screen). A drag can't start while a counted turn plays out. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
   drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
   the tray's ends, and ← →, turn it as a swipe that way (left: clockwise); their arrows are Hexodus's shapes
