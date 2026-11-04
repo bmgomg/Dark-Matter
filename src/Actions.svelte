@@ -1,7 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { OVER_MS, PROMPT_PLAY_NEW, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
-	import { isOver, playNew, resetStats, reveal, ss } from './shared.svelte';
+	import { clearAllText, OVER_MS, PROMPT_CLEAR_ALL, PROMPT_PLAY_NEW, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
+	import { clearAll, isOver, planetCount, playNew, resetStats, reveal, ss } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
 
 	// in the palette's place: the answers to a prompt, or, at the end of a game, its message for a while, then Play new
@@ -38,6 +38,19 @@
 	{#if ss.prompt === PROMPT_SURRENDER}
 		<div class="pair" in:fade={{ duration: 200 }}>
 			<TextButton text={[PROMPT_SURRENDER]} framed style={PILL} onClick={reveal} />
+			<TextButton text={['no']} framed style={PILL} onClick={dismiss} />
+		</div>
+	{:else if ss.prompt === PROMPT_CLEAR_ALL}
+		<div class="pair" in:fade={{ duration: 200 }}>
+			<TextButton
+				text={[clearAllText(planetCount())]}
+				framed
+				style={PILL}
+				onClick={() => {
+					clearAll();
+					dismiss();
+				}}
+			/>
 			<TextButton text={['no']} framed style={PILL} onClick={dismiss} />
 		</div>
 	{:else if ss.prompt === PROMPT_RESET_STATS}

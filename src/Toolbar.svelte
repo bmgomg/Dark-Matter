@@ -1,10 +1,11 @@
 <script>
-	import { PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
-	import { goBack, isOver, persistCommon, ss } from './shared.svelte';
+	import { PROMPT_CLEAR_ALL, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
+	import { goBack, isOver, persistCommon, planetCount, ss } from './shared.svelte';
 	import { _sound } from './sound.svelte';
 	import TextButton from './Text Button.svelte';
 
 	const noSurrender = $derived(ss.launcher || !ss.pzl || isOver() || ss.prompt === PROMPT_SURRENDER);
+	const noClearAll = $derived(ss.launcher || isOver() || !planetCount() || ss.prompt === PROMPT_CLEAR_ALL);
 	const noResetStats = $derived(ss.launcher || ss.stats.plays === 0 || ss.prompt === PROMPT_RESET_STATS);
 
 	const onSfx = () => {
@@ -27,6 +28,14 @@
 
 <div class="toolbar">
 	<TextButton text={['Back']} onClick={goBack} />
+	<TextButton
+		text={['Clear', 'All']}
+		disabled={noClearAll}
+		onClick={() => {
+			delete ss.sel;
+			ss.prompt = PROMPT_CLEAR_ALL;
+		}}
+	/>
 	<TextButton text={['Give', 'Up']} disabled={noSurrender} onClick={() => (ss.prompt = PROMPT_SURRENDER)} />
 	<TextButton text={['Reset', 'Stats']} disabled={noResetStats} onClick={() => (ss.prompt = PROMPT_RESET_STATS)} />
 	<TextButton text={['Sound', _sound.sfx ? 'On' : 'Off']} onClick={onSfx} />
@@ -36,7 +45,7 @@
 <style>
 	.toolbar {
 		display: grid;
-		grid-template-columns: repeat(5, 1fr);
+		grid-template-columns: repeat(6, 1fr);
 		align-items: center;
 		width: 410px;
 		height: 46px;

@@ -334,6 +334,40 @@ export const mark = (v) => {
 	persist();
 };
 
+// the planets on the map
+export const planetCount = () => (ss.pzl ? ss.pzl.marks.flat().filter((v) => v > 0).length : 0);
+
+// Clear All: every planet on the map cleared, each a change of mind, as if cleared one by one
+export const clearAll = () => {
+	const pzl = ss.pzl;
+
+	if (!pzl || pzl.over || !planetCount()) {
+		return;
+	}
+
+	pzl.marks = pzl.marks.map((row) =>
+		row.map((v) => {
+			if (v > 0) {
+				pzl.changes += 1;
+				return 0;
+			}
+
+			return v;
+		})
+	);
+
+	delete ss.sel;
+	sfx('click');
+	sfx('coin1');
+
+	if (matches(pzl)) {
+		win();
+		return;
+	}
+
+	persist();
+};
+
 // the map is the sky: every planet in place, the rest blank
 const matches = (pzl) => pzl.sol.every((row, i) => row.every((v, j) => Math.max(0, pzl.marks[i][j]) === v));
 

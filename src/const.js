@@ -35,6 +35,9 @@ export const FLIP_PAUSE_MS = 0;
 
 export const PROMPT_SURRENDER = 'Average will be affected — give up?';
 export const PROMPT_RESET_STATS = 'Reset stats — are you sure?';
+// Clear All's prompt, by name; its text gives the price
+export const PROMPT_CLEAR_ALL = 'clear all';
+export const clearAllText = (n) => `Clear ${n} planet${n === 1 ? '' : 's'} — $${n * COST_CHANGE}?`;
 export const PROMPT_PLAY_NEW = 'Play new';
 export const MSG_AVERAGE_IMPROVED = 'Average improved!';
 export const MSG_BEST_SCORE = 'Best score!';

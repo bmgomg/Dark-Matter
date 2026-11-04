@@ -87,7 +87,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 As in Mixed Results and Bits and Pieces (the designer's proposal). Each game starts with `BANK` ($10, every level). A
 quarter turn costs `COST_TURN` ($1), every turn, a side seen before too; turns after the game ends are free. The
 first mark in a cell is free; any change after that costs `COST_CHANGE` ($1): another size, or clearing it
-(`pzl.marks`: -1 never marked, 0 cleared, 1–3 a planet; `pzl.turns`, `pzl.changes`). The scoreboard: the level's
+(`pzl.marks`: -1 never marked, 0 cleared, 1–3 a planet; `pzl.turns`, `pzl.changes`). Clear All (toolbar, after
+Back; `clearAll`) clears every planet on the map at `COST_CHANGE` each, as by hand, after a prompt that names the price
+("Clear 3 planets — $3?" / No; the designer's call: a convenience, not a loophole). The scoreboard: the level's
 stats, led by its difficulty (plays, solved, average and best balance; the best only from games solved), then
 BANK − COST = BALANCE (`Money.svelte`, NumberFlow dollars; the balance red below zero). A win scores the balance,
 which may be negative ("…but the bank's broken"). A give-up counts as a play scoring $0, or the balance if lower,
