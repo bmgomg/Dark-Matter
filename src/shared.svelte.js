@@ -89,7 +89,6 @@ const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // out: for what's already moving (a swipe settling); a tap on an arrow turns at an even pace
 const easeOut = (k) => 1 - (1 - k) ** 3;
-const easeIn = (k) => k ** 3;
 const linear = (k) => k;
 
 // one animation at a time per value: a new one cancels the old
@@ -190,7 +189,7 @@ export const turnBy = (dir) => {
 
 // Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and,
 // after a little pause edge-on (counted from when it got there, so a slow puzzle doesn't add to it), the new, empty map
-// flips back. Out, it eases out (quick, then slowing to edge-on); back, it eases in (slow from edge-on, then quick).
+// flips back. Only then do the tray's new planets rise, so the two don't move at once.
 export const playNew = () => {
 	tween(
 		'flip',
@@ -198,15 +197,16 @@ export const playNew = () => {
 		FLIP_MS,
 		async () => {
 			const t0 = performance.now();
-			await newPuzzle();
+			await newPuzzle(false);
 			const wait = Math.max(0, FLIP_PAUSE_MS - (performance.now() - t0));
-			setTimeout(() => tween('flip', 0, FLIP_MS, null, easeIn), wait);
+			setTimeout(() => tween('flip', 0, FLIP_MS, () => tween('rise', 0, 700), linear), wait);
 		},
-		easeOut
+		linear
 	);
 };
 
-export const newPuzzle = async () => {
+// rise: false to keep the new planets down till the caller raises them
+export const newPuzzle = async (rise = true) => {
 	const { N, diff } = level();
 	const id = ss.level;
 
@@ -238,7 +238,13 @@ export const newPuzzle = async () => {
 	};
 
 	sfx('draw', 1.4, 0.5);
-	riseHorizon(250);
+
+	if (rise) {
+		riseHorizon(250);
+	} else {
+		ss.rise = 1;
+	}
+
 	persist();
 };
 

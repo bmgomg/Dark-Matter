@@ -28,7 +28,7 @@ export const SWIPE_PX = MAP + 40;
 export const TURN_MS = 420;
 export const TAP_TURN_MS = 500;
 // Play new: the map flips a quarter turn about its upright axis till it's edge-on, the next sky is charted out of sight,
-// and it flips back, each way in this long (easing out on the way there, in on the way back)
+// and it flips back, each way in this long, at an even pace
 export const FLIP_MS = 500;
 // how long it stays edge-on before flipping back, at the least
 export const FLIP_PAUSE_MS = 0;
