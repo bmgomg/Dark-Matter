@@ -27,6 +27,9 @@ export const SWIPE_PX = MAP + 40;
 // a swipe's last stretch, to rest; a whole quarter turn on a tap of an arrow (or ← →)
 export const TURN_MS = 420;
 export const TAP_TURN_MS = 500;
+// Play new: the map flips a quarter turn about its upright axis till it's edge-on, the next sky is charted out of sight,
+// and it flips back, each way in this long, at an even pace
+export const FLIP_MS = 500;
 
 export const PROMPT_SURRENDER = 'Average will be affected — give up?';
 export const PROMPT_RESET_STATS = 'Reset stats — are you sure?';

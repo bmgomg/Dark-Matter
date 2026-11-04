@@ -3,6 +3,7 @@ import {
 	BANK,
 	COST_CHANGE,
 	COST_TURN,
+	FLIP_MS,
 	LEVELS,
 	MSG_AVERAGE_IMPROVED,
 	MSG_BEST_SCORE,
@@ -29,12 +30,14 @@ export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 // angle: the board's angle on screen, in degrees clockwise; between steps while it turns
 // rise: 1 while the horizon's spheres are still below it (a new puzzle), easing to 0
 // sel: the cell being marked, [i, j], while the palette is up
+// flip: how far the map is tilted away for a new puzzle, 0 flat to 1 edge-on
 export const ss = $state({
 	home: true,
 	scale: 1,
 	stats: newStats(),
 	angle: 0,
-	rise: 0
+	rise: 0,
+	flip: 0
 });
 
 const appKey = () => `${APP_STATE} • ${ss.level}`;
@@ -170,6 +173,21 @@ export const turnBy = (dir) => {
 	}
 
 	spinTo((ss.target ?? Math.round(ss.angle / 90)) + dir, true);
+};
+
+// Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and the
+// new, empty map flips back
+export const playNew = () => {
+	tween(
+		'flip',
+		1,
+		FLIP_MS,
+		async () => {
+			await newPuzzle();
+			tween('flip', 0, FLIP_MS, null, linear);
+		},
+		linear
+	);
 };
 
 export const newPuzzle = async () => {

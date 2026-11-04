@@ -121,6 +121,7 @@
 	class="board"
 	class:locked={isOver()}
 	viewBox="-225 -175 450 350"
+	style:transform={ss.flip ? `perspective(1000px) rotateY(${ss.flip * 90}deg)` : null}
 	role="grid"
 	tabindex="-1"
 	aria-label="Your map, viewed from the {SIDES[front]}. Tap a cell to mark it."
@@ -175,7 +176,9 @@
 
 	{#each marks as m (m.id)}
 		<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GAP, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
-			<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
+			<g class:beat={won} style="--delay: {m.delay}ms;">
+				<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
+			</g>
 		</g>
 	{/each}
 
@@ -254,6 +257,19 @@
 		animation: pulse 1.6s ease-in-out var(--delay) infinite;
 	}
 
+	/* a win: each planet swells three times, in a wave from the north-west corner, at an even pace */
+	.beat {
+		transform-box: fill-box;
+		transform-origin: center;
+		animation: beat 0.5s linear var(--delay) 3;
+	}
+
+	@keyframes beat {
+		50% {
+			transform: scale(1.22);
+		}
+	}
+
 	@keyframes pulse {
 		50% {
 			filter: brightness(1.35) drop-shadow(0 0 6px #fff7);
@@ -262,7 +278,8 @@
 
 	@media (prefers-reduced-motion: reduce) {
 		.board :global(.pulse),
-		.board .cell.sel {
+		.board .cell.sel,
+		.beat {
 			animation: none;
 		}
 	}

@@ -1,7 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition';
 	import { OVER_MS, PROMPT_PLAY_NEW, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
-	import { isOver, newPuzzle, resetStats, reveal, ss } from './shared.svelte';
+	import { isOver, playNew, resetStats, reveal, ss } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
 
 	// in the palette's place: the answers to a prompt, or, at the end of a game, its message for a while, then Play new
@@ -57,7 +57,7 @@
 		<div class="over" class:won={ss.pzl?.over === 'won'} in:fade={{ duration: 300 }} out:fade={{ duration: 200 }}>{ss.message}</div>
 	{:else if ss.prompt === PROMPT_PLAY_NEW}
 		<div in:fade={{ duration: 300, delay: 200 }}>
-			<TextButton text={['play new']} framed onClick={newPuzzle} />
+			<TextButton text={['play new']} framed onClick={playNew} />
 		</div>
 	{/if}
 </div>
