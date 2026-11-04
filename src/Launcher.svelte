@@ -1,10 +1,10 @@
 <script>
 	import { BANK, COST_CHANGE, COST_TURN, LEVELS } from './const';
-	import { level, onPlay, ss } from './shared.svelte';
+	import { inProgress, level, onPlay, ss } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
 
 	// Between Home and a game, as in Triangula: how the bank works, then the board's size and the difficulty, then
-	// Play. It opens on the level played last; Play goes on with that level's game if it isn't finished.
+	// Start, or Resume for a level with a game under way. It opens on the level played last.
 	const SIZES = [4, 5];
 	const DIFFS = ['easy', 'hard'];
 
@@ -14,8 +14,10 @@
 	const OP = 'width: 92px; padding: 10px 0 9px; font-size: 14px; letter-spacing: 0.2em;';
 	const PICKED = 'background: #ffd77a; color: #14102e;';
 
+	const id = $derived(LEVELS.find((l) => l.N === N && l.diff === diff).id);
+	const resume = $derived(inProgress(id));
+
 	const play = () => {
-		const id = LEVELS.find((l) => l.N === N && l.diff === diff).id;
 		delete ss.launcher;
 		onPlay(id);
 	};
@@ -45,7 +47,12 @@
 		</div>
 	</div>
 
-	<TextButton text={['play']} framed style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em;" onClick={play} />
+	<TextButton
+		text={[resume ? 'resume' : 'start']}
+		framed
+		style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em;"
+		onClick={play}
+	/>
 </div>
 
 <style>

@@ -47,8 +47,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average
   improved, the bank broken, or the revealed one) for `OVER_MS` (3 s), then Play new.
 - **The launcher** (`Launcher.svelte`, as in Triangula; Home's Play opens it): a glass panel with the economy
-  paragraph, Board (4×4 / 5×5) and Difficulty (easy / hard) pills, and Play. No stats there (the designer's call). It
-  opens on the last level played; Play goes on with that level's unfinished game. The toolbar's first button is
+  paragraph, Board (4×4 / 5×5) and Difficulty (easy / hard) pills, and Start, or Resume when the picked level has a
+  game begun (a turn or a mark) and not finished (`inProgress`). No stats there (the designer's call). It opens on
+  the last level played; an untouched new puzzle is kept, under Start. The toolbar's first button is
   Back (text, like the rest: no icons in the toolbar): a game → the launcher → Home.
 - **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge as a 2D being sees it), with no
   lane lines (the designer dropped the dashed ones) and no line under the planets, its lanes under
@@ -69,8 +70,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   centres (`ss.rise`, 1 to 0).
 - **A game's end**: on a win the map's planets glow, and swell three times (0.5 s each, linear) in a wave from the
   north-west corner. Play new (`playNew`) flips the map a quarter turn about its upright axis (`ss.flip`, `FLIP_MS`
-  0.5 s, linear) till it's edge-on, makes the next puzzle out of sight, pauses (`FLIP_PAUSE_MS`, 0.25 s at the least), and flips the empty map back (the designer's
-  call: y-axis, linear, 0.5 s each way).
+  0.5 s, ease-out) till it's edge-on, makes the next puzzle out of sight, pauses (`FLIP_PAUSE_MS`, now 0), and flips
+  the empty map back (ease-in). The designer's call: y-axis, 0.5 s each way; linear at first, then eased.
 - A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
   mid-turn, giving the puzzle away.
 - Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Spectral (`SR`, text; its italic `SI` for hints and the

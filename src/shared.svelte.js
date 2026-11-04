@@ -41,7 +41,18 @@ export const ss = $state({
 	flip: 0
 });
 
-const appKey = () => `${APP_STATE} • ${ss.level}`;
+const keyOf = (id) => `${APP_STATE} • ${id}`;
+const appKey = () => keyOf(ss.level);
+
+// whether a level has a game under way, begun (a turn made or a cell marked) and not finished
+export const inProgress = (id) => {
+	try {
+		const pzl = JSON.parse(localStorage.getItem(keyOf(id)))?.pzl;
+		return !!pzl && !pzl.over && (pzl.turns > 0 || pzl.marks.some((row) => row.some((v) => v !== -1)));
+	} catch {
+		return false;
+	}
+};
 
 export const _log = (value) => console.log($state.snapshot(value));
 
@@ -78,6 +89,7 @@ const still = () => matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // out: for what's already moving (a swipe settling); a tap on an arrow turns at an even pace
 const easeOut = (k) => 1 - (1 - k) ** 3;
+const easeIn = (k) => k ** 3;
 const linear = (k) => k;
 
 // one animation at a time per value: a new one cancels the old
@@ -178,7 +190,7 @@ export const turnBy = (dir) => {
 
 // Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and,
 // after a little pause edge-on (counted from when it got there, so a slow puzzle doesn't add to it), the new, empty map
-// flips back
+// flips back. Out, it eases out (quick, then slowing to edge-on); back, it eases in (slow from edge-on, then quick).
 export const playNew = () => {
 	tween(
 		'flip',
@@ -188,9 +200,9 @@ export const playNew = () => {
 			const t0 = performance.now();
 			await newPuzzle();
 			const wait = Math.max(0, FLIP_PAUSE_MS - (performance.now() - t0));
-			setTimeout(() => tween('flip', 0, FLIP_MS, null, linear), wait);
+			setTimeout(() => tween('flip', 0, FLIP_MS, null, easeIn), wait);
 		},
-		linear
+		easeOut
 	);
 };
 
