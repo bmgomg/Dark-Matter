@@ -25,7 +25,11 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 
 ## Look: deep space
 
-- A starfield with nebulae (`Space.svelte`, seeded, some stars twinkle) behind a dark glass page with a violet rim.
+- A starfield with nebulae (`Space.svelte`, on a canvas, seeded, some stars twinkle) behind a dark glass page with a
+  violet rim. It has parallax, at the designer's wish: the bigger a star, the nearer it is and the faster it moves. The
+  stars drift, swinging to a new heading every 20–40 s, the sky breathes (zooms slowly in and out), and it pans as the
+  board turns (the same way as the tray's planets) and leans with a mouse. On a touch screen (the designer's call: a
+  phone's page hides nearly all of it) or with reduced motion, it's still.
 - The planets (`Defs.svelte`, drawn once on a unit circle, used through `Planet.svelte`): 1 a golden cratered moon,
   2 a teal ocean world, 3 a violet gas giant with bands and a storm. Lit from the upper left. Radii as the brief:
   17, 29, 44 hundredths of a cell.
