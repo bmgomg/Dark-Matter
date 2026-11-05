@@ -30,9 +30,10 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   stars drift, swinging to a new heading every 20–40 s, the sky breathes (zooms slowly in and out), and it pans as the
   board turns (the same way as the tray's planets) and leans with a mouse. On a touch screen (the designer's call: a
   phone's page hides nearly all of it) or with reduced motion, it's still.
-- The planets (`Defs.svelte`, drawn once on a unit circle, used through `Planet.svelte`): 1 a golden cratered moon,
-  2 a teal ocean world, 3 a violet gas giant with bands and a storm. Lit from the upper left. Radii as the brief:
-  17, 29, 44 hundredths of a cell.
+- The planets (`Defs.svelte`, one image each on a unit circle, used through `Planet.svelte`): 1 a banded golden world,
+  2 a teal swirled ocean world, 3 a violet gas giant. The designer's Recraft images (`src/lib/images/planet-*.webp`),
+  replacing drawn SVGs, each cropped to its disc, stretched to a true circle, 256 px. Lit from the upper left. Radii as
+  the brief: 17, 29, 44 hundredths of a cell.
 - **The map** (`Board.svelte`): flat, top-down, `MAP` (330 px) wide, the side being viewed at the bottom with a gold
   edge. It turns with the board (`ss.angle`), live while the tray is dragged; its planets stay upright. Tap a cell to
   select it (`ss.sel`: gold, pulsing), again to let it go; the map itself doesn't swipe. The board turns with a cell
