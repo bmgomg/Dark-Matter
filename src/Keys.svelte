@@ -47,7 +47,13 @@
 		place-items: center;
 		z-index: 10;
 		background: #05041299;
-		border-radius: 18px 18px 0 0;
+	}
+
+	/* the page's top corners, while it has them (#app-content) */
+	@media (min-width: 451px) and (min-height: 801px) {
+		.scrim {
+			border-radius: 18px 18px 0 0;
+		}
 	}
 
 	.card {

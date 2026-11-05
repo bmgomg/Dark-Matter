@@ -131,11 +131,18 @@
 		place-self: center;
 		display: grid;
 		touch-action: none;
-		border-radius: 18px;
 		background: radial-gradient(ellipse at 50% 30%, #1a1442cc, #0a0920e6 70%);
 		box-shadow:
 			0 0 0 1px #8f86ff40,
 			0 0 40px #6b40c240,
 			inset 0 0 60px #00000080;
+	}
+
+	/* rounded only while it floats free, with room all round: the page never grows past 450 × 800, and in a window no
+	   bigger it touches an edge, where rounded corners look cut off */
+	@media (min-width: 451px) and (min-height: 801px) {
+		#app-content {
+			border-radius: 18px;
+		}
 	}
 </style>
