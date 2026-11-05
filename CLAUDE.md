@@ -104,7 +104,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   except in the home page's rules and the shortcuts card, where the designer preferred Quicksand, `QS`),
   Space Mono (`SM`, labels; its bold on a gold button, selected or hovered, where thin dark letters were hard to read,
   more so on a phone; the same width, so nothing shifts).
-- Splash: the template's BMG one. Sounds: the template's effects sprite; Unmix's music (Eric Matyas, soundimage.org).
+- Splash: the template's BMG one. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License).
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
 
 ## Scoring: the bank
@@ -168,9 +168,15 @@ mirrored at random by `generate`. The other levels are generated live.
 ## License
 
 The code is MIT (`LICENSE`, the designer's choice). `NOTICE.md` lists what that doesn't cover: the art and the logo (all
-rights reserved), the music, the sound effects, the fonts (OFL, its texts in `src/lib/fonts`) and howler.js. The music's
-license (Soundimage: CC BY 4.0 with one restriction, not sublicensable) requires its credit in the game itself, so the
-launcher's line can't simply go. The sound effects' source isn't on record.
+rights reserved), the music, the sound effects, the fonts (OFL, its texts in `src/lib/fonts`) and the libraries in the
+client bundle (howler, Svelte, SvelteKit, clsx). `static/NOTICE.md` is a copy of it, so that it ships with the game (MIT
+asks for the libraries' notices in every copy, and minifying strips them): change the two together, and add any new
+runtime library. The music's license (Soundimage: CC BY 4.0 with one restriction, not sublicensable) requires its credit
+in the game itself, so the launcher's line can't simply go.
+
+Not on record: the sound effects' source (the same sprite is in 64 of the BMG games), and the music's. The credit to Eric
+Matyas was taken from this file's note on Unmix's track, but `f6c4696` replaced that track with one shared with DLMPY,
+Forever Contagion, Now You See Me, Parasite, Total Contagion and ZKT, none of which names a source; it's unconfirmed.
 
 ## Open questions
 
