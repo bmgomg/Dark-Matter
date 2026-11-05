@@ -171,8 +171,9 @@ mirrored at random by `generate`. The other levels are generated live.
   Run Game button, the planets in the outer lanes, clear of it. Its `#wide` layout is the Wide Cover, 840 × 360 (21:9),
   with no title, as itch's form says it puts the title or logo over promo modules. Its `#social` layout is the social media image, 1200 × 630, with the title, since a link preview has no
   overlay. `scripts/logo.html` is the logo, 1000 × 300 on transparency: cream letters on a dark outline, as itch wants it
-  legible on white and black. `sh scripts/render-cover.sh` writes the stills to `itch/`: `cover.png`, `embed-bg.png`,
-  `social.png`, `logo.png`. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
+  legible on white and black. `scripts/tile.html` is the page's background, a seamless tile, 1024 × 1024: the game's sky on
+  a flat base, its nebulae fractal noise that wraps. `sh scripts/render-cover.sh` writes the stills to `itch/`:
+  `cover.png`, `embed-bg.png`, `social.png`, `logo.png`, `tile.png`. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
   hold on that view, then one full turn (needs ffmpeg). GIFs work on itch, in the designer's experience. The settings are
   set to come in under 3 MB, itch's limit on GIFs by forum reports (no official figure found).
 
