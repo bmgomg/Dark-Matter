@@ -85,6 +85,27 @@
 		white-space: nowrap;
 	}
 
+	/* A phone's page is scaled down, and the small text with it. The line heights are the desktop's, so the board stays
+	   put. The larger text needs a wider row to keep the stats apart: the toolbar divider's width, more if the longest
+	   numbers need it, centred. */
+	@media (pointer: coarse) {
+		.stats {
+			width: max-content;
+			min-width: 410px;
+			column-gap: 12px;
+		}
+
+		.label {
+			font-size: 12px;
+			line-height: 15px;
+		}
+
+		.value {
+			font-size: 16px;
+			line-height: 21px;
+		}
+	}
+
 	/* bank − cost = balance, each sum under its label */
 	.budget {
 		display: grid;

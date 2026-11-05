@@ -121,7 +121,7 @@ shrinks, so up below zero. On a phone too: `Roller Digit.svelte` moves its strip
 29% with NumberFlow, 42% with a Web Animation on the compositor (mask and glow hardly mattered), 8% by requestAnimationFrame, 1.7% without its mask, against 1% with no rolling. Any
 animation on the compositor during a turn seems to do it (the arrows' press scale and hover fade did too). A win scores the balance,
 which may be negative ("…but you shifted into the red"). A give-up counts as a play scoring $0, or the balance if lower,
-so it never beats breaking even. No board size shown: the board shows it. The sides seen are still recorded
+so it never beats breaking even. On a touch screen its labels and stats are larger (12 and 16 px, against 10 and 14), the board staying put. No board size shown: the board shows it. The sides seen are still recorded
 (`pzl.seen`) but not shown. The saves' key went to V2 with the bank (turn-based stats couldn't carry over).
 
 **Par (on the back burner; measured before half turns, which make opposite sides one move apart, so the table is out of date):** the fewest quarter turns from South to see a set of sides that solves the puzzle
