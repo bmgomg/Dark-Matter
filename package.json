@@ -34,7 +34,6 @@
 		"vitest": "^4.1.8"
 	},
 	"dependencies": {
-		"@number-flow/svelte": "^0.4.2",
 		"howler": "^2.2.4"
 	}
 }
