@@ -4,9 +4,9 @@
 	import Money from './Money.svelte';
 	import { avgScore, balance, cost, level, rolls, sideAt, ss } from './shared.svelte';
 
-	// The level's stats, led by its difficulty (the board's size shows on the board): plays (given-up games count, at
-	// $0 or less), solved, and the average and best balance (the best shows once a game is solved). Below them, the
-	// game's budget: the bank, less what turning and changing your mind have cost, leaves the balance.
+	// The level's stats, led by its difficulty (the board's size shows on the board): solved out of plays (given-up games
+	// count as plays, at $0 or less), and the average and best balance (the best shows once a game is solved). Below them,
+	// the game's budget: the bank, less what turning and changing your mind have cost, leaves the balance.
 	const side = $derived(sideAt(ss.angle));
 	const left = $derived(balance());
 	const money = (v, shown) => (shown ? `${v < 0 ? '−' : ''}$${Math.round(Math.abs(v) * 10) / 10}` : '–');
@@ -16,10 +16,9 @@
 	<div class="stats">
 		<span class="label level">{level()?.sub}</span>
 		<div class="stat">
-			<span class="label">plays</span><span class="value"><NumberFlow value={ss.stats.plays} animated={rolls()} /></span>
-		</div>
-		<div class="stat">
-			<span class="label">solved</span><span class="value"><NumberFlow value={ss.stats.solved} animated={rolls()} /></span>
+			<span class="label">solved</span><span class="value"
+				><NumberFlow value={ss.stats.solved} animated={rolls()} />/<NumberFlow value={ss.stats.plays} animated={rolls()} /></span
+			>
 		</div>
 		<div class="stat"><span class="label">avg</span><span class="value">{money(avgScore(), ss.stats.plays)}</span></div>
 		<div class="stat"><span class="label">best</span><span class="value">{money(ss.stats.best, ss.stats.solved)}</span></div>
@@ -56,7 +55,7 @@
 		justify-content: space-between;
 		align-items: center;
 		column-gap: 5px;
-		width: 410px;
+		width: 330px;
 	}
 
 	.stat {
