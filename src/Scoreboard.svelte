@@ -48,14 +48,16 @@
 		margin-top: 20px;
 	}
 
-	/* a fixed span, as wide as the toolbar's divider, so it holds still as the numbers grow, and fits at their longest */
+	/* The map's width, so it lines up with it and holds still as the numbers grow, unless the stats would then come closer
+	   together than the gap keeps them (the longest level's name does that): then wider, centred. */
 	.stats {
 		display: grid;
 		grid-auto-flow: column;
 		justify-content: space-between;
 		align-items: center;
-		column-gap: 5px;
-		width: 330px;
+		column-gap: 16px;
+		width: max-content;
+		min-width: 330px;
 	}
 
 	.stat {
@@ -90,7 +92,6 @@
 	   numbers need it, centred. */
 	@media (pointer: coarse) {
 		.stats {
-			width: max-content;
 			min-width: 410px;
 			column-gap: 12px;
 		}
@@ -98,6 +99,7 @@
 		.label {
 			font-size: 12px;
 			line-height: 15px;
+			letter-spacing: 0.16em;
 		}
 
 		.value {
