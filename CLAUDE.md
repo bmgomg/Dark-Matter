@@ -164,6 +164,11 @@ mirrored at random by `generate`. The other levels are generated live.
   (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), selecting and marking (`select`, `mark`; a match ends the game), the budget (`cost`, `balance`), reveal, Back (`goBack`). `pzl.step` is the net count of clockwise quarter turns.
 - `src/const.js`: title, levels, sizes, sides, swipe and turn timing, the bank and costs, prompts.
 - `scripts/build-itch.js`: `npm run build:itch`, a static build without the PWA parts, zipped for itch.io.
+- `scripts/cover.html`: the itch.io cover, 630 × 500: the board seen from low down, under the title. The camera is in line
+  with one lane and at the planets' height, so that lane's planets are concentric and the board stays square with the
+  picture (the designer's calls: the game's even rings, a level gold edge). `sh scripts/render-cover.sh` writes
+  `itch/cover.png`. `node scripts/render-cover-gif.mjs` writes `itch/cover.gif`: a hold on that view, then one full turn
+  (needs ffmpeg). Its settings are set to come in under itch's limit, 3 MB by forum reports (no official figure found).
 
 ## License
 

@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cover</title>
+<!-- The itch.io cover, 630 × 500, rendered by render-cover.sh: the board seen from low down, past its gold edge, so that
+     its planets line up and eclipse each other, under the title. The sky is Space.svelte's (the same seed). -->
+<style>
+	@font-face {
+		font-family: CZ;
+		src: url('../src/lib/fonts/Cinzel.ttf');
+		font-weight: 400 900;
+	}
+
+	@font-face {
+		font-family: SM;
+		src: url('../src/lib/fonts/Space Mono.ttf');
+	}
+
+	html,
+	body {
+		margin: 0;
+		background: #05050f;
+	}
+
+	.cover {
+		position: relative;
+		width: 630px;
+		height: 500px;
+		overflow: hidden;
+		background: radial-gradient(ellipse at 50% 120%, #2a1b5e 0%, #0d0b24 55%, #05050f 100%);
+	}
+
+	.nebula {
+		position: absolute;
+		inset: -50px;
+		background:
+			radial-gradient(ellipse 60% 40% at 18% 22%, #6b3fc255, transparent 70%),
+			radial-gradient(ellipse 50% 35% at 85% 35%, #15808a40, transparent 70%),
+			radial-gradient(ellipse 70% 30% at 60% 85%, #b06bff30, transparent 70%),
+			radial-gradient(ellipse 30% 20% at 75% 10%, #ffb35c22, transparent 70%);
+		filter: blur(10px);
+	}
+
+	canvas {
+		position: absolute;
+		inset: 0;
+	}
+
+	.titles {
+		position: absolute;
+		top: 20px;
+		left: 0;
+		right: 0;
+		display: grid;
+		justify-items: center;
+		text-align: center;
+	}
+
+	.title {
+		font-family: CZ;
+		font-size: 74px;
+		line-height: 1;
+		color: #fff4dc;
+		text-shadow:
+			0 0 22px #ffd77a66,
+			0 0 50px #b06bff77,
+			0 2px 4px #05050f;
+	}
+
+	.title-2 {
+		font-size: 40px;
+		margin-top: 6px;
+		letter-spacing: 0.06em;
+	}
+
+	.tagline {
+		margin-top: 10px;
+		font-family: SM;
+		font-size: 14px;
+		letter-spacing: 0.34em;
+		margin-right: -0.34em;
+		text-transform: uppercase;
+		color: #ffd77a;
+		text-shadow: 0 1px 3px #05050f;
+	}
+</style>
+</head>
+<body>
+<div class="cover">
+	<div class="nebula"></div>
+	<canvas id="c" width="630" height="500"></canvas>
+	<div class="titles">
+		<div class="title">
+			<div>Dark Matter</div>
+			<div class="title-2">of Perspective</div>
+		</div>
+		<div class="tagline">It takes a shift</div>
+	</div>
+</div>
+<script>
+	const W = 630;
+	const H = 500;
+
+	// the camera: its height above the board (degrees), how far off, the lens, where the board's centre lands
+	const ELEVATION = 9.5;
+	const DISTANCE = 6.2;
+	const LENS = 880;
+	const CX = 385;
+	const CY = 401;
+	const SIGHT = DISTANCE * Math.cos((ELEVATION * Math.PI) / 180);
+	// the camera's place across the board: in line with the eclipse's lane, which it looks straight down, with no need to
+	// turn the board out of square with the picture
+	const LANE = 0.5;
+	// the board's turn, in degrees (falling: clockwise from above, as a swipe to the left turns it in the game)
+	const YAW = 0;
+
+	const N = 4;
+	const R = [0, 0.17, 0.29, 0.44];
+	// how far above the plate the planets' centres are: at the camera's height, so that they're all on one line on the
+	// screen and a lane's planets are concentric, as in the tray
+	const AXIS = DISTANCE * Math.sin((ELEVATION * Math.PI) / 180);
+	const THICK = 0.09;
+	// the planets larger than their cells would have them, in the same proportions: they're the picture
+	const BIG = 1.28;
+	// how squarely a side must face the camera for its bright lip to start showing and to show fully
+	const LIP_FROM = 0.55;
+	const LIP_TO = 0.95;
+	// the depths a planet's dimming runs between
+	const DIM_NEAR = 4.6;
+	const DIM_FAR = 7.6;
+
+	// [column from the left, row from the front, size]
+	const PLANETS = [
+		// the eclipse: one lane, all on one line of sight, and behind them, seen only by its shadow, the dark matter
+		[2, 0, 1],
+		[2, 1, 2],
+		[2, 2, 3],
+		[2, 3, 1],
+		[0, 1, 3],
+		[0, 3, 1],
+		[1, 3, 2],
+		[3, 1, 2],
+		[3, 3, 1]
+	];
+
+	// where the corona goes: the eclipse's largest planet
+	const CORONA = [2, 2];
+
+	const ctx = document.getElementById('c').getContext('2d');
+
+	const rand = (() => {
+		let a = 20261103;
+		return () => {
+			a = (a + 0x6d2b79f5) | 0;
+			let t = Math.imul(a ^ (a >>> 15), 1 | a);
+			t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+			return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+		};
+	})();
+
+	const TINTS = ['#ffffff', '#ffffff', '#ffffff', '#ffe9c4', '#c9d6ff', '#e6d6ff'];
+
+	const stars = Array.from({ length: 260 }, () => ({
+		r: 0.4 + rand() ** 3 * 1.6,
+		x: rand() * 1000,
+		y: rand() * 1000,
+		o: 0.25 + rand() * 0.7,
+		tint: TINTS[Math.floor(rand() * TINTS.length)],
+		twinkle: rand(),
+		delay: rand()
+	}));
+
+	const image = (src) =>
+		new Promise((resolve) => {
+			const img = new Image();
+			img.onload = () => resolve(img);
+			img.src = src;
+		});
+
+	const drawStars = () => {
+		const scale = 0.8;
+
+		for (const s of stars) {
+			ctx.globalAlpha = s.o;
+			ctx.fillStyle = s.tint;
+			ctx.beginPath();
+			ctx.arc(W / 2 + (s.x - 500) * scale, H / 2 + (s.y - 500) * scale, s.r * scale, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+
+		ctx.globalAlpha = 1;
+	};
+
+	const project = (x, y, z, yaw) => {
+		const a = (yaw * Math.PI) / 180;
+		const e = (ELEVATION * Math.PI) / 180;
+		const rx = x * Math.cos(a) - z * Math.sin(a);
+		const rz = x * Math.sin(a) + z * Math.cos(a);
+		const depth = DISTANCE - y * Math.sin(e) + rz * Math.cos(e);
+		const k = LENS / depth;
+
+		return { x: CX + (rx - LANE) * k, y: CY - (y * Math.cos(e) + rz * Math.sin(e)) * k, k, depth };
+	};
+
+	const poly = (points) => {
+		ctx.beginPath();
+		points.forEach((p, i) => (i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+		ctx.closePath();
+	};
+
+	const cellCentre = (c, r) => [c - N / 2 + 0.5, r - N / 2 + 0.5];
+
+	const drawBoard = (yaw) => {
+		const h = N / 2;
+		const corner = (x, z, y = 0) => project(x, y, z, yaw);
+
+		// the rim: the plate's thickness, gold, on the sides facing the camera; a side comes into view edge-on, so it
+		// doesn't pop in
+		const a = (yaw * Math.PI) / 180;
+		const SIDES = [
+			[-h, -h, h, -h, 0, -1],
+			[h, -h, h, h, 1, 0],
+			[h, h, -h, h, 0, 1],
+			[-h, h, -h, -h, -1, 0]
+		];
+		const lips = [];
+
+		for (const [x1, z1, x2, z2, nx, nz] of SIDES) {
+			const facing = -(nx * Math.sin(a) + nz * Math.cos(a));
+			const across = nx * Math.cos(a) - nz * Math.sin(a);
+
+			if (facing * SIGHT + across * LANE > h) {
+				const t = Math.min(1, Math.max(0, (facing - LIP_FROM) / (LIP_TO - LIP_FROM)));
+
+				poly([corner(x1, z1), corner(x2, z2), corner(x2, z2, -THICK), corner(x1, z1, -THICK)]);
+				ctx.fillStyle = '#ffd77a';
+				ctx.fill();
+				lips.push({ from: corner(x1, z1), to: corner(x2, z2), t });
+			}
+		}
+
+		// the plate
+		poly([corner(-h, -h), corner(h, -h), corner(h, h), corner(-h, h)]);
+		const near = project(0, 0, -h, YAW);
+		const far = project(0, 0, h, YAW);
+		const plate = ctx.createLinearGradient(0, near.y, 0, far.y);
+		plate.addColorStop(0, '#2a2470');
+		plate.addColorStop(1, '#141240');
+		ctx.fillStyle = plate;
+		ctx.fill();
+
+		// the cells
+		const INSET = 0.04;
+
+		for (let c = 0; c < N; c++) {
+			for (let r = 0; r < N; r++) {
+				const [x, z] = cellCentre(c, r);
+				const a = 0.5 - INSET;
+
+				poly([corner(x - a, z - a), corner(x + a, z - a), corner(x + a, z + a), corner(x - a, z + a)]);
+				ctx.fillStyle = '#4a43b866';
+				ctx.fill();
+				ctx.strokeStyle = '#8f86ff';
+				ctx.globalAlpha = 0.65;
+				ctx.lineWidth = 1;
+				ctx.stroke();
+				ctx.globalAlpha = 1;
+			}
+		}
+
+		// the gold edge's bright lip
+		ctx.strokeStyle = '#fff4dc';
+		ctx.lineWidth = 1.5;
+		ctx.shadowColor = '#ffd77a';
+		ctx.shadowBlur = 14;
+
+		for (const { from, to, t } of lips) {
+			ctx.globalAlpha = t;
+			ctx.beginPath();
+			ctx.moveTo(from.x, from.y);
+			ctx.lineTo(to.x, to.y);
+			ctx.stroke();
+		}
+
+		ctx.globalAlpha = 1;
+		ctx.shadowBlur = 0;
+	};
+
+	const drawPlanets = (yaw, images) => {
+		const items = PLANETS.map(([c, r, size]) => {
+			const [x, z] = cellCentre(c, r);
+			return { size, centre: project(x, AXIS, z, yaw), ground: project(x, 0, z, yaw) };
+		}).sort((a, b) => b.centre.depth - a.centre.depth);
+
+		// the shadows first, flat on the plate
+		for (const { size, ground } of items) {
+			const r = BIG * R[size] * ground.k;
+			ctx.save();
+			ctx.translate(ground.x, ground.y);
+			ctx.scale(1, 0.22);
+			const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+			g.addColorStop(0, '#05050fcc');
+			g.addColorStop(1, '#05050f00');
+			ctx.fillStyle = g;
+			ctx.beginPath();
+			ctx.arc(0, 0, r, 0, 2 * Math.PI);
+			ctx.fill();
+			ctx.restore();
+		}
+
+		// the far ones a little dimmer, on a range that stays put as the board turns
+		for (const { size, centre } of items) {
+			const r = BIG * R[size] * centre.k;
+			const dim = Math.min(1, Math.max(0, (centre.depth - DIM_NEAR) / (DIM_FAR - DIM_NEAR)));
+			ctx.filter = `brightness(${1 - 0.28 * dim})`;
+			ctx.drawImage(images[size], centre.x - r, centre.y - r, 2 * r, 2 * r);
+		}
+
+		ctx.filter = 'none';
+	};
+
+	// the eclipse's corona, as in the emblem, behind the board and every planet: a light in the sky, where the eclipse
+	// forms, so it stays put as the board turns
+	const drawCorona = () => {
+		const [cc, cr] = CORONA;
+		const [cx, cz] = cellCentre(cc, cr);
+		const { x, y, k } = project(cx, AXIS, cz, YAW);
+		const rc = 1.5 * k;
+		const corona = ctx.createRadialGradient(x, y, 0, x, y, rc);
+		corona.addColorStop(0, '#ffe2a066');
+		corona.addColorStop(0.45, '#ffb35c33');
+		corona.addColorStop(1, '#b06bff00');
+		ctx.fillStyle = corona;
+		ctx.beginPath();
+		ctx.arc(x, y, rc, 0, 2 * Math.PI);
+		ctx.fill();
+	};
+
+	// a fixed grain for the GIF, whose few colours would otherwise show the sky's gradients as bands: on what stays still
+	// it costs nothing after the first frame, unlike a dither over everything
+	const GRAIN = 7;
+	const grain = document.createElement('canvas');
+	grain.width = W;
+	grain.height = H;
+	const grainContext = grain.getContext('2d');
+	const noise = grainContext.createImageData(W, H);
+
+	for (let i = 0; i < noise.data.length; i += 4) {
+		noise.data.fill(rand() < 0.5 ? 0 : 255, i, i + 3);
+		noise.data[i + 3] = rand() * GRAIN;
+	}
+
+	grainContext.putImageData(noise, 0, 0);
+
+	// sky: grain on the sky; whole: on the whole picture, for a frame that's held
+	const draw = (yaw, images, { sky, whole } = {}) => {
+		ctx.clearRect(0, 0, W, H);
+		drawStars();
+		drawCorona();
+
+		if (sky) {
+			ctx.drawImage(grain, 0, 0);
+		}
+
+		drawBoard(yaw);
+		drawPlanets(yaw, images);
+
+		if (whole) {
+			ctx.drawImage(grain, 0, 0);
+		}
+	};
+
+	// a frame for the GIF (render-cover-gif.mjs): how far through the turn, 0 to 1, from the eclipse round to it again
+	window.ready = Promise.all([1, 2, 3].map((i) => image(`../src/lib/images/planet-${i}.webp`))).then(async ([a, b, c]) => {
+		await document.fonts.ready;
+		const images = [null, a, b, c];
+
+		window.frame = (turned, grains) => draw(YAW - 360 * turned, images, grains);
+		window.frame(0);
+	});
+</script>
+</body>
+</html>
