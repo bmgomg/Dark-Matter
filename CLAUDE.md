@@ -109,7 +109,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 
 As in Mixed Results and Bits and Pieces (the designer's proposal). Each game starts with `BANK` ($10, every level). A
 turn costs `COST_TURN` ($1), a quarter or a half alike (so each new side costs $1, and all four still cost $3), every
-turn, a side seen before too; turns after the game ends are free. The
+turn, a side seen before too; turns after the game ends are free. A swipe is one move however far it goes, charged by
+where it lands: $1 on another side, $0 full circle on the same one. The
 first mark in a cell is free; any change after that costs `COST_CHANGE` ($1): another size, or clearing it
 (`pzl.marks`: -1 never marked, 0 cleared, 1–3 a planet; `pzl.turns`, `pzl.changes`). Clear All (toolbar, after
 Back; `clearAll`) clears every planet on the map at `COST_CHANGE` each, as by hand, after a prompt that names the price

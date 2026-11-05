@@ -183,10 +183,11 @@ const onSettled = () => {
 		return;
 	}
 
-	// a half turn is one move, like a quarter turn
-	const span = Math.abs(step - pzl.step);
+	// one move, however far it went (a long drag shows nothing on the way), and free if it's come full circle
+	if (sideAt(step * 90) !== sideAt(pzl.step * 90)) {
+		pzl.turns += 1;
+	}
 
-	pzl.turns += span === 2 ? 1 : span;
 	pzl.step = step;
 	pzl.seen[sideAt(ss.angle)] = true;
 
