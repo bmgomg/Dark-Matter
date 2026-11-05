@@ -27,7 +27,9 @@
 
 	const mod4 = (k) => ((k % 4) + 4) % 4;
 
-	// the lineup a side shows, shifted along the tray by dx; tag tells an incoming lineup from the outgoing one
+	// the lineup a side shows, shifted along the tray by dx; the keys go by side, so a lineup that slid in keeps its
+	// elements as it lands (new ones can paint a frame late: on Comet, a blink); tag tells an incoming lineup from the
+	// outgoing one on a drag that's come full circle, the one case where both show the same side
 	const lineup = (s, dx, tag = '') => {
 		const out = [];
 
@@ -63,7 +65,8 @@
 			// (past 1 if it was dragged beyond the side it's settling on: it comes back to it, and the lineup still slides in)
 			const start = Math.max(LAG, (ss.turnFrom / 90 - pzl.step) / span);
 			const k = start === 1 ? 1 : Math.min(1, Math.max(0, (done - start) / (1 - start)));
-			out.push(...lineup(mod4(ss.target), Math.sign(span) * (1 - k) * SWIPE_PX, 'in'));
+			const next = mod4(ss.target);
+			out.push(...lineup(next, Math.sign(span) * (1 - k) * SWIPE_PX, next === mod4(pzl.step) ? 'in' : ''));
 		}
 
 		return out;

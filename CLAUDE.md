@@ -72,7 +72,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   the other end only after a release that turns the board (counted), arriving as the turn ends. It sets off only once
   the old lineup is `LAG` (40%) of the way out, so a tap's turn, which starts from rest, plays like a swipe let go of
   partway: the old lineup leaves, then the new one comes in (the designer's call). A drag shows only the current side's, so it can't peek at the next side and come back (the designer
-  found that loophole on a wide screen). A drag can't start while a counted turn plays out. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
+  found that loophole on a wide screen). A lineup that slid in keeps its elements as it lands (keyed by side): new ones made the planets blink at the end of a swipe in Comet, though not in other browsers. A drag can't start while a counted turn plays out. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
   drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
   the tray's ends, and ← →, turn it as a swipe that way (left: clockwise). Holding one (`HOLD_MS`, 0.4 s) turns it a half
   instead (`turnHalf`), straight to the opposite side, as do ↑ ↓ (the designer's call; "hold", in the hint, because it
