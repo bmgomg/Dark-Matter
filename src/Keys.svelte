@@ -5,11 +5,12 @@
 	// the keyboard shortcuts, on a card over the page above the toolbar; a tap anywhere but the Keys button, or any
 	// key, puts it away (the Keys button toggles it)
 	const KEYS = [
-		[['←', '→'], 'Turn the board'],
-		[['W', 'A', 'S', 'D'], 'Move between the cells (or ↑ ↓)'],
+		[['←', '→'], 'Turn the board 90°'],
+		[['↑', '↓'], 'Turn the board 180°'],
+		[['W', 'A', 'S', 'D'], 'Move between the cells'],
 		[['1', '2', '3'], 'Mark the cell: small, medium, large'],
 		[['0', 'Del', '⌫'], 'Clear the cell'],
-		[['Esc'], 'Let the cell go'],
+		[['Esc'], 'Deselect the cell'],
 		[['Tab'], 'Move to the map or a button'],
 		[['Enter'], 'Press the button, or open the palette'],
 		[['?'], 'Show or hide this card']

@@ -15,7 +15,7 @@
 		}
 
 		if (!ss.swiped) {
-			return 'Swipe the planets below the map to turn it.';
+			return 'Swipe the planets or tap the arrows to turn the map 90°. Hold an arrow to turn 180°.';
 		}
 
 		return 'Tap a cell to place a planet. Blank cells count as empty.';

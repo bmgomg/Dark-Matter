@@ -13,7 +13,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 ## Rules
 
 - Planets of three sizes (small, medium, large) on an N × N board, at most one per cell.
-- The player sees the board only edge-on, one side at a time, and turns it a quarter at a time.
+- The player sees the board only edge-on, one side at a time, and turns it a quarter or a half at a time.
 - A planet hides anything its size or smaller behind it; a bigger one behind still shows over it.
 - The player taps a cell (it pulses, and the palette comes up) and marks it small, medium or large, or clears it.
   A blank cell counts as empty; there's no "empty" mark (the designer's call: a blank is an answer too). The game ends
@@ -46,8 +46,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   off the map lets the cell go), because the designer kept mistaking a palette below the tray for the tray, both
   rows of planets. `PALETTE_AT_CELL` switches back to the old palette there (`Palette.svelte`). Moving the tray above
   the map was weighed and rejected: it belongs against the gold edge it's seen from. Keys: the map is one Tab stop with a cursor on a cell (`ss.cursor`, white; it
-  shows only for the keyboard, `ss.cursorOn`). W A S D or ↑ ↓ move it by the screen, however the board has turned (← →
-  still turn the board, which is why not all four arrows: one key doing two things, one of which costs). Enter or Space
+  shows only for the keyboard, `ss.cursorOn`). W A S D move it by the screen, however the board has turned (W A S D only, the
+  designer's call; ← → and ↑ ↓ turn the board). Enter or Space
   on the map opens the palette; 1–3 a planet,
   0 / Delete / Backspace clear, on the selected cell or else straight on the cursor's, at the same price; the "Think
   twice" warning shows with the cursor too. Esc lets the cell go, then the cursor. ? the shortcuts card (`Keys.svelte`, over the page above the
@@ -73,12 +73,17 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   partway: the old lineup leaves, then the new one comes in (the designer's call). A drag shows only the current side's, so it can't peek at the next side and come back (the designer
   found that loophole on a wide screen). A drag can't start while a counted turn plays out. A quarter turn is `SWIPE_PX` of travel; a flick goes on to the next quarter, a slow
   drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
-  the tray's ends, and ← →, turn it as a swipe that way (left: clockwise); their arrows are Hexodus's shapes
+  the tray's ends, and ← →, turn it as a swipe that way (left: clockwise). Holding one (`HOLD_MS`, 0.4 s) turns it a half
+  instead (`turnHalf`), straight to the opposite side, as do ↑ ↓ (the designer's call; "hold", in the hint, because it
+  reads right for a finger and a mouse alike). A tap acts on release, so the hold costs a tap no delay. Their arrows are Hexodus's shapes
   (`Icon.svelte`), bare, without its rings, upside down, each tilted 35° outwards (left counterclockwise, right
   clockwise) to hint at the way the lineup slides. They don't scale when pressed, and have no hover on a touch screen: on a
   Pixel 6a, each made a tap's turn stagger at its start (38–44% of its frames late, against 1% without; measured on the
   phone over USB; a hover sticks to the arrow last tapped, so changing direction faded both). A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
-  turn `TAP_TURN_MS` (0.5 s, linear), slowed at the designer's request. A new puzzle's planets grow from their
+  turn `TAP_TURN_MS` (0.5 s, linear), slowed at the designer's request; a half turn `HALF_TURN_MS` (0.7 s, linear). A turn to
+  another side can't be called off or added to: arrows and keys are ignored till it lands, and Back lands it at once and
+  charges it, since tapping back or leaving just before it landed gave a free look at the next side (the designer's
+  call: a quick double tap no longer makes a half turn). A new puzzle's planets grow from their
   centres (`ss.rise`, 1 to 0).
 - **A game's end**: on a win the map's planets glow, and swell three times (0.5 s each, linear) in a wave from the
   north-west corner. Play new (`playNew`) flips the map a quarter turn about its horizontal axis (`ss.flip`, `FLIP_MS`
@@ -102,7 +107,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 ## Scoring: the bank
 
 As in Mixed Results and Bits and Pieces (the designer's proposal). Each game starts with `BANK` ($10, every level). A
-quarter turn costs `COST_TURN` ($1), every turn, a side seen before too; turns after the game ends are free. The
+turn costs `COST_TURN` ($1), a quarter or a half alike (so each new side costs $1, and all four still cost $3), every
+turn, a side seen before too; turns after the game ends are free. The
 first mark in a cell is free; any change after that costs `COST_CHANGE` ($1): another size, or clearing it
 (`pzl.marks`: -1 never marked, 0 cleared, 1–3 a planet; `pzl.turns`, `pzl.changes`). Clear All (toolbar, after
 Back; `clearAll`) clears every planet on the map at `COST_CHANGE` each, as by hand, after a prompt that names the price
@@ -114,7 +120,7 @@ which may be negative ("…but you shifted into the red"). A give-up counts as a
 so it never beats breaking even. No board size shown: the board shows it. The sides seen are still recorded
 (`pzl.seen`) but not shown. The saves' key went to V2 with the bank (turn-based stats couldn't carry over).
 
-**Par (on the back burner):** the fewest quarter turns from South to see a set of sides that solves the puzzle
+**Par (on the back burner; measured before half turns, which make opposite sides one move apart, so the table is out of date):** the fewest quarter turns from South to see a set of sides that solves the puzzle
 (0 to 3; any 3 turns see all four sides). Measured over 1,000 puzzles per level (Nov 2026), by the solver tier that
 graded each puzzle; tier 3 and true uniqueness gave the same within a point:
 

@@ -29,6 +29,9 @@ export const SWIPE_PX = MAP + 40;
 // a swipe's last stretch, to rest; a whole quarter turn on a tap of an arrow (or ← →)
 export const TURN_MS = 420;
 export const TAP_TURN_MS = 500;
+// a half turn, on holding an arrow (or ↑ ↓), and how long the hold takes
+export const HALF_TURN_MS = 700;
+export const HOLD_MS = 400;
 // how long the game page takes to fade in
 export const PAGE_FADE_MS = 250;
 // Play new: the map flips a quarter turn about its horizontal axis, its gold edge coming towards the player, till it's
@@ -52,7 +55,7 @@ export const MSG_WON = 'No more dark matter!';
 export const MSG_BROKE = 'No more dark matter — but you shifted into the red.';
 export const MSG_REVEALED = 'This is how the sky really lies.';
 
-// Each game starts with a bank. Every quarter turn costs, and so does changing your mind about a cell (another size,
+// Each game starts with a bank. Every turn costs, half turns the same, and so does changing your mind about a cell (another size,
 // or clearing it); the first mark in a blank cell is free. A game given up scores no more than breaking even.
 export const BANK = 10;
 export const COST_TURN = 1;

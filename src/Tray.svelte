@@ -1,9 +1,9 @@
 <script>
-	import { MAP, R, SIDES, SWIPE_PX } from './const';
+	import { HOLD_MS, MAP, R, SIDES, SWIPE_PX } from './const';
 	import { elevation } from './logic';
 	import Icon from './Icon.svelte';
 	import Planet from './Planet.svelte';
-	import { sideAt, spinTo, ss, stopTurning, turnBy } from './shared.svelte';
+	import { sideAt, spinTo, ss, stopTurning, turnBy, turnHalf } from './shared.svelte';
 
 	// The view from the player's seat, edge-on: each lane seen along its line of sight, the planets centred on it, a
 	// bigger one behind showing around the ones in front of it, like an annular eclipse. Swiping it turns the board:
@@ -118,6 +118,34 @@
 
 		spinTo(Math.abs(v) > 0.3 ? (v > 0 ? Math.floor(q) : Math.ceil(q)) : Math.round(q));
 	};
+
+	// An arrow tapped turns the board a quarter, on the click, at release. Held, it turns it a half as soon as the hold
+	// is long enough, and the click that follows the release is let go. A click from the keyboard (no detail) is always a
+	// tap: a hold released off the arrow leaves no click behind to clear `held`.
+	let holding;
+	let held = false;
+
+	const onArrowDown = (e, dir) => {
+		held = false;
+		clearTimeout(holding);
+
+		if (e.button === 0) {
+			holding = setTimeout(() => {
+				held = true;
+				turnHalf(dir);
+			}, HOLD_MS);
+		}
+	};
+
+	const onArrowEnd = () => clearTimeout(holding);
+
+	const onArrowClick = (e, dir) => {
+		if (held && e.detail) {
+			held = false;
+		} else {
+			turnBy(dir);
+		}
+	};
 </script>
 
 <div
@@ -158,18 +186,26 @@
 	<button
 		class="turn left"
 		style:margin-top="{AXIS - 22}px"
-		aria-label="Turn the board clockwise"
+		aria-label="Turn the board clockwise. Hold to turn it halfway round."
 		aria-keyshortcuts="ArrowLeft"
-		onclick={() => turnBy(1)}
+		onpointerdown={(e) => onArrowDown(e, 1)}
+		onpointerup={onArrowEnd}
+		onpointerleave={onArrowEnd}
+		onpointercancel={onArrowEnd}
+		onclick={(e) => onArrowClick(e, 1)}
 	>
 		<Icon name="left" />
 	</button>
 	<button
 		class="turn right"
 		style:margin-top="{AXIS - 22}px"
-		aria-label="Turn the board counterclockwise"
+		aria-label="Turn the board counterclockwise. Hold to turn it halfway round."
 		aria-keyshortcuts="ArrowRight"
-		onclick={() => turnBy(-1)}
+		onpointerdown={(e) => onArrowDown(e, -1)}
+		onpointerup={onArrowEnd}
+		onpointerleave={onArrowEnd}
+		onpointercancel={onArrowEnd}
+		onclick={(e) => onArrowClick(e, -1)}
 	>
 		<Icon name="right" />
 	</button>

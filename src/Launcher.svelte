@@ -11,7 +11,7 @@
 	let N = $state(level()?.N ?? 4);
 	let diff = $state(level()?.diff ?? 'easy');
 
-	const OP = 'width: 120px; padding: 10px 0 9px; font-size: 14px; letter-spacing: 0.17em;';
+	const OP = 'width: 130px; padding: 10px 0 9px; font-size: 14px; letter-spacing: 0.17em;';
 	const PICKED = 'background: #ffd77a; color: #14102e;';
 
 	const id = $derived(LEVELS.find((l) => l.N === N && l.diff === diff).id);
@@ -50,7 +50,7 @@
 	<TextButton
 		text={[resume ? 'resume' : 'start']}
 		framed
-		style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em;"
+		style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em; margin-top: 15px;"
 		onClick={play}
 	/>
 </div>
@@ -61,7 +61,7 @@
 		justify-items: center;
 		align-content: center;
 		gap: 34px;
-		width: 350px;
+		width: 380px;
 		padding: 36px 30px 40px;
 		box-sizing: border-box;
 		border-radius: 24px;

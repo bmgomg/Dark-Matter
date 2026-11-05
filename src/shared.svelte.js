@@ -5,6 +5,7 @@ import {
 	COST_TURN,
 	FLIP_MS,
 	FLIP_PAUSE_MS,
+	HALF_TURN_MS,
 	LEVELS,
 	MSG_AVERAGE_IMPROVED,
 	MSG_BEST_SCORE,
@@ -26,7 +27,7 @@ export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 
 // pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, changes, seen, over }
 //   marks: -1 never marked, 0 cleared (both blank, which counts as empty), 1..3 a planet
-//   turns, changes: what the game has cost so far, in quarter turns and changes of mind
+//   turns, changes: what the game has cost so far, in turns and changes of mind
 //   step: quarter turns clockwise so far, net (the board's angle at rest is step × 90°)
 //   over: 'won' or 'revealed'
 // angle: the board's angle on screen, in degrees clockwise; between steps while it turns
@@ -135,6 +136,10 @@ const tween = (key, to, ms, done, ease = easeOut) => {
 	tweens[key] = requestAnimationFrame(tick);
 };
 
+// A turn to another side plays out, and is charged as it lands. Nothing can call it off once it's begun: the next side
+// starts sliding in on the tray, so calling it off would be a free look.
+const turnUnderWay = () => ss.target !== undefined && ss.target !== ss.pzl?.step;
+
 export const stopTurning = () => {
 	cancelAnimationFrame(tweens.angle);
 	delete tweens.angle;
@@ -178,7 +183,10 @@ const onSettled = () => {
 		return;
 	}
 
-	pzl.turns += Math.abs(step - pzl.step);
+	// a half turn is one move, like a quarter turn
+	const span = Math.abs(step - pzl.step);
+
+	pzl.turns += span === 2 ? 1 : span;
 	pzl.step = step;
 	pzl.seen[sideAt(ss.angle)] = true;
 
@@ -190,24 +198,33 @@ const onSettled = () => {
 
 // the board eases to rest on a quarter turn: quickly after a swipe, slowly and evenly after a tap;
 // turnFrom: the angle it set off from, for the tray to slide the next lineup in over the whole of the turn
-export const spinTo = (step, tapped = false) => {
+export const spinTo = (step, tapped = false, ms = tapped ? TAP_TURN_MS : TURN_MS) => {
 	if (ss.target !== step && step !== ss.pzl?.step) {
 		whoosh();
 	}
 
 	ss.target = step;
 	ss.turnFrom = ss.angle;
-	tween('angle', step * 90, tapped ? TAP_TURN_MS : TURN_MS, onSettled, tapped ? linear : easeOut);
+	tween('angle', step * 90, ms, onSettled, tapped ? linear : easeOut);
 };
 
 // a tap on an arrow, or ← →; dir 1: clockwise from above, so the east side comes round to the front (as a swipe to the left)
-// (not while the map is flipping: a turn costs, and there would be nothing to see for it)
+// (not while the map is flipping: a turn costs, and there would be nothing to see for it; nor over a turn under way)
 export const turnBy = (dir) => {
-	if (!ss.pzl || ss.flip) {
+	if (!ss.pzl || ss.flip || turnUnderWay()) {
 		return;
 	}
 
 	spinTo((ss.target ?? Math.round(ss.angle / 90)) + dir, true);
+};
+
+// an arrow held, or ↑ ↓: straight to the opposite side, for the price of one turn; dir as turnBy's, the way it spins
+export const turnHalf = (dir) => {
+	if (!ss.pzl || ss.flip || turnUnderWay()) {
+		return;
+	}
+
+	spinTo(ss.pzl.step + 2 * dir, true, HALF_TURN_MS);
 };
 
 // The map, edge-on with only its gold edge showing, flips back to flat, a pause after t0 (so a slow puzzle doesn't add
@@ -578,9 +595,16 @@ export const goBack = () => {
 	delete ss.prompt;
 	delete ss.sel;
 	delete ss.cursorOn;
+
+	// a turn under way lands at once, and is charged; any other motion is dropped
+	const landing = turnUnderWay() ? ss.target : undefined;
+
 	stopTurning();
 
-	if (ss.pzl) {
+	if (landing !== undefined) {
+		ss.angle = landing * 90;
+		onSettled();
+	} else if (ss.pzl) {
 		ss.angle = ss.pzl.step * 90;
 	}
 

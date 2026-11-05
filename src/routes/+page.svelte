@@ -5,12 +5,12 @@
 	import Space from '../Space.svelte';
 	import Splash from '../Splash.svelte';
 	import { DX, DY } from '../const';
-	import { deselect, hideCursor, markCursor, moveCursor, selectCursor, ss, toggleKeys, turnBy } from '../shared.svelte';
+	import { deselect, hideCursor, markCursor, moveCursor, selectCursor, ss, toggleKeys, turnBy, turnHalf } from '../shared.svelte';
 	import { _sound } from '../sound.svelte';
 	import { clientRect, post } from '../utils';
 
 	// a key's move of the map's cursor on screen, dx and dy
-	const MOVES = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0], arrowup: [0, -1], arrowdown: [0, 1] };
+	const MOVES = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0] };
 
 	$effect(() => {
 		const disable = (e) => {
@@ -44,7 +44,8 @@
 		// trackpad) suggests one, and a key pressed proves it.
 		ss.keyboard = matchMedia('(any-pointer: fine)').matches;
 
-		// ← → turn the board (as a swipe that way); W A S D, or ↑ ↓, move the map's cursor (and bring the focus to the map);
+		// ← → turn the board (as a swipe that way), ↑ ↓ a half turn (not on a key's repeat: holding one would run up the
+		// bill); W A S D move the map's cursor (and bring the focus to the map);
 		// Enter or Space on the map opens the palette; on the selected cell, or else the cursor's, 1 2 3 place a planet, 0
 		// (or Delete) clears it; Esc puts the palette away, or else the cursor; ? shows the shortcuts (Keys.svelte), and any
 		// key puts them away
@@ -72,6 +73,10 @@
 				turnBy(1);
 			} else if (e.key === 'ArrowRight') {
 				turnBy(-1);
+			} else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+				if (!e.repeat) {
+					turnHalf(e.key === 'ArrowUp' ? 1 : -1);
+				}
 			} else if (MOVES[e.key.toLowerCase()]) {
 				moveCursor(...MOVES[e.key.toLowerCase()]);
 				document.querySelector('.board')?.focus({ preventScroll: true });
