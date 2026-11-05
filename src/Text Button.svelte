@@ -110,6 +110,7 @@
 	.framed:focus-visible {
 		background: #ffd77a;
 		color: #14102e;
+		font-weight: 700;
 	}
 
 	.text-only:focus-visible {

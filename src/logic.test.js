@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { elevation, generate, mask, RULES, rotated, tierOf } from './logic';
+import { depth, elevation, fits, generate, mask, needsAllSides, rotated } from './logic';
+import { POOL } from './puzzles';
 
 describe('views', () => {
 	it('a sphere hides its size or smaller, but not bigger', () => {
@@ -24,14 +25,39 @@ describe('views', () => {
 
 describe('generator', () => {
 	for (const N of [4, 5])
-		for (const diff of ['easy', 'hard'])
+		for (const diff of ['easy', 'hard', 'expert'])
 			it(`${N}×${N} ${diff} boards match their level`, async () => {
 				for (let k = 0; k < 5; k++) {
 					const g = await generate(N, diff);
 					const n = g.flat().filter(Boolean).length;
 					expect(g).toHaveLength(N);
 					expect(n).toBeGreaterThanOrEqual(N);
-					expect(RULES[N + diff].ok(tierOf(g), n)).toBe(true);
+					expect(fits(N + diff, g)).toBe(true);
 				}
 			});
+
+	it('every ready-made board matches its level', () => {
+		for (const [id, boards] of Object.entries(POOL)) {
+			const N = parseInt(id);
+
+			for (const b of boards) {
+				const cells = [...b].map(Number);
+				expect(fits(id, Array.from({ length: N }, (_, i) => cells.slice(i * N, (i + 1) * N)))).toBe(true);
+			}
+		}
+	});
+
+	it('turning or mirroring a board leaves its grade alone', () => {
+		const g = [
+			[0, 2, 0, 3],
+			[1, 0, 0, 0],
+			[0, 0, 3, 0],
+			[2, 0, 0, 1]
+		];
+
+		for (const h of [rotated(g, 1), rotated(g, 2), g.map((r) => [...r].reverse())]) {
+			expect(depth(h)).toBe(depth(g));
+			expect(needsAllSides(h)).toBe(needsAllSides(g));
+		}
+	});
 });

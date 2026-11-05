@@ -1,6 +1,7 @@
 // Puzzle rules, solver and generator, ported as-is from the edgewise.html prototype.
 // Sizes: 0 = empty, 1 = small, 2 = medium, 3 = large.
 // Candidate sets are 4-bit masks: bit v set means size v is still possible.
+import { POOL } from './puzzles.js';
 
 // set of sizes visible looking along seq from its first element
 export const mask = (seq) => {
@@ -138,14 +139,96 @@ export function tierOf(g) {
 	return 0;
 }
 
+// How deep the reasoning goes: rounds of whole-lane reasoning, each using only what the rounds before it settled, so
+// it doesn't depend on the order of the views, and a board turned or mirrored keeps its depth. 0 = not solved.
+export function depth(g) {
+	const N = g.length,
+		V = laneViews(g);
+	let cand = Array(N * N).fill(15),
+		rounds = 0;
+	for (;;) {
+		const next = cand.slice();
+		for (const v of V) {
+			const c = cand.slice();
+			wholeLane(c, v, N);
+			for (let i = 0; i < next.length; i++) next[i] &= c[i];
+		}
+		if (next.every((x, i) => x === cand[i])) return cand.every(single) ? rounds : 0;
+		cand = next;
+		rounds++;
+	}
+}
+
+// how many ways the views fit, up to 2, trying a cell and following it through where reasoning runs out
+function ways(cand, V, N) {
+	const c = cand.slice();
+	let ch = true;
+	while (ch) {
+		ch = false;
+		for (const v of V) if (wholeLane(c, v, N)) ch = true;
+		if (c.includes(0)) return 0;
+	}
+	const i = c.findIndex((x) => !single(x));
+	if (i < 0) return 1;
+	let total = 0;
+	for (let v = 0; v < 4 && total < 2; v++) {
+		if (!has(c[i], v)) continue;
+		const d = c.slice();
+		d[i] = 1 << v;
+		total += ways(d, V, N);
+	}
+	return total;
+}
+
+// does the answer take all four sides? Any three leave it open, whichever one is left out. (laneViews lists each row
+// from the west, then the east, and each column from the north, then the south.)
+export function needsAllSides(g) {
+	const N = g.length,
+		V = laneViews(g);
+	const sideOf = (k) => (k < 2 * N ? (k % 2 ? 'E' : 'W') : k % 2 ? 'S' : 'N');
+	return ['S', 'E', 'N', 'W'].every(
+		(out) =>
+			ways(
+				Array(N * N).fill(15),
+				V.filter((_, k) => sideOf(k) !== out),
+				N
+			) > 1
+	);
+}
+
 export const RULES = {
 	'4easy': { p: 0.35, ok: (t) => t === 1 || t === 2 },
 	'4hard': { p: 0.5, ok: (t) => t === 3 },
 	'5easy': { p: 0.25, ok: (t, n) => t === 2 && n === 5 }, // same rules as 4x4 Easy, more lanes
-	'5hard': { p: 0.3, ok: (t, n) => t >= 2 && n >= 6 } // more spheres to place
+	'5hard': { p: 0.3, ok: (t, n) => t >= 2 && n >= 6 }, // more spheres to place
+	// the deepest boards, too rare to find while the player waits, so made ahead of time (scripts/make-puzzles.js)
+	'4expert': { p: 0.5, ok: (t) => t === 3, deep: true },
+	'5expert': { p: 0.3, ok: (t) => t === 3, deep: true }
+};
+
+const DEEP = 4;
+
+// does a board fit its level?
+export const fits = (id, g) => {
+	const { ok, deep } = RULES[id];
+	return ok(tierOf(g), g.flat().filter(Boolean).length) && (!deep || (depth(g) >= DEEP && needsAllSides(g)));
+};
+
+// a ready-made board, turned and mirrored at random (neither changes how it grades)
+const fromPool = (boards, N) => {
+	const cells = [...boards[Math.floor(Math.random() * boards.length)]].map(Number);
+	const g = Array.from({ length: N }, (_, i) => cells.slice(i * N, (i + 1) * N));
+	const turned = rotated(g, Math.floor(Math.random() * 4));
+	return Math.random() < 0.5 ? turned.map((row) => [...row].reverse()) : turned;
 };
 
 export function generate(N, diff) {
+	const boards = POOL[N + diff];
+
+	if (boards?.length) {
+		return Promise.resolve(fromPool(boards, N));
+	}
+
 	const { p, ok } = RULES[N + diff];
 	let tries = 0,
 		fallback = null;

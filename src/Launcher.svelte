@@ -6,13 +6,16 @@
 	// Between Home and a game, as in Triangula: how the bank works, then the board's size and the difficulty, then
 	// Start, or Resume for a level with a game under way. It opens on the level played last.
 	const SIZES = [4, 5];
-	const DIFFS = ['easy', 'hard'];
+	const DIFFS = ['easy', 'hard', 'expert'];
 
 	let N = $state(level()?.N ?? 4);
 	let diff = $state(level()?.diff ?? 'easy');
 
-	const OP = 'width: 130px; padding: 10px 0 9px; font-size: 14px; letter-spacing: 0.17em;';
-	const PICKED = 'background: #ffd77a; color: #14102e;';
+	const OP = 'font-size: 14px; letter-spacing: 0.1em;';
+	const BOARD = 'width: 130px; padding: 10px 0 9px;';
+	// three names of different lengths: each pill as wide as its name
+	const DIFFICULTY = 'padding: 10px 12px 9px;';
+	const PICKED = 'background: #ffd77a; color: #14102e; font-weight: 700;';
 
 	const id = $derived(LEVELS.find((l) => l.N === N && l.diff === diff).id);
 	const resume = $derived(inProgress(id));
@@ -33,7 +36,7 @@
 		<div class="label">board</div>
 		<div class="ops" role="radiogroup" aria-label="Board">
 			{#each SIZES as n (n)}
-				<TextButton text={[`${n}×${n}`]} framed style={OP + (n === N ? PICKED : '')} onClick={() => (N = n)} />
+				<TextButton text={[`${n}×${n}`]} framed style={BOARD + OP + (n === N ? PICKED : '')} onClick={() => (N = n)} />
 			{/each}
 		</div>
 	</div>
@@ -42,7 +45,7 @@
 		<div class="label">difficulty</div>
 		<div class="ops" role="radiogroup" aria-label="Difficulty">
 			{#each DIFFS as d (d)}
-				<TextButton text={[DIFF_NAMES[d]]} framed style={OP + (d === diff ? PICKED : '')} onClick={() => (diff = d)} />
+				<TextButton text={[DIFF_NAMES[d]]} framed style={DIFFICULTY + OP + (d === diff ? PICKED : '')} onClick={() => (diff = d)} />
 			{/each}
 		</div>
 	</div>

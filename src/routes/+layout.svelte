@@ -54,5 +54,13 @@
 			font-family: SM;
 			src: url('$lib/fonts/Space Mono.ttf');
 		}
+
+		/* on a gold button, selected or hovered: thin dark letters on the bright fill were hard to read, more so on a
+		   phone. The same width as the regular, so nothing shifts. */
+		@font-face {
+			font-family: SM;
+			font-weight: 700;
+			src: url('$lib/fonts/Space Mono Bold.ttf');
+		}
 	}
 </style>

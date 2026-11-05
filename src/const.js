@@ -7,12 +7,14 @@ export const TITLE = ['Dark Matter', 'of Perspective'];
 export const TAGLINE = 'It takes a shift';
 
 // what the player calls a difficulty; the code's name for it ('hard') is the generator's, and is in the saves' keys
-export const DIFF_NAMES = { easy: 'easy', hard: 'not easy' };
+export const DIFF_NAMES = { easy: 'easy', hard: 'not easy', expert: 'quite hard' };
 export const LEVELS = [
 	{ id: '4easy', N: 4, diff: 'easy', label: '4×4', sub: DIFF_NAMES.easy },
 	{ id: '4hard', N: 4, diff: 'hard', label: '4×4', sub: DIFF_NAMES.hard },
+	{ id: '4expert', N: 4, diff: 'expert', label: '4×4', sub: DIFF_NAMES.expert },
 	{ id: '5easy', N: 5, diff: 'easy', label: '5×5', sub: DIFF_NAMES.easy },
-	{ id: '5hard', N: 5, diff: 'hard', label: '5×5', sub: DIFF_NAMES.hard }
+	{ id: '5hard', N: 5, diff: 'hard', label: '5×5', sub: DIFF_NAMES.hard },
+	{ id: '5expert', N: 5, diff: 'expert', label: '5×5', sub: DIFF_NAMES.expert }
 ];
 
 // sphere radius by size, in hundredths of a cell; the same in the board and the horizon

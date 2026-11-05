@@ -58,7 +58,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average
   improved, into the red, or the revealed one) for `OVER_MS` (4 s), then Play new.
 - **The launcher** (`Launcher.svelte`, as in Triangula; Home's Play opens it): a glass panel with the economy
-  paragraph, Board (4×4 / 5×5) and Difficulty (Easy / Not Easy: `DIFF_NAMES`, what the player reads; the code and the saves still say `hard`) pills, and Start, or Resume when the picked level has a
+  paragraph, Board (4×4 / 5×5) and Difficulty (Easy / Not Easy / Quite Hard: `DIFF_NAMES`, what the player reads; the code and the saves say `hard` for Not Easy and `expert` for Quite Hard) pills, each difficulty pill as wide as its name, and Start, or Resume when the picked level has a
   game begun (a turn or a mark) and not finished (`inProgress`). No stats there (the designer's call). It opens on
   the last level played; an untouched new puzzle is kept, under Start. The toolbar's first button is
   Back (text, like the rest: no icons in the toolbar): a game → the launcher → Home.
@@ -101,7 +101,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 - Fonts in `src/lib/fonts`: Cinzel (`CZ`, titles and numbers), Spectral (`SR`, text; its italic `SI` for hints and the
   launcher's economy paragraph, as in Mixed Results, at the designer's wish; it replaced Quicksand, which has no italic,
   except in the home page's rules and the shortcuts card, where the designer preferred Quicksand, `QS`),
-  Space Mono (`SM`, labels).
+  Space Mono (`SM`, labels; its bold on a gold button, selected or hovered, where thin dark letters were hard to read,
+  more so on a phone; the same width, so nothing shifts).
 - Splash: the template's BMG one. Sounds: the template's effects sprite; Unmix's music (Eric Matyas, soundimage.org).
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
 
@@ -138,10 +139,26 @@ graded each puzzle; tier 3 and true uniqueness gave the same within a point:
 None is solvable from South alone. As a golf score par is weak (looking at every side is never more than 2 over); the
 idea left open was showing it up front as the challenge ("par 1: two sides are enough"). 4–190 ms per puzzle to compute.
 
+## Quite Hard
+
+The designer's aim was a harder puzzle, not a bigger one. A 6×6 board was tried and dropped: it played as just more
+cells (6–8 planets in 36). The solver's tiers can't go higher: of about 130,000 random boards, none with a unique answer
+needed more than tier 3, so combining a lane's two views adds nothing. Quite Hard is picked from within tier 3 (`fits`
+in `logic.js`): a board that takes all four sides, whichever is left out (`needsAllSides`), and at least `DEEP` (4)
+rounds of reasoning (`depth`: each round uses only what earlier ones settled, so turning or mirroring a board doesn't
+change it). 5×5 Not Easy, by contrast, was about 85% tier 2 when measured. Whether depth is what a player feels as hard
+is the designer's judgement from play, not something measured.
+
+Such boards are too rare to generate while the player waits (about 1 s each for 4×4, 13 s for 5×5, on a desktop), so
+they ship ready-made: `src/puzzles.js` (60 for 4×4, 30 for 5×5), made by `scripts/make-puzzles.js`, and turned and
+mirrored at random by `generate`. The other levels are generated live.
+
 ## Files
 
-- `src/logic.js`: the prototype's rules, solver tiers and generator, as-is (`generate`, `tierOf`, `elevation`), tested
-  in `src/logic.test.js` (`npm test`).
+- `src/logic.js`: the prototype's rules, solver tiers and generator (`generate`, `tierOf`, `elevation`), plus Quite
+  Hard's grading and ready-made boards, tested in `src/logic.test.js` (`npm test`).
+- `scripts/make-puzzles.js`: `node scripts/make-puzzles.js 4expert=60 5expert=30` rewrites `src/puzzles.js`, keeping
+  only the levels named. The dev server reloads the page when it saves.
 - `src/shared.svelte.js`: the store `ss`, per-level saves (`APP_STATE • <level id>`: stats and the puzzle), turning
   (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), selecting and marking (`select`, `mark`; a match ends the game), the budget (`cost`, `balance`), reveal, Back (`goBack`). `pzl.step` is the net count of clockwise quarter turns.
 - `src/const.js`: title, levels, sizes, sides, swipe and turn timing, the bank and costs, prompts.
