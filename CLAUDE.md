@@ -71,7 +71,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
   the tray's ends, and ← →, turn it as a swipe that way (left: clockwise); their arrows are Hexodus's shapes
   (`Icon.svelte`), bare, without its rings, upside down, each tilted 35° outwards (left counterclockwise, right
-  clockwise) to hint at the way the lineup slides. A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
+  clockwise) to hint at the way the lineup slides. They don't scale when pressed: on a Pixel 6a, that made a tap's turn
+  stagger at its start (38% of its frames late, against 1% without; measured on the phone over USB). A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
   turn `TAP_TURN_MS` (0.5 s, linear), slowed at the designer's request. A new puzzle's planets grow from their
   centres (`ss.rise`, 1 to 0).
 - **A game's end**: on a win the map's planets glow, and swell three times (0.5 s each, linear) in a wave from the

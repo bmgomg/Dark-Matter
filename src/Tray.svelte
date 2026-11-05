@@ -196,6 +196,8 @@
 		overflow: visible;
 	}
 
+	/* No easing scale on press: on a phone (measured on a Pixel 6a) it made a good third of the turn's frames miss their
+	   time, nearly all of them at its start, which is the moment it plays. A layer of its own for the button didn't help. */
 	.turn {
 		grid-area: 1/1;
 		align-self: start;
@@ -209,18 +211,12 @@
 		cursor: pointer;
 		display: grid;
 		place-items: center;
-		transition:
-			opacity 0.15s,
-			transform 0.1s;
+		transition: opacity 0.15s;
 		-webkit-tap-highlight-color: transparent;
 	}
 
 	.turn:hover {
 		opacity: 1;
-	}
-
-	.turn:active {
-		transform: scale(0.85);
 	}
 
 	.turn.left {
