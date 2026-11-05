@@ -2,7 +2,7 @@
 	import NumberFlow from '@number-flow/svelte';
 	import { BANK, SIDES } from './const';
 	import Money from './Money.svelte';
-	import { avgScore, balance, cost, level, sideAt, ss } from './shared.svelte';
+	import { avgScore, balance, cost, level, rolls, sideAt, ss } from './shared.svelte';
 
 	// The level's stats, led by its difficulty (the board's size shows on the board): plays (given-up games count, at
 	// $0 or less), solved, and the average and best balance (the best shows once a game is solved). Below them, the
@@ -15,8 +15,12 @@
 <div class="scoreboard">
 	<div class="stats">
 		<span class="label level">{level()?.sub}</span>
-		<div class="stat"><span class="label">plays</span><span class="value"><NumberFlow value={ss.stats.plays} /></span></div>
-		<div class="stat"><span class="label">solved</span><span class="value"><NumberFlow value={ss.stats.solved} /></span></div>
+		<div class="stat">
+			<span class="label">plays</span><span class="value"><NumberFlow value={ss.stats.plays} animated={rolls()} /></span>
+		</div>
+		<div class="stat">
+			<span class="label">solved</span><span class="value"><NumberFlow value={ss.stats.solved} animated={rolls()} /></span>
+		</div>
 		<div class="stat"><span class="label">avg</span><span class="value">{money(avgScore(), ss.stats.plays)}</span></div>
 		<div class="stat"><span class="label">best</span><span class="value">{money(ss.stats.best, ss.stats.solved)}</span></div>
 	</div>

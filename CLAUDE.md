@@ -71,8 +71,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   drag settles on the nearest. A swipe to the left turns the board clockwise (East comes round). The turn buttons at
   the tray's ends, and ← →, turn it as a swipe that way (left: clockwise); their arrows are Hexodus's shapes
   (`Icon.svelte`), bare, without its rings, upside down, each tilted 35° outwards (left counterclockwise, right
-  clockwise) to hint at the way the lineup slides. They don't scale when pressed: on a Pixel 6a, that made a tap's turn
-  stagger at its start (38% of its frames late, against 1% without; measured on the phone over USB). A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
+  clockwise) to hint at the way the lineup slides. They don't scale when pressed, and have no hover on a touch screen: on a
+  Pixel 6a, each made a tap's turn stagger at its start (38–44% of its frames late, against 1% without; measured on the
+  phone over USB; a hover sticks to the arrow last tapped, so changing direction faded both). A swipe's settle takes `TURN_MS` (0.42 s, ease-out); a tap's whole quarter
   turn `TAP_TURN_MS` (0.5 s, linear), slowed at the designer's request. A new puzzle's planets grow from their
   centres (`ss.rise`, 1 to 0).
 - **A game's end**: on a win the map's planets glow, and swell three times (0.5 s each, linear) in a wave from the
@@ -103,7 +104,8 @@ first mark in a cell is free; any change after that costs `COST_CHANGE` ($1): an
 Back; `clearAll`) clears every planet on the map at `COST_CHANGE` each, as by hand, after a prompt that names the price
 ("Clear 3 planets — $3?" / No; the designer's call: a convenience, not a loophole). The scoreboard: the level's
 stats, led by its difficulty (plays, solved, average and best balance; the best only from games solved), then
-BANK − COST = BALANCE (`Money.svelte`, NumberFlow dollars; the balance red below zero). A win scores the balance,
+BANK − COST = BALANCE (`Money.svelte`, NumberFlow dollars; the balance red below zero). The digits roll, but not on a
+touch screen (`rolls`): on a Pixel 6a the rolling made the turns stagger (17–31% of their frames late, against 1%). A win scores the balance,
 which may be negative ("…but you shifted into the red"). A give-up counts as a play scoring $0, or the balance if lower,
 so it never beats breaking even. No board size shown: the board shows it. The sides seen are still recorded
 (`pzl.seen`) but not shown. The saves' key went to V2 with the bank (turn-based stats couldn't carry over).

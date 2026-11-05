@@ -197,7 +197,9 @@
 	}
 
 	/* No easing scale on press: on a phone (measured on a Pixel 6a) it made a good third of the turn's frames miss their
-	   time, nearly all of them at its start, which is the moment it plays. A layer of its own for the button didn't help. */
+	   time, nearly all of them at its start, which is the moment it plays. A layer of its own for the button didn't help.
+	   Nor any hover on a touch screen: it stays on the arrow last tapped, so tapping the other one faded both, as the turn
+	   began, with the same result. */
 	.turn {
 		grid-area: 1/1;
 		align-self: start;
@@ -215,8 +217,10 @@
 		-webkit-tap-highlight-color: transparent;
 	}
 
-	.turn:hover {
-		opacity: 1;
+	@media (hover: hover) {
+		.turn:hover {
+			opacity: 1;
+		}
 	}
 
 	.turn.left {
