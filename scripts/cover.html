@@ -8,6 +8,7 @@
      (no hash)  the cover, 630 × 500
      #embed     the Embed BG, 640 × 360 (the size that works on itch, in the designer's experience): itch puts its Run Game button in the middle, so the dark disc of the emblem's
                 eclipse is there to hold it, with the planets on the same line of sight on either side
+     #social    the social media image, 1200 × 630: the cover's scene with the title, since a link preview has no overlay
      #wide      the Wide Cover, 840 × 360 (21:9), for itch's home page features: no title, which itch puts over its promo
                 modules itself (its form says so, of the logo that replaces it) -->
 <style>
@@ -64,6 +65,32 @@
 
 	.wide .titles {
 		display: none;
+	}
+
+	.social.cover {
+		width: 1200px;
+		height: 630px;
+	}
+
+	.social .titles {
+		top: 26px;
+	}
+
+	.social .title {
+		display: flex;
+		align-items: baseline;
+		gap: 26px;
+		font-size: 86px;
+	}
+
+	.social .title-2 {
+		font-size: 53px;
+		margin-top: 0;
+	}
+
+	.social .tagline {
+		margin-top: 8px;
+		font-size: 18px;
 	}
 
 	.embed .titles {
@@ -143,22 +170,48 @@
 	</div>
 </div>
 <script>
-	const EMBED = location.hash === '#embed';
-	const WIDE = location.hash === '#wide';
-	const W = WIDE ? 840 : EMBED ? 640 : 630;
-	const H = WIDE ? 360 : EMBED ? 360 : 500;
+	// [column from the left, row from the front, size]
+	const ECLIPSE = [
+		// the eclipse: one lane, all on one line of sight, and behind them, seen only by its shadow, the dark matter
+		[2, 0, 1],
+		[2, 1, 2],
+		[2, 2, 3],
+		[2, 3, 1],
+		[0, 1, 3],
+		[0, 3, 1],
+		[1, 3, 2],
+		[3, 1, 2],
+		[3, 3, 1]
+	];
+	const OUTER_LANES = [
+		// the outer lanes only, clear of the button: on each, a planet partly eclipsing a giant, and behind the giant,
+		// seen only by its shadow, the dark matter
+		[0, 0, 2],
+		[0, 1, 3],
+		[0, 3, 1],
+		[3, 0, 1],
+		[3, 1, 3],
+		[3, 2, 2]
+	];
 
-	// the camera: its height above the board (degrees), how far off, the lens, where the board's centre lands
-	const ELEVATION = WIDE ? 8 : 9.5;
+	// W, H: the picture; ELEVATION: the camera's height above the board, in degrees; LENS; CX, CY: where the board's centre
+	// lands; LANE: the camera's place across the board: in line with the eclipse's lane, which it looks straight down, with
+	// no need to turn the board out of square with the picture (the Embed BG's is on the board's centre line: its eclipse
+	// is the disc behind the button); THICK: the plate's; BIG: the planets, larger than their cells would have them, in
+	// the same proportions: they're the picture; STARS: the sky's scale
+	const LAYOUTS = {
+		cover: { W: 630, H: 500, ELEVATION: 9.5, LENS: 880, CX: 385, CY: 401, LANE: 0.5, THICK: 0.09, BIG: 1.28, STARS: 0.8, PLANETS: ECLIPSE },
+		embed: { W: 640, H: 360, ELEVATION: 9.5, LENS: 587, CX: 320, CY: 278.5, LANE: 0, THICK: 0.09, BIG: 1.2, STARS: 0.67, PLANETS: OUTER_LANES },
+		wide: { W: 840, H: 360, ELEVATION: 8, LENS: 917, CX: 531, CY: 270, LANE: 0.5, THICK: 0.06, BIG: 1.28, STARS: 0.86, PLANETS: ECLIPSE },
+		social: { W: 1200, H: 630, ELEVATION: 8, LENS: 1311, CX: 759, CY: 500, LANE: 0.5, THICK: 0.06, BIG: 1.28, STARS: 1.2, PLANETS: ECLIPSE }
+	};
+	const NAME = location.hash.slice(1) || 'cover';
+	const { W, H, ELEVATION, LENS, CX, CY, LANE, THICK, BIG, STARS, PLANETS } = LAYOUTS[NAME];
+	const EMBED = NAME === 'embed';
+
+	// how far off the camera is
 	const DISTANCE = 6.2;
-	const LENS = WIDE ? 917 : EMBED ? 587 : 880;
-	const CX = WIDE ? 531 : EMBED ? 320 : 385;
-	const CY = WIDE ? 270 : EMBED ? 278.5 : 401;
 	const SIGHT = DISTANCE * Math.cos((ELEVATION * Math.PI) / 180);
-	// the camera's place across the board: in line with the eclipse's lane, which it looks straight down, with no need to
-	// turn the board out of square with the picture
-	// (the Embed BG's camera is on the board's centre line instead: its eclipse is the disc behind the button)
-	const LANE = EMBED ? 0 : 0.5;
 	// the board's turn, in degrees (falling: clockwise from above, as a swipe to the left turns it in the game)
 	const YAW = 0;
 
@@ -167,40 +220,12 @@
 	// how far above the plate the planets' centres are: at the camera's height, so that they're all on one line on the
 	// screen and a lane's planets are concentric, as in the tray
 	const AXIS = DISTANCE * Math.sin((ELEVATION * Math.PI) / 180);
-	const THICK = WIDE ? 0.06 : 0.09;
-	// the planets larger than their cells would have them, in the same proportions: they're the picture
-	const BIG = EMBED ? 1.2 : 1.28;
 	// how squarely a side must face the camera for its bright lip to start showing and to show fully
 	const LIP_FROM = 0.55;
 	const LIP_TO = 0.95;
 	// the depths a planet's dimming runs between
 	const DIM_NEAR = 4.6;
 	const DIM_FAR = 7.6;
-
-	// [column from the left, row from the front, size]
-	const PLANETS = EMBED
-		? [
-				// the outer lanes only, clear of the button: on each, a planet partly eclipsing a giant, and behind the giant,
-				// seen only by its shadow, the dark matter
-				[0, 0, 2],
-				[0, 1, 3],
-				[0, 3, 1],
-				[3, 0, 1],
-				[3, 1, 3],
-				[3, 2, 2]
-			]
-		: [
-				// the eclipse: one lane, all on one line of sight, and behind them, seen only by its shadow, the dark matter
-				[2, 0, 1],
-				[2, 1, 2],
-				[2, 2, 3],
-				[2, 3, 1],
-				[0, 1, 3],
-				[0, 3, 1],
-				[1, 3, 2],
-				[3, 1, 2],
-				[3, 3, 1]
-			];
 
 	// where the corona goes: the eclipse's largest planet
 	const CORONA = [2, 2];
@@ -209,9 +234,7 @@
 	canvas.width = W;
 	canvas.height = H;
 
-	if (EMBED || WIDE) {
-		document.getElementById('cover').classList.add(EMBED ? 'embed' : 'wide');
-	}
+	document.getElementById('cover').classList.add(NAME);
 
 	const ctx = canvas.getContext('2d');
 
@@ -245,7 +268,7 @@
 		});
 
 	const drawStars = () => {
-		const scale = WIDE ? 0.86 : EMBED ? 0.67 : 0.8;
+		const scale = STARS;
 
 		for (const s of stars) {
 			ctx.globalAlpha = s.o;

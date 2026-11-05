@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Logo</title>
+<!-- The itch.io logo, 1000 × 300, on transparency, rendered by render-cover.sh: the emblem's eclipse beside the title. Itch
+     asks for it to be legible on both white and black: the letters are cream, for black, on a dark outline, for white. -->
+<style>
+	@font-face {
+		font-family: CZ;
+		src: url('../src/lib/fonts/Cinzel.ttf');
+		font-weight: 400 900;
+	}
+
+	html,
+	body {
+		margin: 0;
+		background: none;
+	}
+
+	svg {
+		display: block;
+	}
+
+	text {
+		font-family: CZ;
+		fill: #fff4dc;
+		stroke: #15123a;
+		stroke-linejoin: round;
+		paint-order: stroke fill;
+	}
+</style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 300" width="1000" height="300">
+	<defs>
+		<radialGradient id="corona">
+			<stop offset="0.5" stop-color="#fff8e6" />
+			<stop offset="0.56" stop-color="#ffe2a0" stop-opacity="0.85" />
+			<stop offset="0.7" stop-color="#ffb35c" stop-opacity="0.35" />
+			<stop offset="1" stop-color="#b06bff" stop-opacity="0" />
+		</radialGradient>
+		<radialGradient id="moon" cx="0.4" cy="0.35" r="0.75">
+			<stop offset="0" stop-color="#1c1838" />
+			<stop offset="1" stop-color="#05040e" />
+		</radialGradient>
+		<filter id="glint" x="-200%" y="-200%" width="500%" height="500%">
+			<feGaussianBlur stdDeviation="5" />
+		</filter>
+	</defs>
+
+	<g transform="translate(150 150)">
+		<circle r="146" fill="url(#corona)" />
+		<circle r="73" fill="url(#moon)" stroke="#fff4dc" stroke-width="2" />
+		<circle cx="52" cy="-52" r="8" fill="#ffe2a0" filter="url(#glint)" />
+		<circle cx="52" cy="-52" r="5" fill="#fff" />
+	</g>
+
+	<text x="290" y="150" font-size="96" font-weight="700" stroke-width="10">Dark Matter</text>
+	<text x="294" y="222" font-size="56" font-weight="700" stroke-width="8" letter-spacing="3">of Perspective</text>
+</svg>
+</body>
+</html>

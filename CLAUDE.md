@@ -169,8 +169,10 @@ mirrored at random by `generate`. The other levels are generated live.
   picture (the designer's calls: the game's even rings, a level gold edge). Its `#embed` layout is the Embed BG, 640 ×
   360 (the only size that has worked on itch, in the designer's experience): the emblem's dark disc behind itch's central
   Run Game button, the planets in the outer lanes, clear of it. Its `#wide` layout is the Wide Cover, 840 × 360 (21:9),
-  with no title, as itch's form says it puts the title or logo over promo modules. `sh scripts/render-cover.sh` writes `itch/cover.png` and
-  `itch/embed-bg.png`. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
+  with no title, as itch's form says it puts the title or logo over promo modules. Its `#social` layout is the social media image, 1200 × 630, with the title, since a link preview has no
+  overlay. `scripts/logo.html` is the logo, 1000 × 300 on transparency: cream letters on a dark outline, as itch wants it
+  legible on white and black. `sh scripts/render-cover.sh` writes the stills to `itch/`: `cover.png`, `embed-bg.png`,
+  `social.png`, `logo.png`. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
   hold on that view, then one full turn (needs ffmpeg). GIFs work on itch, in the designer's experience. The settings are
   set to come in under 3 MB, itch's limit on GIFs by forum reports (no official figure found).
 
