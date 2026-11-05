@@ -102,7 +102,6 @@ const tween = (key, to, ms, done, ease = easeOut) => {
 	cancelAnimationFrame(tweens[key]);
 
 	const from = ss[key];
-	const t0 = performance.now();
 
 	if (still() || from === to) {
 		ss[key] = to;
@@ -110,7 +109,14 @@ const tween = (key, to, ms, done, ease = easeOut) => {
 		return;
 	}
 
+	// The clock starts on the first frame, not now. A frame's time is when it began, which can be before now (a tap is
+	// handled inside the frame), so timing from now would start a little behind 0, more so on a slow phone: the value
+	// would jump back, then rush to catch up. It also leaves whatever the first frame had to do out of the time.
+	let t0;
+
 	const tick = (t) => {
+		t0 ??= t;
+
 		const k = Math.min(1, (t - t0) / ms);
 		ss[key] = from + (to - from) * ease(k);
 
