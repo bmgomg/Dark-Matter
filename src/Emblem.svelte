@@ -79,8 +79,9 @@
 
 <style>
 	.emblem {
-		width: 400px;
-		height: 220px;
+		display: block;
+		width: 360px;
+		height: 198px;
 		overflow: visible;
 	}
 

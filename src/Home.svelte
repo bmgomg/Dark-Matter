@@ -30,11 +30,11 @@
 		</div>
 
 		<div class="titles">
-			<div class="tagline">{TAGLINE}</div>
 			<div class="title">
 				<div>{TITLE[0]}</div>
 				<div class="title-2">{TITLE[1]}</div>
 			</div>
+			<div class="tagline">{TAGLINE}</div>
 		</div>
 
 		<ul class="rules">
@@ -60,9 +60,10 @@
 {/if}
 
 <style>
+	/* all of it together, centred on the page */
 	.home {
 		display: grid;
-		grid-template-rows: 1fr auto auto auto 1fr;
+		align-content: center;
 		justify-items: center;
 		width: 450px;
 		height: 800px;
@@ -70,14 +71,13 @@
 	}
 
 	.hero {
-		align-self: end;
-		margin-bottom: 4px;
+		margin-bottom: 30px;
 	}
 
 	.titles {
 		display: grid;
 		justify-items: center;
-		gap: 8px;
+		gap: 12px;
 	}
 
 	.tagline {
@@ -107,7 +107,7 @@
 
 	.rules {
 		list-style: none;
-		margin: 30px 0 0;
+		margin: 36px 0 0;
 		padding: 0;
 		width: 380px;
 		display: grid;
@@ -141,7 +141,6 @@
 	}
 
 	.play {
-		align-self: start;
-		margin-top: 40px;
+		margin-top: 46px;
 	}
 </style>
