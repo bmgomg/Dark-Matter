@@ -74,7 +74,7 @@ export const cost = () => (ss.pzl ? ss.pzl.turns * COST_TURN + ss.pzl.changes * 
 export const balance = () => BANK - cost();
 
 export const persistCommon = () => {
-	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music, swiped: ss.swiped });
+	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music });
 	localStorage.setItem(APP_STATE, json);
 };
 
@@ -84,7 +84,6 @@ export const loadCommon = () => {
 	if (job) {
 		_sound.sfx = job.sfx;
 		_sound.music = job.music;
-		ss.swiped = job.swiped;
 	}
 };
 
@@ -183,11 +182,8 @@ const onSettled = () => {
 	pzl.step = step;
 	pzl.seen[sideAt(ss.angle)] = true;
 
-	// the player knows how to turn the board now, whichever way they did it: the hint moves on
-	if (!ss.swiped) {
-		ss.swiped = true;
-		persistCommon();
-	}
+	// the player knows how to turn the board now, whichever way they did it: the hint moves on, till the next session
+	ss.swiped = true;
 
 	persist();
 };
