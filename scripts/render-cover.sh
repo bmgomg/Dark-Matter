@@ -1,6 +1,6 @@
 #!/bin/sh
 # Renders the itch.io art from cover.html with headless Edge (or Chrome): sh scripts/render-cover.sh [output folder]
-# (the cover, 630 × 500, the Embed BG, 640 × 360, the social media image, 1200 × 630, the logo, on transparency, and the page's background tile, 1024 × 1024)
+# (the cover, 630 × 500, the Embed BG, 640 × 360, the social media image, 1200 × 630, the logo, on transparency, the page's background tile, 1024 × 1024, and the rules graphic, 900 × 600)
 cd "$(dirname "$0")"
 BROWSER="/c/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
 [ -f "$BROWSER" ] || BROWSER="/c/Program Files/Google/Chrome/Application/chrome.exe"
@@ -20,3 +20,4 @@ render "cover.html#embed" 640 360 embed-bg.png
 render "cover.html#social" 1200 630 social.png
 render logo.html 1000 300 logo.png --default-background-color=00000000
 render tile.html 1024 1024 tile.png
+render rules.html 900 600 rules.png
