@@ -203,6 +203,12 @@ export const spinTo = (step, tapped = false, ms = tapped ? TAP_TURN_MS : TURN_MS
 		whoosh();
 	}
 
+	// released bang on the side it's turning to: a hair off it, so the next lineup, which slides in as the angle
+	// closes, has some way to go
+	if (ss.angle === step * 90 && step !== ss.pzl?.step) {
+		ss.angle += 0.01;
+	}
+
 	ss.target = step;
 	ss.turnFrom = ss.angle;
 	tween('angle', step * 90, ms, onSettled, tapped ? linear : easeOut);

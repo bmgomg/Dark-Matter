@@ -60,8 +60,9 @@
 			const span = ss.target - pzl.step;
 			// how far through the whole turn the board is, and was when the turn was made
 			const done = (q - pzl.step) / span;
+			// (past 1 if it was dragged beyond the side it's settling on: it comes back to it, and the lineup still slides in)
 			const start = Math.max(LAG, (ss.turnFrom / 90 - pzl.step) / span);
-			const k = start >= 1 ? 1 : Math.min(1, Math.max(0, (done - start) / (1 - start)));
+			const k = start === 1 ? 1 : Math.min(1, Math.max(0, (done - start) / (1 - start)));
 			out.push(...lineup(mod4(ss.target), Math.sign(span) * (1 - k) * SWIPE_PX, 'in'));
 		}
 
