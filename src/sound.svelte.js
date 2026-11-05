@@ -24,9 +24,22 @@ const sprite = {
 };
 
 const MUSIC_VOLUME = 0.4;
+const MUSIC_FADE_MS = 5000;
 
 const howl = new Howl({ src: [sounds], sprite });
-const loop = new Howl({ src: [music], loop: true });
+
+// Silent until it plays: Howler queues calls made before the file has loaded, and a queued fade would hold up a queued
+// "off" till it ended, so the first fade waits for the play event.
+const loop = new Howl({ src: [music], loop: true, volume: 0, onplay: () => setMusic() });
+
+// up from silence whenever it starts or resumes; off at once
+const setMusic = () => {
+	if (_sound.music > 0) {
+		loop.fade(0, MUSIC_VOLUME, MUSIC_FADE_MS);
+	} else {
+		loop.volume(0);
+	}
+};
 
 export const _sound = $state({
 	sfx: 1,
@@ -44,9 +57,9 @@ export const _sound = $state({
 		if (!_sound.musicPlayed) {
 			_sound.musicPlayed = true;
 			loop.play();
+		} else if (loop.playing()) {
+			setMusic();
 		}
-
-		loop.volume(_sound.music > 0 ? MUSIC_VOLUME : 0);
 	},
 	stopMusic: () => {
 		loop.stop();

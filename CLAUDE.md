@@ -104,7 +104,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   except in the home page's rules and the shortcuts card, where the designer preferred Quicksand, `QS`),
   Space Mono (`SM`, labels; its bold on a gold button, selected or hovered, where thin dark letters were hard to read,
   more so on a phone; the same width, so nothing shifts).
-- Splash: the template's BMG one. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License).
+- Splash: the template's BMG one. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License). It fades up from silence (`MUSIC_FADE_MS`, 5 s) whenever it starts or resumes (the first Start, Music On, back in the window), at the designer's wish; it goes off at once.
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
 
 ## Scoring: the bank
