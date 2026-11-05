@@ -175,7 +175,8 @@ mirrored at random by `generate`. The other levels are generated live.
   a flat base, its nebulae fractal noise that wraps. `scripts/rules.html` is the rules graphic for the page's description,
   900 × 600, in the format of Hexodus's: its wording states the difficulties' names and the price of a turn, so change it
   with the game. `sh scripts/render-cover.sh` writes the stills to `itch/`: `cover.png`, `embed-bg.png`, `social.png`,
-  `logo.png`, `tile.png`, `rules.png`. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
+  `logo.png`, `tile.png`, `rules.png`. `node scripts/render-screenshots.mjs` writes `itch/screenshots/`, five shots of the real game, with the dev server
+  running; the puzzle is random, so look at them. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
   hold on that view, then one full turn (needs ffmpeg). GIFs work on itch, in the designer's experience. The settings are
   set to come in under 3 MB, itch's limit on GIFs by forum reports (no official figure found).
 
