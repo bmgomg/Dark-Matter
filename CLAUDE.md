@@ -61,7 +61,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   paragraph, Board (4×4 / 5×5) and Difficulty (Easy / Not Easy / Quite Hard: `DIFF_NAMES`, what the player reads; the code and the saves say `hard` for Not Easy and `expert` for Quite Hard) pills, each difficulty pill as wide as its name, and Start, or Resume when the picked level has a
   game begun (a turn or a mark) and not finished (`inProgress`). No stats there (the designer's call). It opens on
   the last level played; an untouched new puzzle is kept, under Start. The toolbar's first button is
-  Back (text, like the rest: no icons in the toolbar): a game → the launcher → Home.
+  Back (text, like the rest: no icons in the toolbar): a game → the launcher → Home. The music's credit (see License)
+  shows at the foot of the page while the launcher is up, and only then (`Game Page.svelte`; the designer's call).
 - **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge as a 2D being sees it), with no
   lane lines (the designer dropped the dashed ones) and no line under the planets, its lanes under
   the map's columns at the same scale. The planets are centred on one line of sight (`AXIS`: as low as a large planet allows, its bottom on the old floor
@@ -163,6 +164,13 @@ mirrored at random by `generate`. The other levels are generated live.
   (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), selecting and marking (`select`, `mark`; a match ends the game), the budget (`cost`, `balance`), reveal, Back (`goBack`). `pzl.step` is the net count of clockwise quarter turns.
 - `src/const.js`: title, levels, sizes, sides, swipe and turn timing, the bank and costs, prompts.
 - `scripts/build-itch.js`: `npm run build:itch`, a static build without the PWA parts, zipped for itch.io.
+
+## License
+
+The code is MIT (`LICENSE`, the designer's choice). `NOTICE.md` lists what that doesn't cover: the art and the logo (all
+rights reserved), the music, the sound effects, the fonts (OFL, its texts in `src/lib/fonts`) and howler.js. The music's
+license (Soundimage: CC BY 4.0 with one restriction, not sublicensable) requires its credit in the game itself, so the
+launcher's line can't simply go. The sound effects' source isn't on record.
 
 ## Open questions
 

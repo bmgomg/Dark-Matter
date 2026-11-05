@@ -20,7 +20,11 @@
 <!-- the launcher (between Home and a game), or the game itself, above the toolbar -->
 <div class="game-page ga11" class:show={!ss.home} inert={ss.home}>
 	{#if ss.launcher}
-		<div class="ga11 launching" in:fade={{ duration: 250 }} out:fade={{ duration: 150 }}><Launcher /></div>
+		<div class="ga11 launching" in:fade={{ duration: 250 }} out:fade={{ duration: 150 }}>
+			<div class="ga11"><Launcher /></div>
+			<!-- the music's license requires a credit in the game itself -->
+			<div class="ga11 credit">Music by Eric Matyas · www.soundimage.org</div>
+		</div>
 	{:else}
 		<div class="ga11 game" in:fade={{ duration: PAGE_FADE_MS }} out:fade={{ duration: 150 }}>
 			<Scoreboard />
@@ -81,6 +85,14 @@
 	.launching {
 		display: grid;
 		place-items: center;
+	}
+
+	.credit {
+		align-self: end;
+		padding-bottom: 14px;
+		font-family: SI;
+		font-size: 14px;
+		color: #b8b0ff;
 	}
 
 	.stage {
