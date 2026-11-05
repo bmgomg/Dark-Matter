@@ -44,7 +44,10 @@
 						{#if size}
 							<Planet x={0} y={0} r={(R[size] / R[3]) * 10} {size} />
 						{:else}
-							<circle r="3" class="dot" />
+							<!-- the favicon's eclipse, in the emblem's gradients -->
+							<circle r="11" fill="url(#corona)" />
+							<circle r="5.5" fill="url(#moon-dark)" stroke="#fff4dc" stroke-width="0.3" />
+							<circle cx="3.9" cy="-3.9" r="0.8" fill="#fff" />
 						{/if}
 					</svg>
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -134,10 +137,6 @@
 		width: 24px;
 		height: 24px;
 		overflow: visible;
-	}
-
-	.dot {
-		fill: #ffd77a;
 	}
 
 	.play {
