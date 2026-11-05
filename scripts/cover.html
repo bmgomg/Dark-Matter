@@ -3,8 +3,11 @@
 <head>
 <meta charset="utf-8">
 <title>Cover</title>
-<!-- The itch.io cover, 630 × 500, rendered by render-cover.sh: the board seen from low down, past its gold edge, so that
-     its planets line up and eclipse each other, under the title. The sky is Space.svelte's (the same seed). -->
+<!-- The itch.io art, rendered by render-cover.sh: the board seen from low down, past its gold edge, so that its planets
+     line up and eclipse each other, under the title. The sky is Space.svelte's (the same seed). Layouts:
+     (no hash)  the cover, 630 × 500
+     #embed     the Embed BG, 640 × 360 (the size that works on itch, in the designer's experience): itch puts its Run Game button in the middle, so the dark disc of the emblem's
+                eclipse is there to hold it, with the planets on the same line of sight on either side -->
 <style>
 	@font-face {
 		font-family: CZ;
@@ -47,6 +50,36 @@
 		inset: 0;
 	}
 
+	.embed.cover {
+		width: 640px;
+		height: 360px;
+	}
+
+	.embed .titles {
+		top: 12px;
+	}
+
+	.embed .title {
+		display: flex;
+		align-items: baseline;
+		gap: 12px;
+		font-size: 39px;
+	}
+
+	.embed .title-2 {
+		font-size: 24px;
+		margin-top: 0;
+	}
+
+	.embed .tagline {
+		position: absolute;
+		top: 331px;
+		left: 0;
+		right: 0;
+		margin: 0;
+		font-size: 10px;
+	}
+
 	.titles {
 		position: absolute;
 		top: 20px;
@@ -87,7 +120,7 @@
 </style>
 </head>
 <body>
-<div class="cover">
+<div class="cover" id="cover">
 	<div class="nebula"></div>
 	<canvas id="c" width="630" height="500"></canvas>
 	<div class="titles">
@@ -99,19 +132,21 @@
 	</div>
 </div>
 <script>
-	const W = 630;
-	const H = 500;
+	const EMBED = location.hash === '#embed';
+	const W = EMBED ? 640 : 630;
+	const H = EMBED ? 360 : 500;
 
 	// the camera: its height above the board (degrees), how far off, the lens, where the board's centre lands
 	const ELEVATION = 9.5;
 	const DISTANCE = 6.2;
-	const LENS = 880;
-	const CX = 385;
-	const CY = 401;
+	const LENS = EMBED ? 587 : 880;
+	const CX = EMBED ? 320 : 385;
+	const CY = EMBED ? 278.5 : 401;
 	const SIGHT = DISTANCE * Math.cos((ELEVATION * Math.PI) / 180);
 	// the camera's place across the board: in line with the eclipse's lane, which it looks straight down, with no need to
 	// turn the board out of square with the picture
-	const LANE = 0.5;
+	// (the Embed BG's camera is on the board's centre line instead: its eclipse is the disc behind the button)
+	const LANE = EMBED ? 0 : 0.5;
 	// the board's turn, in degrees (falling: clockwise from above, as a swipe to the left turns it in the game)
 	const YAW = 0;
 
@@ -122,7 +157,7 @@
 	const AXIS = DISTANCE * Math.sin((ELEVATION * Math.PI) / 180);
 	const THICK = 0.09;
 	// the planets larger than their cells would have them, in the same proportions: they're the picture
-	const BIG = 1.28;
+	const BIG = EMBED ? 1.2 : 1.28;
 	// how squarely a side must face the camera for its bright lip to start showing and to show fully
 	const LIP_FROM = 0.55;
 	const LIP_TO = 0.95;
@@ -131,23 +166,42 @@
 	const DIM_FAR = 7.6;
 
 	// [column from the left, row from the front, size]
-	const PLANETS = [
-		// the eclipse: one lane, all on one line of sight, and behind them, seen only by its shadow, the dark matter
-		[2, 0, 1],
-		[2, 1, 2],
-		[2, 2, 3],
-		[2, 3, 1],
-		[0, 1, 3],
-		[0, 3, 1],
-		[1, 3, 2],
-		[3, 1, 2],
-		[3, 3, 1]
-	];
+	const PLANETS = EMBED
+		? [
+				// the outer lanes only, clear of the button: on each, a planet partly eclipsing a giant, and behind the giant,
+				// seen only by its shadow, the dark matter
+				[0, 0, 2],
+				[0, 1, 3],
+				[0, 3, 1],
+				[3, 0, 1],
+				[3, 1, 3],
+				[3, 2, 2]
+			]
+		: [
+				// the eclipse: one lane, all on one line of sight, and behind them, seen only by its shadow, the dark matter
+				[2, 0, 1],
+				[2, 1, 2],
+				[2, 2, 3],
+				[2, 3, 1],
+				[0, 1, 3],
+				[0, 3, 1],
+				[1, 3, 2],
+				[3, 1, 2],
+				[3, 3, 1]
+			];
 
 	// where the corona goes: the eclipse's largest planet
 	const CORONA = [2, 2];
 
-	const ctx = document.getElementById('c').getContext('2d');
+	const canvas = document.getElementById('c');
+	canvas.width = W;
+	canvas.height = H;
+
+	if (EMBED) {
+		document.getElementById('cover').classList.add('embed');
+	}
+
+	const ctx = canvas.getContext('2d');
 
 	const rand = (() => {
 		let a = 20261103;
@@ -179,7 +233,7 @@
 		});
 
 	const drawStars = () => {
-		const scale = 0.8;
+		const scale = EMBED ? 0.67 : 0.8;
 
 		for (const s of stars) {
 			ctx.globalAlpha = s.o;
@@ -337,6 +391,62 @@
 		ctx.fill();
 	};
 
+	// the Embed BG's eclipse, the emblem's, on the board's line of sight: big enough to hold the button (itch's is about
+	// 179 × 49 at this size, for "Restore game", its longest) and behind the board and every planet
+	const DISC = 103;
+
+	const drawEclipse = () => {
+		const y = CY - LENS * Math.tan((ELEVATION * Math.PI) / 180);
+		const rc = 167;
+		const corona = ctx.createRadialGradient(CX, y, 0, CX, y, rc);
+		const edge = DISC / rc;
+		corona.addColorStop(edge, '#fff8e6');
+		corona.addColorStop(edge + 0.04, '#ffe2a0d9');
+		corona.addColorStop(edge + 0.16, '#ffb35c59');
+		corona.addColorStop(1, '#b06bff00');
+		ctx.fillStyle = corona;
+		ctx.beginPath();
+		ctx.arc(CX, y, rc, 0, 2 * Math.PI);
+		ctx.fill();
+
+		ctx.strokeStyle = '#ffe2a0';
+		ctx.globalAlpha = 0.3;
+		ctx.lineWidth = 1.5;
+		ctx.lineCap = 'round';
+
+		for (let k = 0; k < 18; k++) {
+			const a = (k * 20 * Math.PI) / 180;
+			const to = k % 2 ? 124 : 134;
+			ctx.beginPath();
+			ctx.moveTo(CX + Math.sin(a) * (DISC + 8), y - Math.cos(a) * (DISC + 8));
+			ctx.lineTo(CX + Math.sin(a) * to, y - Math.cos(a) * to);
+			ctx.stroke();
+		}
+
+		ctx.globalAlpha = 1;
+
+		const moon = ctx.createRadialGradient(CX - 21, y - 31, 0, CX - 21, y - 31, DISC * 1.5);
+		moon.addColorStop(0, '#1c1838');
+		moon.addColorStop(1, '#05040e');
+		ctx.fillStyle = moon;
+		ctx.beginPath();
+		ctx.arc(CX, y, DISC, 0, 2 * Math.PI);
+		ctx.fill();
+		ctx.strokeStyle = '#fff4dccc';
+		ctx.lineWidth = 1.5;
+		ctx.stroke();
+
+		// the diamond ring: the last of the sun, at the moon's edge
+		const d = DISC * Math.SQRT1_2;
+		ctx.fillStyle = '#fff';
+		ctx.shadowColor = '#ffe2a0';
+		ctx.shadowBlur = 16;
+		ctx.beginPath();
+		ctx.arc(CX + d, y - d, 5, 0, 2 * Math.PI);
+		ctx.fill();
+		ctx.shadowBlur = 0;
+	};
+
 	// a fixed grain for the GIF, whose few colours would otherwise show the sky's gradients as bands: on what stays still
 	// it costs nothing after the first frame, unlike a dither over everything
 	const GRAIN = 7;
@@ -357,7 +467,12 @@
 	const draw = (yaw, images, { sky, whole } = {}) => {
 		ctx.clearRect(0, 0, W, H);
 		drawStars();
-		drawCorona();
+
+		if (EMBED) {
+			drawEclipse();
+		} else {
+			drawCorona();
+		}
 
 		if (sky) {
 			ctx.drawImage(grain, 0, 0);
@@ -371,12 +486,24 @@
 		}
 	};
 
+	// how far through the turn the Embed BG's tagline has gone
+	const TAGLINE_FADE = 0.05;
+
 	// a frame for the GIF (render-cover-gif.mjs): how far through the turn, 0 to 1, from the eclipse round to it again
 	window.ready = Promise.all([1, 2, 3].map((i) => image(`../src/lib/images/planet-${i}.webp`))).then(async ([a, b, c]) => {
 		await document.fonts.ready;
 		const images = [null, a, b, c];
 
-		window.frame = (turned, grains) => draw(YAW - 360 * turned, images, grains);
+		// the Embed BG's tagline, under the board, goes while the board turns: its corners swing through there
+		const tagline = document.querySelector('.tagline');
+
+		window.frame = (turned, grains) => {
+			draw(YAW - 360 * turned, images, grains);
+
+			if (EMBED) {
+				tagline.style.opacity = Math.max(0, 1 - Math.min(turned, 1 - turned) / TAGLINE_FADE);
+			}
+		};
 		window.frame(0);
 	});
 </script>

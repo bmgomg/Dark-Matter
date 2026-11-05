@@ -1,6 +1,6 @@
-// The itch.io cover as a GIF, 630 × 500: one full turn of the board in cover.html, from the eclipse round to it again,
-// holding on it at the start, so the first frame is the still cover. Headless Chrome over the DevTools protocol for the
-// frames, ffmpeg for the palette and the GIF: node scripts/render-cover-gif.mjs [output.gif]
+// The itch.io art as a GIF: one full turn of the board in cover.html, from its first view round to it again, holding on
+// it at the start, so the first frame is the still picture. Headless Chrome over the DevTools protocol for the frames,
+// ffmpeg for the palette and the GIF: node scripts/render-cover-gif.mjs [cover|embed] [output.gif]
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -8,14 +8,25 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const OUT = resolve(process.argv[2] ?? join(HERE, '../itch/cover.gif'));
+const LAYOUTS = {
+	cover: { width: 630, height: 500, hash: '', file: 'cover.gif', fps: 12, colors: 96 },
+	embed: { width: 640, height: 360, hash: '#embed', file: 'embed-bg.gif', fps: 15, colors: 256 }
+};
+const LAYOUT = LAYOUTS[process.argv[2] ?? 'cover'];
+
+if (!LAYOUT) {
+	console.error('usage: node render-cover-gif.mjs [cover|embed] [output.gif]');
+	process.exit(1);
+}
+
+const OUT = resolve(process.argv[3] ?? join(HERE, '../itch', LAYOUT.file));
 const CHROME = process.env.CHROME ?? 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 const PORT = 9334;
 
-const FPS = +(process.env.FPS ?? 12);
+const FPS = +(process.env.FPS ?? LAYOUT.fps);
 const TURN_SECONDS = +(process.env.TURN ?? 6);
 const HOLD_SECONDS = +(process.env.HOLD ?? 1.5);
-const COLORS = +(process.env.COLORS ?? 96);
+const COLORS = +(process.env.COLORS ?? LAYOUT.colors);
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const work = mkdtempSync(join(tmpdir(), 'cover-gif-'));
@@ -78,9 +89,9 @@ try {
 		}
 	};
 
-	await send('Emulation.setDeviceMetricsOverride', { width: 630, height: 500, deviceScaleFactor: 1, mobile: false });
+	await send('Emulation.setDeviceMetricsOverride', { width: LAYOUT.width, height: LAYOUT.height, deviceScaleFactor: 1, mobile: false });
 	await send('Page.enable');
-	await send('Page.navigate', { url: pathToFileURL(join(HERE, 'cover.html')).href });
+	await send('Page.navigate', { url: pathToFileURL(join(HERE, 'cover.html')).href + LAYOUT.hash });
 	await sleep(500);
 	await evaluate('window.ready');
 

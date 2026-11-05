@@ -166,9 +166,12 @@ mirrored at random by `generate`. The other levels are generated live.
 - `scripts/build-itch.js`: `npm run build:itch`, a static build without the PWA parts, zipped for itch.io.
 - `scripts/cover.html`: the itch.io cover, 630 × 500: the board seen from low down, under the title. The camera is in line
   with one lane and at the planets' height, so that lane's planets are concentric and the board stays square with the
-  picture (the designer's calls: the game's even rings, a level gold edge). `sh scripts/render-cover.sh` writes
-  `itch/cover.png`. `node scripts/render-cover-gif.mjs` writes `itch/cover.gif`: a hold on that view, then one full turn
-  (needs ffmpeg). Its settings are set to come in under itch's limit, 3 MB by forum reports (no official figure found).
+  picture (the designer's calls: the game's even rings, a level gold edge). Its `#embed` layout is the Embed BG, 640 ×
+  360 (the only size that has worked on itch, in the designer's experience): the emblem's dark disc behind itch's central
+  Run Game button, the planets in the outer lanes, clear of it. `sh scripts/render-cover.sh` writes `itch/cover.png` and
+  `itch/embed-bg.png`. `node scripts/render-cover-gif.mjs [cover|embed]` writes `itch/cover.gif` or `itch/embed-bg.gif`: a
+  hold on that view, then one full turn (needs ffmpeg). GIFs work on itch, in the designer's experience. The settings are
+  set to come in under 3 MB, itch's limit on GIFs by forum reports (no official figure found).
 
 ## License
 
