@@ -1,17 +1,14 @@
 <script>
-	import NumberFlow from '@number-flow/svelte';
 	import { BANK, SIDES } from './const';
 	import Money from './Money.svelte';
-	import { avgScore, balance, cost, level, rolls, sideAt, ss } from './shared.svelte';
+	import Roller from './Roller.svelte';
+	import { avgScore, balance, cost, level, sideAt, ss } from './shared.svelte';
 
 	// The level's stats, led by its difficulty (the board's size shows on the board): solved out of plays (given-up games
 	// count as plays, at $0 or less), and the average and best balance (the best shows once a game is solved). Below them,
 	// the game's budget: the bank, less what turning and changing your mind have cost, leaves the balance.
 	const side = $derived(sideAt(ss.angle));
 	const left = $derived(balance());
-	// the balance's digits roll down as the number shrinks and up as it grows, so below zero, where a falling balance is
-	// a growing number, one step at a time: −$1 to −$2 rolling down would go the long way round, through 0, 9, 8…
-	const rollBySize = (from, to) => Math.sign(Math.abs(to) - Math.abs(from));
 	const money = (v, shown) => (shown ? `${v < 0 ? '−' : ''}$${Math.round(Math.abs(v) * 10) / 10}` : '–');
 </script>
 
@@ -20,7 +17,7 @@
 		<span class="label level">{level()?.sub}</span>
 		<div class="stat">
 			<span class="label">solved</span><span class="value"
-				><NumberFlow value={ss.stats.solved} animated={rolls()} />/<NumberFlow value={ss.stats.plays} animated={rolls()} /></span
+				><Roller value={ss.stats.solved} />/<Roller value={ss.stats.plays} /></span
 			>
 		</div>
 		<div class="stat"><span class="label">avg</span><span class="value">{money(avgScore(), ss.stats.plays)}</span></div>
@@ -38,7 +35,7 @@
 		<span></span>
 		<span class="sign">=</span>
 		<span class="label">balance</span>
-		<span class="sum balance" class:broke={left < 0}><Money value={left} trend={rollBySize} /></span>
+		<span class="sum balance" class:broke={left < 0}><Money value={left} /></span>
 	</div>
 	<span class="sr">From the {SIDES[side]}</span>
 </div>
@@ -102,7 +99,7 @@
 	.sum {
 		font-family: CZ;
 		font-size: 30px;
-		line-height: 1;
+		line-height: 1.5;
 		color: #d8d2ff;
 		opacity: 0.75;
 	}

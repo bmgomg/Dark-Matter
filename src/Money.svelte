@@ -1,14 +1,9 @@
 <script>
-	import NumberFlow from '@number-flow/svelte';
-	import { rolls } from './shared.svelte';
+	import Roller from './Roller.svelte';
 
-	// dollars, rolling to a new value (as in Mixed Results); trend: which way the digits roll, or a function that says
-	const { value, trend = 1 } = $props();
+	// dollars, rolling to a new value (as in Mixed Results); the digits go by the number's size, so a falling balance's roll
+	// down above zero and up below it
+	const { value } = $props();
 </script>
 
-<NumberFlow
-	{value}
-	{trend}
-	animated={rolls()}
-	format={{ style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }}
-/>
+{value < 0 ? '−' : ''}$<Roller value={Math.abs(value)} />

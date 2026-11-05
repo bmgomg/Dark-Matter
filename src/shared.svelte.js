@@ -60,10 +60,6 @@ export const inProgress = (id) => {
 	}
 };
 
-// Whether the scoreboard's digits roll to a new value. Not on a touch screen: on a Pixel 6a, the rolling made the board's
-// turns stagger (17–31% of their frames late, against 1%), even turns starting well after it had finished.
-export const rolls = () => typeof matchMedia === 'undefined' || !matchMedia('(pointer: coarse)').matches;
-
 export const _log = (value) => console.log($state.snapshot(value));
 
 export const level = () => LEVELS.find((l) => l.id === ss.level);
