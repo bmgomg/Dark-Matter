@@ -2,10 +2,11 @@
 	import { MSG_THINK_TWICE } from './const';
 	import { ss } from './shared.svelte';
 
-	// Down by the palette: with a cell selected, the warning that changing a mark costs; otherwise what to do next,
-	// in the palette's place. The game-over message is the prompts' (Actions).
+	// Down by the palette: with a cell selected, or the keyboard's cursor on one (a number key marks it at once), the
+	// warning that changing a mark costs; otherwise what to do next, in the palette's place. The game-over message is the
+	// prompts' (Actions).
 	const message = $derived.by(() => {
-		if (ss.sel) {
+		if (ss.sel || ss.cursorOn) {
 			return MSG_THINK_TWICE;
 		}
 

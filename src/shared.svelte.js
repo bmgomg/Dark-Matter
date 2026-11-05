@@ -32,6 +32,7 @@ export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 // angle: the board's angle on screen, in degrees clockwise; between steps while it turns
 // rise: 1 while the horizon's spheres are still below it (a new puzzle), easing to 0
 // sel: the cell being marked, [i, j], while the palette is up
+// cursor: the keyboard's cell, [i, j]; cursorOn: while it shows, which only keyboard use brings about
 // flip: how far the map is tilted away for a new puzzle, 0 flat to 1 edge-on
 export const ss = $state({
 	home: true,
@@ -271,6 +272,8 @@ export const newPuzzle = async () => {
 
 	delete ss.generating;
 	delete ss.sel;
+	delete ss.cursor;
+	delete ss.cursorOn;
 	stopTurning();
 
 	ss.angle = 0;
@@ -300,6 +303,7 @@ export const onPlay = (id) => {
 		delete ss.prompt;
 		delete ss.message;
 		delete ss.sel;
+		delete ss.cursor;
 
 		const job = JSON.parse(localStorage.getItem(appKey()));
 		ss.stats = job?.stats ?? newStats();
@@ -336,6 +340,7 @@ export const select = (i, j) => {
 	}
 
 	tap();
+	ss.cursor = [i, j];
 
 	if (ss.sel?.[0] === i && ss.sel?.[1] === j) {
 		delete ss.sel;
@@ -345,6 +350,81 @@ export const select = (i, j) => {
 };
 
 export const deselect = () => delete ss.sel;
+
+// The board as the keyboard plays it: the map is one Tab stop, with a cursor on one of its cells. It remembers its cell
+// (a tap moves it too), and it starts in the corner at the screen's top left. It's for the keyboard only: it shows when
+// the keyboard brings focus to the map or moves it, and goes when the focus goes or a pointer comes down on the map.
+// The cursor's cell turns with the board, but it moves by the screen: up is up, however the board has turned.
+const canPlay = () => ss.pzl && !ss.pzl.over && !ss.flip && !ss.prompt;
+
+export const showCursor = () => {
+	if (!canPlay()) {
+		return;
+	}
+
+	if (ss.sel) {
+		ss.cursor = ss.sel;
+	} else if (!ss.cursor) {
+		const far = ss.pzl.N - 1;
+		ss.cursor = [
+			[0, 0],
+			[far, 0],
+			[far, far],
+			[0, far]
+		][sideAt(ss.angle)];
+	}
+
+	ss.cursorOn = true;
+};
+
+export const hideCursor = () => delete ss.cursorOn;
+
+// dx, dy: a cell's move on screen. The first key only shows the cursor, where it is. An open palette goes along.
+export const moveCursor = (dx, dy) => {
+	if (!canPlay()) {
+		return;
+	}
+
+	if (!ss.cursorOn) {
+		showCursor();
+		return;
+	}
+
+	// the screen's move, turned back by the board's quarter turns (the one it's heading for, if it's turning)
+	const [c, s] = [
+		[1, 0],
+		[0, 1],
+		[-1, 0],
+		[0, -1]
+	][sideAt((ss.target ?? ss.angle / 90) * 90)];
+	const limit = (v) => Math.max(0, Math.min(ss.pzl.N - 1, v));
+	const i = limit(ss.cursor[0] - dx * s + dy * c);
+	const j = limit(ss.cursor[1] + dx * c + dy * s);
+
+	ss.cursor = [i, j];
+
+	if (ss.sel) {
+		ss.sel = [i, j];
+	}
+};
+
+// Enter or Space on the map: the cursor's cell, its palette up, or down
+export const selectCursor = () => {
+	if (canPlay() && ss.cursorOn) {
+		select(...ss.cursor);
+	}
+};
+
+// a key's mark, 0 to clear: on the selected cell, or else on the cursor's, straight off, at the same price
+export const markCursor = (v) => {
+	if (ss.sel) {
+		mark(v);
+	} else if (canPlay() && ss.cursorOn) {
+		ss.sel = ss.cursor;
+		mark(v);
+		delete ss.sel;
+	}
+};
 
 // the selected cell's mark: 1..3 a planet, -1 or 0 blank
 export const selMark = () => (ss.sel && ss.pzl ? ss.pzl.marks[ss.sel[0]][ss.sel[1]] : -1);
@@ -454,6 +534,7 @@ const win = () => {
 // the game-over message holds the button's place for a while, then gives way to Play new
 const gameOver = () => {
 	delete ss.sel;
+	delete ss.cursorOn;
 	ss.prompt = PROMPT_PLAY_NEW;
 	ss.overAt = Date.now();
 	persist();
@@ -500,6 +581,7 @@ export const goBack = () => {
 
 	delete ss.prompt;
 	delete ss.sel;
+	delete ss.cursorOn;
 	stopTurning();
 
 	if (ss.pzl) {

@@ -1,9 +1,9 @@
 <script>
 	import { cubicOut } from 'svelte/easing';
-	import { FLIP_PERSPECTIVE, MAP, PALETTE_AT_CELL, R, SIDES } from './const';
+	import { FLIP_PERSPECTIVE, MAP, NAMES, PALETTE_AT_CELL, R, SIDES } from './const';
 	import Picker from './Picker.svelte';
 	import Planet from './Planet.svelte';
-	import { deselect, isOver, select, sideAt, ss } from './shared.svelte';
+	import { deselect, hideCursor, isOver, select, showCursor, sideAt, ss } from './shared.svelte';
 
 	// The player's map, seen from above, the side they're viewing from at the bottom. It turns with the board,
 	// following the swipe on the tray below; the planets on it stay upright, lit from the upper left.
@@ -18,6 +18,8 @@
 	const won = $derived(pzl.over === 'won');
 	// the cell being marked, pulsing while the palette is up
 	const sel = $derived(ss.sel ? ss.sel[0] * N + ss.sel[1] : -1);
+	// the keyboard's cell, while it shows (shared.svelte.js); a selected cell has a look of its own
+	const cursor = $derived(ss.cursorOn && ss.cursor ? ss.cursor[0] * N + ss.cursor[1] : -1);
 
 	// a point of the map turned with the board, clockwise on screen
 	const turned = (x, y) => {
@@ -114,6 +116,13 @@
 			deselect();
 		}
 	};
+
+	// the cursor shows for the keyboard's focus, not a pointer's
+	const onFocus = (e) => {
+		if (e.target.matches(':focus-visible')) {
+			showCursor();
+		}
+	};
 </script>
 
 <div class="flipper">
@@ -124,9 +133,13 @@
 		viewBox="-225 -175 450 350"
 		style:transform={ss.flip ? `perspective(${FLIP_PERSPECTIVE}px) rotateX(${ss.flip * 90}deg)` : null}
 		role="grid"
-		tabindex="-1"
+		tabindex={isOver() ? -1 : 0}
 		aria-label="Your map, viewed from the {SIDES[front]}. Tap a cell to mark it."
+		aria-activedescendant={cursor < 0 ? null : `cell-${cursor}`}
 		onclick={onClick}
+		onfocus={onFocus}
+		onblur={hideCursor}
+		onpointerdown={hideCursor}
 	>
 		<defs>
 			<radialGradient id="cell-fill" cx="0.5" cy="0.45" r="0.75">
@@ -155,9 +168,10 @@
 					rx="7"
 					class="cell"
 					class:sel={c.id === sel}
+					id="cell-{c.id}"
 					data-cell={c.id}
 					role="gridcell"
-					aria-label="Row {c.i + 1}, column {c.j + 1}"
+					aria-label="Row {c.i + 1}, column {c.j + 1}: {shown[c.i][c.j] > 0 ? NAMES[shown[c.i][c.j]] + ' planet' : 'blank'}"
 				/>
 			{/each}
 
@@ -182,6 +196,20 @@
 				</g>
 			</g>
 		{/each}
+
+		<!-- over the planets, so a large one can't hide it -->
+		{#if cursor >= 0 && cursor !== sel}
+			{@const [x, y] = center(ss.cursor[0], ss.cursor[1])}
+			<rect
+				x={x - cell / 2 + 3}
+				y={y - cell / 2 + 3}
+				width={cell - 6}
+				height={cell - 6}
+				rx="7"
+				class="cursor nope"
+				transform="rotate({ss.angle})"
+			/>
+		{/if}
 
 		{#if PALETTE_AT_CELL && selAt && !isOver()}
 			<Picker x={at[0]} y={at[1]} {cell} id={ss.sel ? ss.sel[0] * N + ss.sel[1] : -1} />
@@ -270,6 +298,13 @@
 			filter: drop-shadow(0 0 9px #ffd77a);
 			stroke-width: 3.5;
 		}
+	}
+
+	/* the keyboard's cell: white, as the selected one is gold */
+	.cursor {
+		fill: #ffffff14;
+		stroke: #fff;
+		stroke-width: 2.5;
 	}
 
 	.front {

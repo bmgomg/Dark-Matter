@@ -6,10 +6,12 @@
 	// key, puts it away (the Keys button toggles it)
 	const KEYS = [
 		[['←', '→'], 'Turn the board'],
-		[['1', '2', '3'], 'Mark the selected cell: small, medium, large'],
-		[['0', 'Del', '⌫'], 'Clear the selected cell'],
-		[['Esc'], 'Deselect the cell'],
-		[['Tab', 'Enter'], 'Move between the buttons, press one'],
+		[['W', 'A', 'S', 'D'], 'Move between the cells (or ↑ ↓)'],
+		[['1', '2', '3'], 'Mark the cell: small, medium, large'],
+		[['0', 'Del', '⌫'], 'Clear the cell'],
+		[['Esc'], 'Let the cell go'],
+		[['Tab'], 'Move to the map or a button'],
+		[['Enter'], 'Press the button, or open the palette'],
 		[['?'], 'Show or hide this card']
 	];
 

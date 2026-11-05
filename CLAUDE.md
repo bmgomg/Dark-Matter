@@ -45,8 +45,12 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   a pill on the map with a notch pointing at the cell, above it or below it near the top, growing out of it; a tap
   off the map lets the cell go), because the designer kept mistaking a palette below the tray for the tray, both
   rows of planets. `PALETTE_AT_CELL` switches back to the old palette there (`Palette.svelte`). Moving the tray above
-  the map was weighed and rejected: it belongs against the gold edge it's seen from. Keys: 1–3 a planet,
-  0 / Delete / Backspace clear, Esc lets the cell go, ? the shortcuts card (`Keys.svelte`, over the page above the
+  the map was weighed and rejected: it belongs against the gold edge it's seen from. Keys: the map is one Tab stop with a cursor on a cell (`ss.cursor`, white; it
+  shows only for the keyboard, `ss.cursorOn`). W A S D or ↑ ↓ move it by the screen, however the board has turned (← →
+  still turn the board, which is why not all four arrows: one key doing two things, one of which costs). Enter or Space
+  on the map opens the palette; 1–3 a planet,
+  0 / Delete / Backspace clear, on the selected cell or else straight on the cursor's, at the same price; the "Think
+  twice" warning shows with the cursor too. Esc lets the cell go, then the cursor. ? the shortcuts card (`Keys.svelte`, over the page above the
   toolbar; any key or a tap puts it away). The toolbar's Keys button opens it too, shown only with a keyboard about
   (`ss.keyboard`: a fine pointer suggests one, a key pressed proves it). Any prompt takes the same place (`Actions.svelte`, 50 px tall
   so the game-over message doesn't shift when Play new fades in): the confirmations, which follow the template (the
