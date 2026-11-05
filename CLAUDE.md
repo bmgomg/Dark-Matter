@@ -40,7 +40,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   selected. No compass letters and no "from the South" label: the designer found them unhelpful (the turning map
   shows the orientation). (Cursors carrying the brush went with the brushes.)
 - **Below the tray** (`Game Page.svelte`, the rest of the page's height, its content centred, no separator): with no
-  cell selected, the hint (`Message.svelte`: what to do next), moved down from above the map at the designer's
+  cell selected, the hint (`Message.svelte`: what to do next; the first fades out and the next in once the board has turned, by requestAnimationFrame, any other change at once), moved down from above the map at the designer's
   request; with one selected, "Think twice — changing your mind costs $1." The palette (small, medium, large, clear;
   the cell's own planet lit and disabled, Clear disabled on a blank cell) is being tried at the cell (`Picker.svelte`:
   a pill on the map with a notch pointing at the cell, above it or below it near the top, growing out of it; a tap
