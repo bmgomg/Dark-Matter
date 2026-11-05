@@ -9,6 +9,9 @@
 	// the game's budget: the bank, less what turning and changing your mind have cost, leaves the balance.
 	const side = $derived(sideAt(ss.angle));
 	const left = $derived(balance());
+	// the balance's digits roll down as the number shrinks and up as it grows, so below zero, where a falling balance is
+	// a growing number, one step at a time: −$1 to −$2 rolling down would go the long way round, through 0, 9, 8…
+	const rollBySize = (from, to) => Math.sign(Math.abs(to) - Math.abs(from));
 	const money = (v, shown) => (shown ? `${v < 0 ? '−' : ''}$${Math.round(Math.abs(v) * 10) / 10}` : '–');
 </script>
 
@@ -35,7 +38,7 @@
 		<span></span>
 		<span class="sign">=</span>
 		<span class="label">balance</span>
-		<span class="sum balance" class:broke={left < 0}><Money value={left} trend={-1} /></span>
+		<span class="sum balance" class:broke={left < 0}><Money value={left} trend={rollBySize} /></span>
 	</div>
 	<span class="sr">From the {SIDES[side]}</span>
 </div>

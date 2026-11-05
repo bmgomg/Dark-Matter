@@ -116,7 +116,7 @@ first mark in a cell is free; any change after that costs `COST_CHANGE` ($1): an
 Back; `clearAll`) clears every planet on the map at `COST_CHANGE` each, as by hand, after a prompt that names the price
 ("Clear 3 planets — $3?" / No; the designer's call: a convenience, not a loophole). The scoreboard: the level's
 stats, led by its difficulty (solved M/N, N the plays; average and best balance; the best only from games solved), then
-BANK − COST = BALANCE (`Money.svelte`, NumberFlow dollars; the balance red below zero). The digits roll, but not on a
+BANK − COST = BALANCE (`Money.svelte`, NumberFlow dollars; the balance red below zero, its digits rolling by the number's size, so up below zero). The digits roll, but not on a
 touch screen (`rolls`): on a Pixel 6a the rolling made the turns stagger (17–31% of their frames late, against 1%). A win scores the balance,
 which may be negative ("…but you shifted into the red"). A give-up counts as a play scoring $0, or the balance if lower,
 so it never beats breaking even. No board size shown: the board shows it. The sides seen are still recorded
