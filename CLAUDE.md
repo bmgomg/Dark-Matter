@@ -168,8 +168,9 @@ mirrored at random by `generate`. The other levels are generated live.
   with one lane and at the planets' height, so that lane's planets are concentric and the board stays square with the
   picture (the designer's calls: the game's even rings, a level gold edge). Its `#embed` layout is the Embed BG, 640 ×
   360 (the only size that has worked on itch, in the designer's experience): the emblem's dark disc behind itch's central
-  Run Game button, the planets in the outer lanes, clear of it. `sh scripts/render-cover.sh` writes `itch/cover.png` and
-  `itch/embed-bg.png`. `node scripts/render-cover-gif.mjs [cover|embed]` writes `itch/cover.gif` or `itch/embed-bg.gif`: a
+  Run Game button, the planets in the outer lanes, clear of it. Its `#wide` layout is the Wide Cover, 840 × 360 (21:9),
+  with no title, as itch's form says it puts the title or logo over promo modules. `sh scripts/render-cover.sh` writes `itch/cover.png` and
+  `itch/embed-bg.png`. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
   hold on that view, then one full turn (needs ffmpeg). GIFs work on itch, in the designer's experience. The settings are
   set to come in under 3 MB, itch's limit on GIFs by forum reports (no official figure found).
 

@@ -7,7 +7,9 @@
      line up and eclipse each other, under the title. The sky is Space.svelte's (the same seed). Layouts:
      (no hash)  the cover, 630 × 500
      #embed     the Embed BG, 640 × 360 (the size that works on itch, in the designer's experience): itch puts its Run Game button in the middle, so the dark disc of the emblem's
-                eclipse is there to hold it, with the planets on the same line of sight on either side -->
+                eclipse is there to hold it, with the planets on the same line of sight on either side
+     #wide      the Wide Cover, 840 × 360 (21:9), for itch's home page features: no title, which itch puts over its promo
+                modules itself (its form says so, of the logo that replaces it) -->
 <style>
 	@font-face {
 		font-family: CZ;
@@ -53,6 +55,15 @@
 	.embed.cover {
 		width: 640px;
 		height: 360px;
+	}
+
+	.wide.cover {
+		width: 840px;
+		height: 360px;
+	}
+
+	.wide .titles {
+		display: none;
 	}
 
 	.embed .titles {
@@ -133,15 +144,16 @@
 </div>
 <script>
 	const EMBED = location.hash === '#embed';
-	const W = EMBED ? 640 : 630;
-	const H = EMBED ? 360 : 500;
+	const WIDE = location.hash === '#wide';
+	const W = WIDE ? 840 : EMBED ? 640 : 630;
+	const H = WIDE ? 360 : EMBED ? 360 : 500;
 
 	// the camera: its height above the board (degrees), how far off, the lens, where the board's centre lands
-	const ELEVATION = 9.5;
+	const ELEVATION = WIDE ? 8 : 9.5;
 	const DISTANCE = 6.2;
-	const LENS = EMBED ? 587 : 880;
-	const CX = EMBED ? 320 : 385;
-	const CY = EMBED ? 278.5 : 401;
+	const LENS = WIDE ? 917 : EMBED ? 587 : 880;
+	const CX = WIDE ? 531 : EMBED ? 320 : 385;
+	const CY = WIDE ? 270 : EMBED ? 278.5 : 401;
 	const SIGHT = DISTANCE * Math.cos((ELEVATION * Math.PI) / 180);
 	// the camera's place across the board: in line with the eclipse's lane, which it looks straight down, with no need to
 	// turn the board out of square with the picture
@@ -155,7 +167,7 @@
 	// how far above the plate the planets' centres are: at the camera's height, so that they're all on one line on the
 	// screen and a lane's planets are concentric, as in the tray
 	const AXIS = DISTANCE * Math.sin((ELEVATION * Math.PI) / 180);
-	const THICK = 0.09;
+	const THICK = WIDE ? 0.06 : 0.09;
 	// the planets larger than their cells would have them, in the same proportions: they're the picture
 	const BIG = EMBED ? 1.2 : 1.28;
 	// how squarely a side must face the camera for its bright lip to start showing and to show fully
@@ -197,8 +209,8 @@
 	canvas.width = W;
 	canvas.height = H;
 
-	if (EMBED) {
-		document.getElementById('cover').classList.add('embed');
+	if (EMBED || WIDE) {
+		document.getElementById('cover').classList.add(EMBED ? 'embed' : 'wide');
 	}
 
 	const ctx = canvas.getContext('2d');
@@ -233,7 +245,7 @@
 		});
 
 	const drawStars = () => {
-		const scale = EMBED ? 0.67 : 0.8;
+		const scale = WIDE ? 0.86 : EMBED ? 0.67 : 0.8;
 
 		for (const s of stars) {
 			ctx.globalAlpha = s.o;

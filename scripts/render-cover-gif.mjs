@@ -1,6 +1,6 @@
 // The itch.io art as a GIF: one full turn of the board in cover.html, from its first view round to it again, holding on
 // it at the start, so the first frame is the still picture. Headless Chrome over the DevTools protocol for the frames,
-// ffmpeg for the palette and the GIF: node scripts/render-cover-gif.mjs [cover|embed] [output.gif]
+// ffmpeg for the palette and the GIF: node scripts/render-cover-gif.mjs [cover|embed|wide] [output.gif]
 import { spawn, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -10,12 +10,13 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LAYOUTS = {
 	cover: { width: 630, height: 500, hash: '', file: 'cover.gif', fps: 12, colors: 96 },
-	embed: { width: 640, height: 360, hash: '#embed', file: 'embed-bg.gif', fps: 15, colors: 256 }
+	embed: { width: 640, height: 360, hash: '#embed', file: 'embed-bg.gif', fps: 15, colors: 256 },
+	wide: { width: 840, height: 360, hash: '#wide', file: 'wide-cover.gif', fps: 10, colors: 112 }
 };
 const LAYOUT = LAYOUTS[process.argv[2] ?? 'cover'];
 
 if (!LAYOUT) {
-	console.error('usage: node render-cover-gif.mjs [cover|embed] [output.gif]');
+	console.error('usage: node render-cover-gif.mjs [cover|embed|wide] [output.gif]');
 	process.exit(1);
 }
 
