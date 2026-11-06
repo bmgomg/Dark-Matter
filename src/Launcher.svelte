@@ -71,7 +71,7 @@
 <div class="launcher">
 	<p class="economy">
 		You start with <em>${BANK}</em>. Each turn of the board costs <em>${COST_TURN}</em>. Placing a planet is free, but changing your mind is
-		not: that costs <em>${COST_CHANGE}</em> too. Finish in the black — or break the bank trying.
+		not: that costs <em>${COST_CHANGE}</em> too. Finish in the black — or shift into the red trying.
 	</p>
 
 	{#if ss.daily}
