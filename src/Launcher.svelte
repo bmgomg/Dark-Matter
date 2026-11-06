@@ -1,13 +1,15 @@
 <script>
 	import { BANK, COST_CHANGE, COST_TURN, DIFF_NAMES, LEVELS } from './const';
 	import Countdown from './Countdown.svelte';
-	import { dateOf } from './logic';
-	import { begun, costOf, dailyGame, inProgress, onPlay, persistCommon, ss, today } from './shared.svelte';
+	import { costOf, dateOf, money, shareCard } from './logic';
+	import { begun, dailyGame, inProgress, onPlay, persistCommon, ss, today } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
+	import { copyText, post } from './utils';
 
 	// Between Home and a game, as in Triangula: how the bank works, then the board's size and the difficulty, then
 	// Start, or Resume for a level with a game under way. It opens on the level picked last. For the daily, in place of
-	// all that: today's date, a button for each level's puzzle, saying how that one stands, and the time till the next.
+	// all that: today's date, a button for each level's puzzle, saying how that one stands, Share once one is finished,
+	// and the time till the next.
 	const SIZES = [4, 5];
 	const DIFFS = ['easy', 'hard', 'expert'];
 
@@ -29,6 +31,9 @@
 	const PICKED = 'background: #ffd77a; color: #14102e; font-weight: 700;';
 	// the daily's: as wide as their names, as above, with room for a second line, one or two lines keeping the row level
 	const DAILY_OP = 'height: 56px; padding: 0 15px; align-content: center; font-size: 13px; letter-spacing: 0.1em;';
+	// wide enough for what it says after a press, so it holds still
+	const SHARE = 'width: 130px; padding: 10px 0 9px;' + OP;
+	const SHARED_MS = 1500;
 
 	const resume = $derived(inProgress(id));
 
@@ -46,11 +51,39 @@
 	// a level's daily so far: nothing new to say, resume, what it scored, or that it was given up
 	const standing = (game) => {
 		if (game?.over === 'won') {
-			const score = BANK - costOf(game);
-			return `${score < 0 ? '−' : ''}$${Math.abs(score)}`;
+			return money(BANK - costOf(game));
 		}
 
 		return game?.over ? 'gave up' : game && begun(game) ? 'resume' : '';
+	};
+
+	const finished = $derived(dailies.flatMap(({ levels }) => levels).filter((l) => l.game?.over));
+
+	// what Share says for a moment after a press
+	let shared = $state('');
+	let sharedTimer = null;
+	let pressed = false;
+
+	const share = async () => {
+		const copied = await copyText(shareCard(date, finished));
+
+		shared = copied ? 'copied' : 'copy failed';
+		clearTimeout(sharedTimer);
+		sharedTimer = post(() => (shared = ''), SHARED_MS);
+	};
+
+	// the copy goes with the click, the one moment every browser allows it, and onClick makes up for a press with no click
+	const onSharePress = () => {
+		pressed = true;
+		share();
+	};
+
+	const onShareClick = () => {
+		if (!pressed) {
+			share();
+		}
+
+		pressed = false;
 	};
 
 	const play = (level) => {
@@ -66,10 +99,7 @@
 	</p>
 
 	{#if ss.daily}
-		<div class="pick">
-			<div class="label">{date}</div>
-			<div class="note">Six new puzzles a day, the same for everyone. One try at each.</div>
-		</div>
+		<div class="label">{date}</div>
 
 		<div class="dailies">
 			{#each dailies as { label, levels } (label)}
@@ -85,6 +115,10 @@
 				</div>
 			{/each}
 		</div>
+
+		{#if finished.length}
+			<TextButton text={[shared || 'share']} framed style={SHARE} onPress={onSharePress} onClick={onShareClick} />
+		{/if}
 
 		<Countdown />
 	{:else}
@@ -164,14 +198,6 @@
 		display: grid;
 		grid-auto-flow: column;
 		gap: 14px;
-	}
-
-	.note {
-		font-family: SI;
-		font-size: 18px;
-		text-align: center;
-		text-wrap: balance;
-		color: #d8d2ff;
 	}
 
 	/* the board's size over its row */

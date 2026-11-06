@@ -2,8 +2,10 @@
 	import { tap } from './sound.svelte';
 	import { post } from './utils';
 
-	// a press shrinks the button and springs it back; it acts once it's back
-	const { id, text, framed, style = '', disabled, sound = true, onClick } = $props();
+	// a press shrinks the button and springs it back; it acts once it's back. onPress comes during the press itself, with
+	// the click, for what browsers allow only then (the clipboard); a press that slips off the shrinking button has no
+	// click, though, so it can't be all a button does
+	const { id, text, framed, style = '', disabled, sound = true, onPress, onClick } = $props();
 
 	let scale = $state(1);
 	let timer = null;
@@ -36,6 +38,7 @@
 	const onKeyDown = (e) => {
 		if (e.key === 'Enter' || e.key === ' ') {
 			e.preventDefault();
+			onPress?.();
 			onPointerDown();
 		}
 	};
@@ -52,6 +55,7 @@
 	tabindex={disabled ? -1 : 0}
 	aria-disabled={disabled}
 	onpointerdown={onPointerDown}
+	onclick={onPress}
 	onkeydown={onKeyDown}
 	ontransitionend={onTransitionEnd}
 >

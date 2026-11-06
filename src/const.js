@@ -5,6 +5,8 @@ export const DY = 800;
 // working title, split into the home page's two lines
 export const TITLE = ['Dark Matter', 'of Perspective'];
 export const TAGLINE = 'It takes a shift';
+// where the daily's share card sends people
+export const GAME_URL = 'https://beautiful-mind-games.itch.io/dark-matter-of-perspective';
 
 // what the player calls a difficulty; the code's name for it ('hard') is the generator's, and is in the saves' keys
 export const DIFF_NAMES = { easy: 'easy', hard: 'not easy', expert: 'quite hard' };

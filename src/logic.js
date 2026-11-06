@@ -1,6 +1,7 @@
 // Puzzle rules, solver and generator, ported as-is from the edgewise.html prototype.
 // Sizes: 0 = empty, 1 = small, 2 = medium, 3 = large.
 // Candidate sets are 4-bit masks: bit v set means size v is still possible.
+import { BANK, COST_CHANGE, COST_TURN, GAME_URL, TITLE } from './const.js';
 import { POOL } from './puzzles.js';
 
 // set of sizes visible looking along seq from its first element
@@ -280,6 +281,28 @@ export const msToMidnight = (time) => new Date(time).setHours(24, 0, 0, 0) - tim
 export const dateOf = (day) => {
 	const [y, m, d] = day.split('-').map(Number);
 	return new Date(y, m - 1, d);
+};
+
+// what a game has cost so far
+export const costOf = (pzl) => pzl.turns * COST_TURN + pzl.changes * COST_CHANGE;
+
+// a score as the player reads it, with a true minus
+export const money = (n) => `${n < 0 ? '−' : ''}$${Math.abs(n)}`;
+
+const count = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+// The text a player shares: the day's finished games, given up too (leaving those out would flatter), each { label, sub,
+// game }. A game under way has no place on it, as its score could still change.
+export const shareCard = (date, finished) => {
+	const lines = finished.map(({ label, sub, game }) => {
+		const name = `${label} ${sub.replace(/\b\w/g, (c) => c.toUpperCase())}`;
+
+		return game.over === 'won'
+			? `${name}: ${money(BANK - costOf(game))} · ${count(game.turns, 'turn', 'turns')} · ${count(game.changes, 'second guess', 'second guesses')}`
+			: `${name}: gave up`;
+	});
+
+	return [TITLE.join(' '), date, '', ...lines, '', GAME_URL].join('\n');
 };
 
 // A level's board for a day: the same for everyone with that date, offline too. A ready-made one isn't drawn at random,

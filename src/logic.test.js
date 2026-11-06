@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { LEVELS } from './const';
-import { canonical, dailyPuzzle, dateOf, dayOf, depth, elevation, fits, generate, mask, needsAllSides, rotated, seeded } from './logic';
+import { canonical, dailyPuzzle, dateOf, dayOf, depth, elevation, fits, generate, mask, money, needsAllSides, rotated, seeded, shareCard } from './logic';
 import { POOL } from './puzzles';
 
 describe('views', () => {
@@ -134,5 +134,36 @@ describe('daily', () => {
 	// day's game after the change gets a different board from one who started before it.
 	it('a day keeps its board across browsers and releases', async () => {
 		expect((await dailyPuzzle('2026-11-02', 4, 'easy')).flat().join('')).toBe('0010033002000000');
+	});
+});
+
+describe('the share card', () => {
+	const game = (over, turns, changes) => ({ over, turns, changes });
+
+	it('lists each finished game, a win with its score and what it cost', () => {
+		const card = shareCard('Friday, November 6', [
+			{ label: '4×4', sub: 'easy', game: game('won', 3, 1) },
+			{ label: '4×4', sub: 'not easy', game: game('revealed', 3, 0) },
+			{ label: '5×5', sub: 'quite hard', game: game('won', 12, 2) }
+		]);
+
+		expect(card.split('\n')).toEqual([
+			'Dark Matter of Perspective',
+			'Friday, November 6',
+			'',
+			'4×4 Easy: $6 · 3 turns · 1 second guess',
+			'4×4 Not Easy: gave up',
+			'5×5 Quite Hard: −$4 · 12 turns · 2 second guesses',
+			'',
+			'https://beautiful-mind-games.itch.io/dark-matter-of-perspective'
+		]);
+	});
+
+	it('counts in the singular and the plural', () => {
+		expect(shareCard('', [{ label: '4×4', sub: 'easy', game: game('won', 1, 0) }])).toContain('$9 · 1 turn · 0 second guesses');
+	});
+
+	it('reads a score as the player does', () => {
+		expect([money(0), money(6), money(-4)]).toEqual(['$0', '$6', '−$4']);
 	});
 });

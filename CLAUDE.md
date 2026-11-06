@@ -164,8 +164,18 @@ button, in place of one Start), one try at each, the same for everyone with that
   designer's call). A finished one reopens its board to look at. Gold fill shows only on a hover or tap: unlike Binge's
   pills, which select (`ss.picked`, kept with the sound settings), these are buttons that act, so no last selection is
   kept (the designer's call, after trying it). A gold tint for finished was tried against the lavender and came out a
-  muddy brown, too near the gold outlines. The time till the next puzzles
+  muddy brown, too near the gold outlines. Share comes under them once one is finished. The time till the next puzzles
   (`Countdown.svelte`) is below. It goes through the launcher, rather than straight from Home, for the economy paragraph.
+  The note "Six new puzzles a day, the same for everyone. One try at each." went to make room for Share (the designer's
+  call), so the game no longer says it anywhere.
+- **Share** copies a text card to the clipboard (`shareCard` in `logic.js`, `copyText` in `utils.js`), the designer's idea:
+  the game's name, the date, a line for each finished game (the score, turns and second guesses, or "gave up"; given-up
+  ones stay on, or the card would flatter), and `GAME_URL`. A game under way isn't on it, as its score could still change.
+  The button says "Copied" or "Copy failed" for `SHARED_MS`. The copy goes in the click itself (`onPress` on
+  `Text Button.svelte`), since `onClick` comes later, after the button springs back, and browsers can refuse the clipboard
+  by then; `onClick` still makes up for a press that slips off the shrinking button, which gets no click. `navigator.clipboard`
+  is refused in a frame of another origin with no rights given, so `copyText` falls back on a selection and
+  `execCommand`: that worked in Chrome in such a frame; not yet tried on itch.io itself or on an iPhone.
 - **The game** is the same, bank and all, and the scoreboard leads with the difficulty, as in Binge. At the end, the
   countdown takes Play new's place; once midnight has passed, Play new comes back and deals that level's new day's.
   There's no replay: the player knows the answer.

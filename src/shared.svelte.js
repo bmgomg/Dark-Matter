@@ -1,8 +1,6 @@
 import {
 	APP_STATE,
 	BANK,
-	COST_CHANGE,
-	COST_TURN,
 	FLIP_MS,
 	FLIP_PAUSE_MS,
 	HALF_TURN_MS,
@@ -17,7 +15,7 @@ import {
 	TAP_TURN_MS,
 	TURN_MS
 } from './const';
-import { dailyPuzzle, dayOf, generate } from './logic';
+import { costOf, dailyPuzzle, dayOf, generate } from './logic';
 import { _sound, sfx, tap, whoosh } from './sound.svelte';
 
 // the side facing the player at a board angle, 0..3 (South, East, North, West)
@@ -86,7 +84,6 @@ export const level = () => LEVELS.find((l) => l.id === ss.level);
 export const isOver = () => !!ss.pzl?.over;
 
 // what the game has cost so far, and what's left of the bank
-export const costOf = (pzl) => pzl.turns * COST_TURN + pzl.changes * COST_CHANGE;
 export const cost = () => (ss.pzl ? costOf(ss.pzl) : 0);
 export const balance = () => BANK - cost();
 

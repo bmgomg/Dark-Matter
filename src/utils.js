@@ -72,6 +72,40 @@ export const scrollClass = () => `root-scroll ${isTouchable() ? 'root-scroll-mob
 
 export const post = (fn, ms) => setTimeout(fn, ms);
 
+// Puts text on the clipboard; whether it did. Call it during a press: browsers allow it only then. The old way, by a
+// selection, is for where the new one is missing (no https) or refused (a page in a frame, as on itch.io, may be).
+export const copyText = async (text) => {
+	try {
+		await navigator.clipboard.writeText(text);
+		return true;
+	} catch {
+		// on to the old way
+	}
+
+	const focused = document.activeElement;
+	const area = document.createElement('textarea');
+
+	area.value = text;
+	area.readOnly = true; // no keyboard coming up on a phone
+	area.style = 'position: fixed; opacity: 0;';
+	document.body.append(area);
+	area.select();
+	area.setSelectionRange(0, text.length);
+
+	let copied = false;
+
+	try {
+		copied = document.execCommand('copy');
+	} catch {
+		// nothing more to try
+	}
+
+	area.remove();
+	focused?.focus();
+
+	return copied;
+};
+
 export const _range = (start, end) => Array.from({ length: end + 1 - start }, (_, i) => start + i);
 
 export const shuffleInPlace = (array) => {
