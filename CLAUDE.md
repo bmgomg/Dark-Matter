@@ -160,11 +160,11 @@ button, in place of one Start), one try at each, the same for everyone with that
   Easy once exactly and 6 times counting turned or mirrored boards, 5×5 Easy 3 times counting those, the others none.
 - **The launcher** shows the date and, in place of the pills and Start, six buttons, a row for each board size, each as
   wide as what it says, as in Binge (the designer's call). A tap starts that level. Each is the level's difficulty over
-  how its daily stands: nothing yet, "resume", the score (the pill lavender), or "gave up" (faded). A finished one reopens
-  its board to look at. Gold fill means the same in both launchers, the last selection (`ss.picked`, `ss.pickedDaily`,
-  kept with the sound settings), and it outranks lavender on a solved one: gold once also meant solved, which looked like
-  a selection that wouldn't move. A gold tint for solved was tried against the lavender and came out a muddy brown, too
-  near the gold outlines. The time till the next puzzles
+  how its daily stands: nothing yet, "resume", the score, or "gave up"; the last two look the same, lavender (the
+  designer's call). A finished one reopens its board to look at. Gold fill shows only on a hover or tap: unlike Binge's
+  pills, which select (`ss.picked`, kept with the sound settings), these are buttons that act, so no last selection is
+  kept (the designer's call, after trying it). A gold tint for finished was tried against the lavender and came out a
+  muddy brown, too near the gold outlines. The time till the next puzzles
   (`Countdown.svelte`) is below. It goes through the launcher, rather than straight from Home, for the economy paragraph.
 - **The game** is the same, bank and all, and the scoreboard leads with the difficulty, as in Binge. At the end, the
   countdown takes Play new's place; once midnight has passed, Play new comes back and deals that level's new day's.

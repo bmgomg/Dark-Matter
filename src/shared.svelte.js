@@ -31,8 +31,7 @@ export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 //   step: quarter turns clockwise so far, net (the board's angle at rest is step × 90°)
 //   over: 'won' or 'revealed'
 //   day: the daily's only: the date it's the puzzle of
-// daily: Home's choice, Daily or Binge; picked, pickedDaily: the level last picked on the launcher in each, kept between
-// sessions
+// daily: Home's choice, Daily or Binge; picked: the level last picked on Binge's launcher, kept between sessions
 // level: the level last played, in either; slot: the save now loaded, which is the level's, or its daily's
 // now: the clock, to the second, for what goes by the time of day
 // angle: the board's angle on screen, in degrees clockwise; between steps while it turns
@@ -92,7 +91,7 @@ export const cost = () => (ss.pzl ? costOf(ss.pzl) : 0);
 export const balance = () => BANK - cost();
 
 export const persistCommon = () => {
-	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music, picked: ss.picked, pickedDaily: ss.pickedDaily });
+	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music, picked: ss.picked });
 	localStorage.setItem(APP_STATE, json);
 };
 
@@ -103,7 +102,6 @@ export const loadCommon = () => {
 		_sound.sfx = job.sfx;
 		_sound.music = job.music;
 		ss.picked = job.picked;
-		ss.pickedDaily = job.pickedDaily;
 	}
 };
 

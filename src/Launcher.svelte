@@ -53,15 +53,6 @@
 		return game?.over ? 'gave up' : game && begun(game) ? 'resume' : '';
 	};
 
-	// gold is the last selection, as in Binge; a solved one is lavender (.solved), and one given up is faded
-	const dailyStyle = (l) => DAILY_OP + (l.id === ss.pickedDaily ? PICKED : l.game?.over === 'revealed' ? 'opacity: 0.6;' : '');
-
-	const playDaily = (id) => {
-		ss.pickedDaily = id;
-		persistCommon();
-		play(id);
-	};
-
 	const play = (level) => {
 		delete ss.launcher;
 		onPlay(level);
@@ -86,8 +77,8 @@
 					<div class="label size">{label}</div>
 					<div class="levels">
 						{#each levels as l (l.id)}
-							<div class="level" class:scored={l.game?.over === 'won'} class:solved={l.game?.over === 'won' && l.id !== ss.pickedDaily}>
-								<TextButton text={[l.sub, standing(l.game)].filter(Boolean)} framed style={dailyStyle(l)} onClick={() => playDaily(l.id)} />
+							<div class="level" class:scored={l.game?.over === 'won'} class:finished={l.game?.over}>
+								<TextButton text={[l.sub, standing(l.game)].filter(Boolean)} framed style={DAILY_OP} onClick={() => play(l.id)} />
 							</div>
 						{/each}
 					</div>
@@ -212,9 +203,9 @@
 		letter-spacing: 0.06em;
 	}
 
-	/* solved: lavender, for the day's progress to show at a glance, apart from the gold of the last selection; a hover or
-	   the keyboard's focus still turns it gold, as on any pill */
-	.solved :global(.framed:not(:hover, :focus-visible)) {
+	/* finished, solved or given up: lavender, for the day's progress to show at a glance; a hover or the keyboard's focus
+	   still turns it gold, as on any pill */
+	.finished :global(.framed:not(:hover, :focus-visible)) {
 		border-color: #b8b0ff;
 		background: #b8b0ff26;
 		color: #ece8ff;
