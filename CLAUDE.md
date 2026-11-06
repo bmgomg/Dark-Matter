@@ -6,7 +6,7 @@ The "dark matter" is the planets hidden behind bigger ones: there, but unseen fr
 what can be seen, as astronomers infer dark matter.
 
 Puzzle game for a jam with the theme **SHIFT**. A SvelteKit app in the style of `C:\git\BMG\♻️Template` and Unmix:
-splash, Home (title, rules, Play), a launcher (the economy, board size, difficulty, Play), Game Page (scoreboard, board, palette, toolbar) on a 450 × 800 page that
+splash, Home (title, rules, Daily and Binge), a launcher (the economy, then today's six puzzles, or board size, difficulty and Start), Game Page (scoreboard, board, palette, toolbar) on a 450 × 800 page that
 scales down to fit, a PWA that plays offline. `npm run dev` serves it on port 1119. The rules, generator and solver come
 from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, tiers, levels; "Known facts" there are settled).
 
@@ -57,10 +57,11 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   so the game-over message doesn't shift when Play new fades in): the confirmations, which follow the template (the
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average
   improved, into the red, or the revealed one) for `OVER_MS` (4 s), then Play new.
-- **The launcher** (`Launcher.svelte`, as in Triangula; Home's Play opens it): a glass panel with the economy
+- **The launcher** (`Launcher.svelte`, as in Triangula; Home's Binge opens it, and Daily, in the daily's form: see
+  Daily): a glass panel with the economy
   paragraph, Board (4×4 / 5×5) and Difficulty (Easy / Not Easy / Quite Hard: `DIFF_NAMES`, what the player reads; the code and the saves say `hard` for Not Easy and `expert` for Quite Hard) pills, each difficulty pill as wide as its name, and Start, or Resume when the picked level has a
   game begun (a turn or a mark) and not finished (`inProgress`). No stats there (the designer's call). It opens on
-  the last level played; an untouched new puzzle is kept, under Start. The toolbar's first button is
+  the level last picked, next session too; an untouched new puzzle is kept, under Start. The toolbar's first button is
   Back (text, like the rest: no icons in the toolbar): a game → the launcher → Home. The music's credit (see License)
   shows at the foot of the page while the launcher is up, and only then (`Game Page.svelte`; the designer's call).
 - **The tray** (`Tray.svelte`): the true view, edge-on (the board's edge as a 2D being sees it), with no
@@ -140,6 +141,41 @@ graded each puzzle; tier 3 and true uniqueness gave the same within a point:
 None is solvable from South alone. As a golf score par is weak (looking at every side is never more than 2 over); the
 idea left open was showing it up front as the challenge ("par 1: two sides are enough"). 4–190 ms per puzzle to compute.
 
+## Daily
+
+Home offers Daily and Binge, the names and the idea as in Threelogy and Pentagramma. Binge is the game as it was, every
+level and Play new. Daily is a puzzle a day at each of the six levels (the designer's call: all six, each its own
+button, in place of one Start), one try at each, the same for everyone with that date.
+
+- **The day** is the player's own date (`dayOf`), as in the other daily games, so it turns over at their midnight. There's
+  no server: it works offline, and it trusts the device's clock.
+- **The board** (`dailyPuzzle` in `logic.js`): the live levels run the normal generator on numbers seeded by the date and
+  level (`seeded`). So a change to the generator or to `RULES` changes the puzzles of every day to come, and a test pins
+  one day's board to catch that. Quite Hard's boards are the ready-made pool, which random draws didn't suit: the same
+  board and orientation came back within weeks. The days walk through the pool instead, a new orientation each pass, so a
+  board comes back only after the whole pool: in a year, turned or mirrored, and exactly as it was in 8. Adding to the
+  pool (`make-puzzles.js`) changes the boards of the days to come, since the walk goes by its size, and a player partway
+  through that day's game keeps the board in their save. Binge's Quite Hard draws from the
+  same pool, so it can deal a board the daily also uses. The live levels can repeat by chance: measured over a year, 4×4
+  Easy once exactly and 6 times counting turned or mirrored boards, 5×5 Easy 3 times counting those, the others none.
+- **The launcher** shows the date and, in place of the pills and Start, six buttons, a row for each board size, each as
+  wide as what it says, as in Binge (the designer's call). A tap starts that level. Each is the level's difficulty over
+  how its daily stands: nothing yet, "resume", the score (the pill lavender), or "gave up" (faded). A finished one reopens
+  its board to look at. Gold fill means the same in both launchers, the last selection (`ss.picked`, `ss.pickedDaily`,
+  kept with the sound settings), and it outranks lavender on a solved one: gold once also meant solved, which looked like
+  a selection that wouldn't move. A gold tint for solved was tried against the lavender and came out a muddy brown, too
+  near the gold outlines. The time till the next puzzles
+  (`Countdown.svelte`) is below. It goes through the launcher, rather than straight from Home, for the economy paragraph.
+- **The game** is the same, bank and all, and the scoreboard leads with the difficulty, as in Binge. At the end, the
+  countdown takes Play new's place; once midnight has passed, Play new comes back and deals that level's new day's.
+  There's no replay: the player knows the answer.
+- **The saves**: each level's daily has its own (`APP_STATE • daily <level id>`), stats and puzzle, with `pzl.day`, so the
+  stats compare like with like and stay apart from Binge's. Unlike a Binge game, a finished one is kept till its day is
+  out. `ss.daily` is Home's choice, `ss.level` the level last played in either, and `ss.slot` the save now loaded. A game
+  begun and not finished by the time that level's daily is next opened counts as given up (`closeOldDaily`), once, so
+  waiting for midnight is no way out of a bad game (the designer's call); one still open at midnight can be finished.
+- `ss.now` is the clock, set each second from `+page.svelte`; `today()` follows it.
+
 ## Quite Hard
 
 The designer's aim was a harder puzzle, not a bigger one. A 6×6 board was tried and dropped: it played as just more
@@ -151,17 +187,19 @@ change it). 5×5 Not Easy, by contrast, was about 85% tier 2 when measured. Whet
 is the designer's judgement from play, not something measured.
 
 Such boards are too rare to generate while the player waits (about 1 s each for 4×4, 13 s for 5×5, on a desktop), so
-they ship ready-made: `src/puzzles.js` (60 for 4×4, 30 for 5×5), made by `scripts/make-puzzles.js`, and turned and
-mirrored at random by `generate`. The other levels are generated live.
+they ship ready-made: `src/puzzles.js` (365 for each size, a year of dailies, none another turned or mirrored), made by
+`scripts/make-puzzles.js`, and turned and mirrored at random by `generate`. The other levels are generated live.
 
 ## Files
 
 - `src/logic.js`: the prototype's rules, solver tiers and generator (`generate`, `tierOf`, `elevation`), plus Quite
-  Hard's grading and ready-made boards, tested in `src/logic.test.js` (`npm test`).
-- `scripts/make-puzzles.js`: `node scripts/make-puzzles.js 4expert=60 5expert=30` rewrites `src/puzzles.js`, keeping
-  only the levels named. The dev server reloads the page when it saves.
+  Hard's grading and ready-made boards, and the daily's dates and boards, tested in `src/logic.test.js` (`npm test`).
+- `scripts/make-puzzles.js`: `node scripts/make-puzzles.js 4expert=365 5expert=365` tops those levels up in
+  `src/puzzles.js`, keeping what's there, on most of the cores at low priority (the last 335 boards at 5×5 took 36
+  minutes on 5 workers), and skips a board that's another turned or mirrored. The dev server reloads the page when it
+  saves, as each level is done.
 - `src/shared.svelte.js`: the store `ss`, per-level saves (`APP_STATE • <level id>`: stats and the puzzle), turning
-  (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), selecting and marking (`select`, `mark`; a match ends the game), the budget (`cost`, `balance`), reveal, Back (`goBack`). `pzl.step` is the net count of clockwise quarter turns.
+  (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), selecting and marking (`select`, `mark`; a match ends the game), the budget (`cost`, `balance`), reveal, the daily's day (`today`, `dailyGame`, `closeOldDaily`), Back (`goBack`). `pzl.step` is the net count of clockwise quarter turns.
 - `src/const.js`: title, levels, sizes, sides, swipe and turn timing, the bank and costs, prompts.
 - `scripts/build-itch.js`: `npm run build:itch`, a static build without the PWA parts, zipped for itch.io.
 - `scripts/cover.html`: the itch.io cover, 630 × 500: the board seen from low down, under the title. The camera is in line
@@ -192,7 +230,3 @@ in the game itself, so the launcher's line can't simply go.
 Not on record: the sound effects' source (the same sprite is in 64 of the BMG games), and the music's. The credit to Eric
 Matyas was taken from this file's note on Unmix's track, but `f6c4696` replaced that track with one shared with DLMPY,
 Forever Contagion, Now You See Me, Parasite, Total Contagion and ZKT, none of which names a source; it's unconfirmed.
-
-## Open questions
-
-1. A daily or seeded puzzle.

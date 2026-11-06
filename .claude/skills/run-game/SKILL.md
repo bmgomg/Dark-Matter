@@ -20,7 +20,7 @@ description: Launch Dark Matter of Perspective and drive it in headless Chrome (
    node .claude/skills/run-game/drive.mjs <output folder>
    ```
 
-   It opens a 450 × 800 page in headless Chrome with a throwaway profile, waits out the splash, then goes Home → Play →
+   It opens a 450 × 800 page in headless Chrome with a throwaway profile, waits out the splash, then goes Home → Binge →
    the launcher → Start → a game → Back, printing the launcher panel's and the music credit's boxes at each step, then
    any uncaught page errors. It saves `1-home.png`, `2-launcher.png` and `3-game.png`.
 

@@ -16,11 +16,19 @@
 		[0, 'Map every planet. The game ends once your map is right.']
 	];
 
-	// to the launcher, to pick the board and the difficulty
-	const play = () => {
+	// to the launcher: today's puzzle, or the choice of board and difficulty
+	const play = (daily) => {
+		if (daily) {
+			ss.daily = true;
+		} else {
+			delete ss.daily;
+		}
+
 		ss.launcher = true;
 		delete ss.home;
 	};
+
+	const BUTTON = 'width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em;';
 </script>
 
 {#if ss.home}
@@ -57,7 +65,8 @@
 		</ul>
 
 		<div class="play">
-			<TextButton text={['play']} framed style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em;" onClick={play} />
+			<TextButton text={['daily']} framed style={BUTTON} onClick={() => play(true)} />
+			<TextButton text={['binge']} framed style={BUTTON} onClick={() => play(false)} />
 		</div>
 	</div>
 {/if}
@@ -140,6 +149,9 @@
 	}
 
 	.play {
+		display: grid;
+		grid-auto-flow: column;
+		gap: 20px;
 		margin-top: 46px;
 	}
 </style>

@@ -214,19 +214,20 @@ export const fits = (id, g) => {
 	return ok(tierOf(g), g.flat().filter(Boolean).length) && (!deep || (depth(g) >= DEEP && needsAllSides(g)));
 };
 
-// a ready-made board, turned and mirrored at random (neither changes how it grades)
-const fromPool = (boards, N) => {
-	const cells = [...boards[Math.floor(Math.random() * boards.length)]].map(Number);
+// a ready-made board, in one of its 8 orientations, turned and mirrored (neither changes how it grades)
+const fromPool = (board, N, orientation) => {
+	const cells = [...board].map(Number);
 	const g = Array.from({ length: N }, (_, i) => cells.slice(i * N, (i + 1) * N));
-	const turned = rotated(g, Math.floor(Math.random() * 4));
-	return Math.random() < 0.5 ? turned.map((row) => [...row].reverse()) : turned;
+	const turned = rotated(g, orientation % 4);
+	return orientation < 4 ? turned : turned.map((row) => [...row].reverse());
 };
 
-export function generate(N, diff) {
+// random: Math.random, or a seeded one for a board that's the same every time (the daily)
+export function generate(N, diff, random = Math.random) {
 	const boards = POOL[N + diff];
 
 	if (boards?.length) {
-		return Promise.resolve(fromPool(boards, N));
+		return Promise.resolve(fromPool(boards[Math.floor(random() * boards.length)], N, Math.floor(random() * 8)));
 	}
 
 	const { p, ok } = RULES[N + diff];
@@ -235,9 +236,7 @@ export function generate(N, diff) {
 	return new Promise((resolve) => {
 		(function batch() {
 			for (let k = 0; k < 400; k++, tries++) {
-				const g = Array.from({ length: N }, () =>
-					Array.from({ length: N }, () => (Math.random() < p ? 1 + Math.floor(Math.random() * 3) : 0))
-				);
+				const g = Array.from({ length: N }, () => Array.from({ length: N }, () => (random() < p ? 1 + Math.floor(random() * 3) : 0)));
 				const n = g.flat().filter(Boolean).length;
 				if (n < N) continue;
 				const t = tierOf(g);
@@ -250,6 +249,56 @@ export function generate(N, diff) {
 	});
 }
 
+// random numbers from a string, the same in every browser: mulberry32, seeded with the string's FNV-1a hash
+export const seeded = (text) => {
+	let h = 0x811c9dc5;
+
+	for (const ch of text) {
+		h = Math.imul(h ^ ch.codePointAt(0), 0x01000193);
+	}
+
+	return () => {
+		h = (h + 0x6d2b79f5) | 0;
+
+		let t = Math.imul(h ^ (h >>> 15), 1 | h);
+
+		t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+		return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+	};
+};
+
+// a moment's date as the daily knows it, the player's own: YYYY-MM-DD
+export const dayOf = (time = Date.now()) => {
+	const date = new Date(time);
+
+	return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+};
+
+// how long from a moment till the next day starts, where the player is, in ms
+export const msToMidnight = (time) => new Date(time).setHours(24, 0, 0, 0) - time;
+
+export const dateOf = (day) => {
+	const [y, m, d] = day.split('-').map(Number);
+	return new Date(y, m - 1, d);
+};
+
+// A level's board for a day: the same for everyone with that date, offline too. A ready-made one isn't drawn at random,
+// as the pools are small and the same board and orientation came back within weeks. The days walk through the pool
+// instead, a new orientation each pass: every board comes up before any comes back, and the same board and orientation
+// only after 8 passes.
+export const dailyPuzzle = (day, N, diff) => {
+	const boards = POOL[N + diff];
+
+	if (!boards?.length) {
+		return generate(N, diff, seeded(`${day} ${N}${diff}`));
+	}
+
+	const date = dateOf(day);
+	const days = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000;
+
+	return Promise.resolve(fromPool(boards[days % boards.length], N, Math.floor(days / boards.length) % 8));
+};
+
 const rotCW = (g) => {
 	const N = g.length;
 	return g.map((_, i) => g.map((__, j) => g[N - 1 - j][i]));
@@ -258,6 +307,16 @@ export const rotated = (g, r) => {
 	for (let k = 0; k < r; k++) g = rotCW(g);
 	return g;
 };
+
+// a board's one name, whichever way it's turned or mirrored: two with the same name are the same puzzle to the player
+export const canonical = (g) =>
+	[0, 1, 2, 3]
+		.flatMap((r) => {
+			const turned = rotated(g, r);
+			return [turned, turned.map((row) => [...row].reverse())];
+		})
+		.map((b) => b.flat().join(''))
+		.sort()[0];
 
 // visible spheres in each lane when the board is turned r times clockwise,
 // listed front to back (front of a lane = bottom row of the turned board)

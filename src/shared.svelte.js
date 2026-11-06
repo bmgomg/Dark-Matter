@@ -17,7 +17,7 @@ import {
 	TAP_TURN_MS,
 	TURN_MS
 } from './const';
-import { generate } from './logic';
+import { dailyPuzzle, dayOf, generate } from './logic';
 import { _sound, sfx, tap, whoosh } from './sound.svelte';
 
 // the side facing the player at a board angle, 0..3 (South, East, North, West)
@@ -25,11 +25,16 @@ export const sideAt = (deg) => ((Math.round(deg / 90) % 4) + 4) % 4;
 
 export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 
-// pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, changes, seen, over }
+// pzl: the puzzle under way, per level: { N, diff, sol, marks, step, turns, changes, seen, over, day }
 //   marks: -1 never marked, 0 cleared (both blank, which counts as empty), 1..3 a planet
 //   turns, changes: what the game has cost so far, in turns and changes of mind
 //   step: quarter turns clockwise so far, net (the board's angle at rest is step × 90°)
 //   over: 'won' or 'revealed'
+//   day: the daily's only: the date it's the puzzle of
+// daily: Home's choice, Daily or Binge; picked, pickedDaily: the level last picked on the launcher in each, kept between
+// sessions
+// level: the level last played, in either; slot: the save now loaded, which is the level's, or its daily's
+// now: the clock, to the second, for what goes by the time of day
 // angle: the board's angle on screen, in degrees clockwise; between steps while it turns
 // rise: 1 while the horizon's spheres are still below it (a new puzzle), easing to 0
 // sel: the cell being marked, [i, j], while the palette is up
@@ -39,16 +44,18 @@ export const ss = $state({
 	home: true,
 	scale: 1,
 	stats: newStats(),
+	now: Date.now(),
 	angle: 0,
 	rise: 0,
 	flip: 0
 });
 
-const keyOf = (id) => `${APP_STATE} • ${id}`;
-const appKey = () => keyOf(ss.level);
+const keyOf = (slot) => `${APP_STATE} • ${slot}`;
+const appKey = () => keyOf(ss.slot);
+const dailySlot = (id) => `daily ${id}`;
 
 // whether a puzzle has been begun: a turn made or a cell marked
-const begun = (pzl) => pzl.turns > 0 || pzl.marks.some((row) => row.some((v) => v !== -1));
+export const begun = (pzl) => pzl.turns > 0 || pzl.marks.some((row) => row.some((v) => v !== -1));
 
 // whether a level has a game under way, begun and not finished
 export const inProgress = (id) => {
@@ -60,6 +67,19 @@ export const inProgress = (id) => {
 	}
 };
 
+// today, by the clock, so what reads it moves on at midnight
+export const today = () => dayOf(ss.now);
+
+// a level's daily game for a day: begun or not, finished or not, or null if it hasn't been dealt
+export const dailyGame = (id, day) => {
+	try {
+		const pzl = JSON.parse(localStorage.getItem(keyOf(dailySlot(id))))?.pzl;
+		return pzl?.day === day ? pzl : null;
+	} catch {
+		return null;
+	}
+};
+
 export const _log = (value) => console.log($state.snapshot(value));
 
 export const level = () => LEVELS.find((l) => l.id === ss.level);
@@ -67,11 +87,12 @@ export const level = () => LEVELS.find((l) => l.id === ss.level);
 export const isOver = () => !!ss.pzl?.over;
 
 // what the game has cost so far, and what's left of the bank
-export const cost = () => (ss.pzl ? ss.pzl.turns * COST_TURN + ss.pzl.changes * COST_CHANGE : 0);
+export const costOf = (pzl) => pzl.turns * COST_TURN + pzl.changes * COST_CHANGE;
+export const cost = () => (ss.pzl ? costOf(ss.pzl) : 0);
 export const balance = () => BANK - cost();
 
 export const persistCommon = () => {
-	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music });
+	const json = JSON.stringify({ sfx: _sound.sfx, music: _sound.music, picked: ss.picked, pickedDaily: ss.pickedDaily });
 	localStorage.setItem(APP_STATE, json);
 };
 
@@ -81,6 +102,8 @@ export const loadCommon = () => {
 	if (job) {
 		_sound.sfx = job.sfx;
 		_sound.music = job.music;
+		ss.picked = job.picked;
+		ss.pickedDaily = job.pickedDaily;
 	}
 };
 
@@ -273,16 +296,17 @@ const arriveEdgeOn = async () => {
 // the new planets stay down till the map has flipped back (flipBack)
 export const newPuzzle = async () => {
 	const { N, diff } = level();
-	const id = ss.level;
+	const day = ss.daily ? dayOf() : undefined;
+	const { slot } = ss;
 
 	ss.generating = true;
 	delete ss.prompt;
 	delete ss.message;
 
-	const sol = await generate(N, diff);
+	const sol = await (day ? dailyPuzzle(day, N, diff) : generate(N, diff));
 
 	// the player may have gone to another level meanwhile
-	if (id !== ss.level) {
+	if (slot !== ss.slot) {
 		return;
 	}
 
@@ -301,7 +325,8 @@ export const newPuzzle = async () => {
 		step: 0,
 		turns: 0,
 		changes: 0,
-		seen: [true, false, false, false]
+		seen: [true, false, false, false],
+		...(day && { day })
 	};
 
 	sfx('draw', 1.4, 0.5);
@@ -309,11 +334,41 @@ export const newPuzzle = async () => {
 	persist();
 };
 
-// a level's saved game goes on unless it was finished; each level keeps its own stats
+// a game given up scores no more than breaking even: $0, or the balance if it's below that
+const countGiveUp = () => {
+	ss.stats.plays += 1;
+	ss.stats.total += Math.min(0, balance());
+};
+
+// The daily's game is for its day. Once that's past it goes, and one begun and left unfinished counts as given up, so
+// waiting for midnight is no way out of a bad game. (A game still open at midnight can be finished, if the player stays
+// with it.)
+const closeOldDaily = () => {
+	if (!ss.pzl || ss.pzl.day === dayOf()) {
+		return;
+	}
+
+	if (!ss.pzl.over && begun(ss.pzl)) {
+		countGiveUp();
+	}
+
+	delete ss.pzl;
+	delete ss.prompt;
+	delete ss.message;
+	delete ss.sel;
+	delete ss.cursor;
+	stopTurning();
+	persist();
+};
+
+// A level's saved game goes on unless it was finished; each level keeps its own stats. The daily's stays once finished,
+// to look at, till the day is out.
 export const onPlay = (id) => {
-	const changed = id !== ss.level;
+	const slot = ss.daily ? dailySlot(id) : id;
+	const changed = slot !== ss.slot;
 
 	if (changed) {
+		ss.slot = slot;
 		ss.level = id;
 		delete ss.pzl;
 		delete ss.prompt;
@@ -324,16 +379,24 @@ export const onPlay = (id) => {
 		const job = JSON.parse(localStorage.getItem(appKey()));
 		ss.stats = job?.stats ?? newStats();
 
-		if (job?.pzl && !job.pzl.over) {
+		if (job?.pzl && (ss.daily || !job.pzl.over)) {
 			ss.pzl = job.pzl;
 			ss.angle = job.pzl.step * 90;
 		}
 	}
 
-	if (ss.pzl && !ss.pzl.over && begun(ss.pzl)) {
+	if (ss.daily) {
+		closeOldDaily();
+	}
+
+	if (ss.pzl && (ss.pzl.over ? ss.daily : begun(ss.pzl))) {
 		// a game resumed: the map is simply there, flat
 		stopFlip();
 		ss.flip = 0;
+
+		if (ss.pzl.over) {
+			ss.prompt = PROMPT_PLAY_NEW;
+		}
 
 		if (changed || ss.rise) {
 			riseHorizon(400);
@@ -556,8 +619,7 @@ const gameOver = () => {
 	persist();
 };
 
-// gives up and shows the sky as it is (the map's planets change over, cell by cell). It counts as a play, scoring
-// no more than breaking even: $0, or the balance if it's below that.
+// gives up and shows the sky as it is (the map's planets change over, cell by cell). It counts as a play.
 export const reveal = () => {
 	const pzl = ss.pzl;
 
@@ -565,8 +627,7 @@ export const reveal = () => {
 		return;
 	}
 
-	ss.stats.plays += 1;
-	ss.stats.total += Math.min(0, balance());
+	countGiveUp();
 
 	pzl.over = 'revealed';
 	sfx('lost');

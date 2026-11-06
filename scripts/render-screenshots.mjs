@@ -122,7 +122,7 @@ try {
 	await send('Page.navigate', { url: GAME });
 
 	// a cold dev server's first load, then the splash
-	for (let i = 0; i < 120 && !(await centre('play')); i++) {
+	for (let i = 0; i < 120 && !(await centre('binge')); i++) {
 		await sleep(500);
 	}
 
@@ -131,7 +131,7 @@ try {
 	await sleep(300);
 	await shot('4-home.png');
 
-	await click('play');
+	await click('binge');
 	await sleep(800);
 	await click('not easy');
 	await sleep(300);

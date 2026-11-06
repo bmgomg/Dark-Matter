@@ -1,10 +1,12 @@
 <script>
 	import { fade } from 'svelte/transition';
 	import { clearAllText, OVER_MS, PROMPT_CLEAR_ALL, PROMPT_PLAY_NEW, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
-	import { clearAll, isOver, planetCount, playNew, resetStats, reveal, ss } from './shared.svelte';
+	import Countdown from './Countdown.svelte';
+	import { clearAll, isOver, planetCount, playNew, resetStats, reveal, ss, today } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
 
-	// in the palette's place: the answers to a prompt, or, at the end of a game, its message for a while, then Play new
+	// in the palette's place: the answers to a prompt, or, at the end of a game, its message for a while, then Play new;
+	// in the daily, the time till the next puzzle, and Play new once that has come
 	const PILL = 'font-size: 12px; letter-spacing: 0.06em; padding: 11px 18px;';
 
 	let lingering = $state(false);
@@ -70,7 +72,11 @@
 		<div class="over" class:won={ss.pzl?.over === 'won'} in:fade={{ duration: 300 }} out:fade={{ duration: 200 }}>{ss.message}</div>
 	{:else if ss.prompt === PROMPT_PLAY_NEW}
 		<div in:fade={{ duration: 300, delay: 200 }}>
-			<TextButton text={['play new']} framed onClick={playNew} />
+			{#if ss.daily && ss.pzl?.day === today()}
+				<Countdown />
+			{:else}
+				<TextButton text={['play new']} framed onClick={playNew} />
+			{/if}
 		</div>
 	{/if}
 </div>

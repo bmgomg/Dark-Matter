@@ -99,6 +99,9 @@
 
 		onResize();
 
+		// the clock, for the daily's countdown, and its next puzzle at midnight
+		const clock = setInterval(() => (ss.now = Date.now()), 1000);
+
 		window.addEventListener('contextmenu', disable);
 		window.addEventListener('dblclick', disable);
 		window.addEventListener('resize', onResize);
@@ -107,6 +110,7 @@
 		window.addEventListener('keydown', onKeyDown);
 
 		return () => {
+			clearInterval(clock);
 			window.removeEventListener('contextmenu', disable);
 			window.removeEventListener('dblclick', disable);
 			window.removeEventListener('resize', onResize);
