@@ -1,4 +1,5 @@
 import { cubicInOut } from 'svelte/easing';
+import { DX } from './const';
 
 export const windowSize = () => {
 	const d = document,
@@ -128,9 +129,30 @@ export const rowCol = (i, size) => {
 
 // A Svelte transition that slides an element sideways: in from `from` (in `unit`s, vw by default) off to one side, or
 // out to it. Two at once, one out and one in, make a push: the splash off to the left as the page comes in from the
-// right, and one page for another (see Game Page.svelte).
-export const slideX = (node, { from, unit = 'vw', duration }) => ({
-	duration,
-	easing: cubicInOut,
-	css: (t) => `translate: ${(1 - t) * from}${unit} 0;`
-});
+// right, and one page for another (see Game Page.svelte). With `raf`, by requestAnimationFrame, not CSS: an animation
+// on the compositor during a turn makes it stagger on a Pixel 6a (see Roller Digit).
+export const slideX = (node, { from, unit = 'vw', duration, delay = 0, raf = false }) => {
+	const at = (t) => `${(1 - t) * from}${unit} 0`;
+
+	return raf
+		? { delay, duration, easing: cubicInOut, tick: (t) => (node.style.translate = at(t)) }
+		: { delay, duration, easing: cubicInOut, css: (t) => `translate: ${at(t)};` };
+};
+
+// A push within the page, by its width, so whatever slides is off it (and clipped) at either end: `way` 1 for on, the
+// new one coming in from the right, -1 for back. Spread into an in: and an out: of slideX.
+export const pushIn = (way, duration, raf) => ({ from: way * DX, unit: 'px', duration, raf });
+export const pushOut = (way, duration, raf) => ({ from: -way * DX, unit: 'px', duration, raf });
+
+// Which way a push goes as what's shown moves along a row of places: 1, on, to a later place, or within the same one;
+// -1, back, to an earlier one. Make one per row, and call it from a $derived of the place, so it's called once a change.
+export const wayAlong = () => {
+	let last = -Infinity;
+
+	return (place) => {
+		const way = place < last ? -1 : 1;
+
+		last = place;
+		return way;
+	};
+};

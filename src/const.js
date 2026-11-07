@@ -41,6 +41,9 @@ export const SPLASH_SLIDE_MS = 700;
 // One page pushes another the same way, in this long. They stand in a row, Home, the launcher, a game, so going on
 // pushes to the left and Back to the right.
 export const PAGE_SLIDE_MS = 500;
+// What's below the tray, the hint, the palette's warning, a prompt, the end of a game, changes by a push too, in this
+// long: the page stays, so it's quicker.
+export const STRIP_SLIDE_MS = 400;
 // Play new: the map flips a quarter turn about its horizontal axis, its gold edge coming towards the player, till it's
 // edge-on, the next sky is charted out of sight, and it flips back, each way in this long, at an even pace. Coming to
 // the game page for a new puzzle, it starts edge-on and only flips back.

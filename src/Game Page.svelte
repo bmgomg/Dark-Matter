@@ -1,5 +1,4 @@
 <script>
-	import { fade } from 'svelte/transition';
 	import Actions from './Actions.svelte';
 	import Board from './Board.svelte';
 	import Keys from './Keys.svelte';
@@ -8,14 +7,22 @@
 	import Tray from './Tray.svelte';
 	import Palette from './Palette.svelte';
 	import Scoreboard from './Scoreboard.svelte';
-	import { PAGE_SLIDE_MS, PALETTE_AT_CELL } from './const';
+	import { PAGE_SLIDE_MS, PALETTE_AT_CELL, STRIP_SLIDE_MS } from './const';
 	import { ss } from './shared.svelte';
 	import Toolbar from './Toolbar.svelte';
-	import { slideX } from './utils';
+	import { pushIn, pushOut, slideX, wayAlong } from './utils';
 
 	// what the space below the tray holds: a prompt's answers (a game over is always one: Play new), the palette
 	// with its warning while a cell is selected, or else what to do next
 	const mode = $derived(ss.prompt ? 'prompt' : ss.sel ? 'palette' : 'hint');
+
+	// one pushes another, as the pages do, these three standing in a row in this order: a cell selected pushes the hint
+	// off to the left, and letting it go brings it back from there
+	const MODES = ['hint', 'palette', 'prompt'];
+	const along = wayAlong();
+	const way = $derived(along(MODES.indexOf(mode)));
+	// (read from the start, so the first change knows where it came from)
+	$effect(() => void way);
 
 	// the pages stand in a row, Home, the launcher, a game: the launcher comes and goes on its left, a game on its right
 	const push = (from) => ({ from, unit: '%', duration: PAGE_SLIDE_MS });
@@ -45,16 +52,16 @@
 
 			<div class="controls">
 				{#if mode === 'prompt'}
-					<div class="ga11" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}><Actions /></div>
+					<div class="ga11" in:slideX={pushIn(way, STRIP_SLIDE_MS)} out:slideX={pushOut(way, STRIP_SLIDE_MS)}><Actions /></div>
 				{:else if mode === 'palette'}
-					<div class="ga11 marking" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}>
+					<div class="ga11 marking" in:slideX={pushIn(way, STRIP_SLIDE_MS)} out:slideX={pushOut(way, STRIP_SLIDE_MS)}>
 						<Message />
 						{#if !PALETTE_AT_CELL}
 							<Palette />
 						{/if}
 					</div>
 				{:else}
-					<div class="ga11" in:fade={{ duration: 200 }} out:fade={{ duration: 150 }}><Message /></div>
+					<div class="ga11" in:slideX={pushIn(way, STRIP_SLIDE_MS)} out:slideX={pushOut(way, STRIP_SLIDE_MS)}><Message /></div>
 				{/if}
 			</div>
 		</div>

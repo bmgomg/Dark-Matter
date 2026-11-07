@@ -40,7 +40,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   selected. No compass letters and no "from the South" label: the designer found them unhelpful (the turning map
   shows the orientation). (Cursors carrying the brush went with the brushes.)
 - **Below the tray** (`Game Page.svelte`, the rest of the page's height, its content centred, no separator): with no
-  cell selected, the hint (`Message.svelte`: what to do next; the first fades out and the next in once the board has turned, by requestAnimationFrame, any other change at once), moved down from above the map at the designer's
+  cell selected, the hint (`Message.svelte`: what to do next; the next pushes the first out to the left once the board has turned, by requestAnimationFrame, any other change at once), moved down from above the map at the designer's
   request; with one selected, "Think twice — changing your mind costs $1." The palette (small, medium, large, clear;
   the cell's own planet lit and disabled, Clear disabled on a blank cell) is being tried at the cell (`Picker.svelte`:
   a pill on the map with a notch pointing at the cell, above it or below it near the top, growing out of it; a tap
@@ -55,7 +55,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   toolbar, sliding in from the right over it and back out, as the pages slide, its shade fading; any key or a tap puts
   it away). The toolbar's Keys button opens it too, shown only with a keyboard about
   (`ss.keyboard`: a fine pointer suggests one, a key pressed proves it). Any prompt takes the same place (`Actions.svelte`, 50 px tall
-  so the game-over message doesn't shift when Play new fades in): the confirmations, which follow the template (the
+  so the game-over message and Play new, pushing it out, are on one line): the confirmations, which follow the template (the
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average
   improved, into the red, or the revealed one) for `OVER_MS` (4 s), then Play new.
 - **The launcher** (`Launcher.svelte`, as in Triangula; Home's Binge opens it, and Daily, in the daily's form: see
@@ -117,7 +117,12 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   a game, so going on pushes to the left and Back to the right. Home and the game page (`Game Page.svelte`, toolbar and
   all, waiting on Home's right, clipped by the glass page) slide together; the launcher and a game push each other above
   the toolbar, which holds still. `ss.launcher` is set from the start, so Daily or Binge brings the page in with the
-  launcher already on it. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License). It fades up from silence (`MUSIC_FADE_MS`, 5 s) whenever it starts or resumes (the first Start, Music On, back in the window), at the designer's wish; it goes off at once.
+  launcher already on it. What's below the tray changes by a push too (`STRIP_SLIDE_MS`, 0.4 s; `pushIn`, `pushOut`):
+  the hint, the palette's warning and a prompt stand in a row in that order (`wayAlong`), so selecting a cell pushes
+  the hint to the left and letting it go brings it back; in `Actions.svelte` what comes next comes from the right (a
+  question, the game-over message, Play new after it), and only a question put away after a game brings Play new back
+  from the left. Fades stay where nothing moves from place to place: the shade behind the shortcuts card, Start and
+  Resume crossfading in their pill, hovers and disabled buttons; planets and the picker grow rather than fade. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License). It fades up from silence (`MUSIC_FADE_MS`, 5 s) whenever it starts or resumes (the first Start, Music On, back in the window), at the designer's wish; it goes off at once.
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
 
 ## Scoring: the bank
