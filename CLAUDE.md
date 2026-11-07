@@ -52,7 +52,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   on the map opens the palette; 1–3 a planet,
   0 / Delete / Backspace clear, on the selected cell or else straight on the cursor's, at the same price; the "Think
   twice" warning shows with the cursor too. Esc lets the cell go, then the cursor. ? the shortcuts card (`Keys.svelte`, over the page above the
-  toolbar; any key or a tap puts it away). The toolbar's Keys button opens it too, shown only with a keyboard about
+  toolbar, sliding in from the right over it and back out, as the pages slide, its shade fading; any key or a tap puts
+  it away). The toolbar's Keys button opens it too, shown only with a keyboard about
   (`ss.keyboard`: a fine pointer suggests one, a key pressed proves it). Any prompt takes the same place (`Actions.svelte`, 50 px tall
   so the game-over message doesn't shift when Play new fades in): the confirmations, which follow the template (the
   question is the yes button, beside No); and at a game's end its message ("No more dark matter!", best / average
@@ -96,7 +97,7 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   edge), and flips the empty map back (the designer's call: x-axis, linear, 0.5 s each way; easing out and in was tried
   and dropped, and so was the y-axis, which left a pause edge-on a blank screen). Only once it's flat do the tray's new
   planets grow in, so the two don't move at once (the designer's call). Coming to the game page plays the second half
-  of this: the map starts edge-on (`arriveEdgeOn`; its pause starts with the page's fade-in, `PAGE_FADE_MS`) and flips
+  of this: the map starts edge-on (`arriveEdgeOn`; its pause starts as the page slides in, `PAGE_SLIDE_MS`) and flips
   back. So does a game coming back (Resume, or a finished daily reopened), at the designer's wish, with its planets
   hovering above the gold edge as on the itch cover, upright, their centres on one line and a lane's concentric (the
   designer's call), the nearer ones larger and in front, each with a shadow on the plate, and going to their cells as the map comes flat (`ss.stand`; `standing` in
@@ -110,7 +111,13 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   except in the home page's rules and the shortcuts card, where the designer preferred Quicksand, `QS`),
   Space Mono (`SM`, labels; its bold on a gold button, selected or hovered, where thin dark letters were hard to read,
   more so on a phone; the same width, so nothing shifts).
-- Splash: the template's BMG one. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License). It fades up from silence (`MUSIC_FADE_MS`, 5 s) whenever it starts or resumes (the first Start, Music On, back in the window), at the designer's wish; it goes off at once.
+- Splash: the template's BMG one. It goes to Home by a push, not a fade (the designer's call, for the theme): the splash
+  slides off to the left as the page slides in from the right, in step (`slideX` in `utils.js`, `SPLASH_SLIDE_MS`, 0.7 s,
+  ease-in-out). One page goes to another the same way (`PAGE_SLIDE_MS`, 0.5 s): they stand in a row, Home, the launcher,
+  a game, so going on pushes to the left and Back to the right. Home and the game page (`Game Page.svelte`, toolbar and
+  all, waiting on Home's right, clipped by the glass page) slide together; the launcher and a game push each other above
+  the toolbar, which holds still. `ss.launcher` is set from the start, so Daily or Binge brings the page in with the
+  launcher already on it. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License). It fades up from silence (`MUSIC_FADE_MS`, 5 s) whenever it starts or resumes (the first Start, Music On, back in the window), at the designer's wish; it goes off at once.
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
 
 ## Scoring: the bank

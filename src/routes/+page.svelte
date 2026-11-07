@@ -4,10 +4,10 @@
 	import Home from '../Home.svelte';
 	import Space from '../Space.svelte';
 	import Splash from '../Splash.svelte';
-	import { DX, DY } from '../const';
+	import { DX, DY, SPLASH_SLIDE_MS } from '../const';
 	import { deselect, hideCursor, markCursor, moveCursor, selectCursor, ss, toggleKeys, turnBy, turnHalf } from '../shared.svelte';
 	import { _sound } from '../sound.svelte';
-	import { clientRect, post } from '../utils';
+	import { clientRect, post, slideX } from '../utils';
 
 	// a key's move of the map's cursor on screen, dx and dy
 	const MOVES = { w: [0, -1], a: [-1, 0], s: [0, 1], d: [1, 0] };
@@ -131,7 +131,7 @@
 	{#if splash}
 		<Splash />
 	{:else}
-		<div id="app-content" style="width: {DX}px; height: {DY}px; scale: {ss.scale};">
+		<div id="app-content" in:slideX={{ from: 100, duration: SPLASH_SLIDE_MS }} style="width: {DX}px; height: {DY}px; scale: {ss.scale};">
 			<GamePage />
 			<Home />
 		</div>
@@ -151,6 +151,8 @@
 		grid-area: 1/1;
 		place-self: center;
 		display: grid;
+		/* the pages waiting off to the side, and those sliding in or out, show only within it */
+		overflow: hidden;
 		touch-action: none;
 		background: radial-gradient(ellipse at 50% 30%, #1a1442cc, #0a0920e6 70%);
 		box-shadow:

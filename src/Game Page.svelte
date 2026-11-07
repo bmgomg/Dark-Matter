@@ -8,25 +8,30 @@
 	import Tray from './Tray.svelte';
 	import Palette from './Palette.svelte';
 	import Scoreboard from './Scoreboard.svelte';
-	import { PAGE_FADE_MS, PALETTE_AT_CELL } from './const';
+	import { PAGE_SLIDE_MS, PALETTE_AT_CELL } from './const';
 	import { ss } from './shared.svelte';
 	import Toolbar from './Toolbar.svelte';
+	import { slideX } from './utils';
 
 	// what the space below the tray holds: a prompt's answers (a game over is always one: Play new), the palette
 	// with its warning while a cell is selected, or else what to do next
 	const mode = $derived(ss.prompt ? 'prompt' : ss.sel ? 'palette' : 'hint');
+
+	// the pages stand in a row, Home, the launcher, a game: the launcher comes and goes on its left, a game on its right
+	const push = (from) => ({ from, unit: '%', duration: PAGE_SLIDE_MS });
 </script>
 
-<!-- the launcher (between Home and a game), or the game itself, above the toolbar -->
+<!-- the launcher (between Home and a game), or the game itself, above the toolbar; all of it, toolbar too, waits on
+     Home's right -->
 <div class="game-page ga11" class:show={!ss.home} inert={ss.home}>
 	{#if ss.launcher}
-		<div class="ga11 launching" in:fade={{ duration: 250 }} out:fade={{ duration: 150 }}>
+		<div class="ga11 launching" transition:slideX={push(-100)}>
 			<div class="ga11"><Launcher /></div>
 			<!-- the music's license requires a credit in the game itself -->
 			<div class="ga11 credit">Music by Eric Matyas · www.soundimage.org</div>
 		</div>
 	{:else}
-		<div class="ga11 game" in:fade={{ duration: PAGE_FADE_MS }} out:fade={{ duration: 150 }}>
+		<div class="ga11 game" transition:slideX={push(100)}>
 			<Scoreboard />
 
 			<div class="stage" class:dim={ss.generating}>
@@ -66,13 +71,14 @@
 		grid-template-rows: 1fr auto;
 		width: 450px;
 		height: 800px;
-		opacity: 0;
+		translate: 100% 0;
 		pointer-events: none;
-		transition: opacity 0.3s;
+		/* as slideX: PAGE_SLIDE_MS, cubicInOut */
+		transition: translate 0.5s cubic-bezier(0.65, 0, 0.35, 1);
 	}
 
 	.show {
-		opacity: 1;
+		translate: 0 0;
 		pointer-events: auto;
 	}
 

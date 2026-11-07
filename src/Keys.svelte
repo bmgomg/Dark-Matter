@@ -1,9 +1,12 @@
 <script>
 	import { fade } from 'svelte/transition';
+	import { DX, PAGE_SLIDE_MS } from './const';
 	import { ss } from './shared.svelte';
+	import { slideX } from './utils';
 
 	// the keyboard shortcuts, on a card over the page above the toolbar; a tap anywhere but the Keys button, or any
-	// key, puts it away (the Keys button toggles it)
+	// key, puts it away (the Keys button toggles it). It slides in from the right over the page, which stays, and back out
+	// that way, as the pages slide, while the shade behind it fades.
 	const KEYS = [
 		[['←', '→'], 'Turn the board 90°'],
 		[['↑', '↓'], 'Turn the board 180°'],
@@ -28,8 +31,8 @@
 	});
 </script>
 
-<div class="ga11 scrim" transition:fade={{ duration: 200 }}>
-	<div class="card" role="dialog" aria-label="Keyboard shortcuts">
+<div class="ga11 scrim" transition:fade={{ duration: PAGE_SLIDE_MS }}>
+	<div class="card" transition:slideX={{ from: DX, unit: 'px', duration: PAGE_SLIDE_MS }} role="dialog" aria-label="Keyboard shortcuts">
 		<div class="title">keyboard</div>
 		<div class="rows">
 			{#each KEYS as [caps, what] (what)}

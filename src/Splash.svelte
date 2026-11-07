@@ -1,6 +1,6 @@
 <script>
-	import { fade } from 'svelte/transition';
-	import { APP_STATE } from './const';
+	import { APP_STATE, SPLASH_SLIDE_MS } from './const';
+	import { slideX } from './utils';
 
 	let classes = $state('splash');
 
@@ -14,7 +14,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-<div class={classes} out:fade={{ duration: 300 }} onpointerdown={onPointerDown}>
+<div class={classes} out:slideX={{ from: -100, duration: SPLASH_SLIDE_MS }} onpointerdown={onPointerDown}>
 	<div class="bmg"></div>
 </div>
 

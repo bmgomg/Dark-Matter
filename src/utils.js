@@ -1,3 +1,5 @@
+import { cubicInOut } from 'svelte/easing';
+
 export const windowSize = () => {
 	const d = document,
 		e = d.documentElement,
@@ -123,3 +125,12 @@ export const rowCol = (i, size) => {
 
 	return { row, col };
 };
+
+// A Svelte transition that slides an element sideways: in from `from` (in `unit`s, vw by default) off to one side, or
+// out to it. Two at once, one out and one in, make a push: the splash off to the left as the page comes in from the
+// right, and one page for another (see Game Page.svelte).
+export const slideX = (node, { from, unit = 'vw', duration }) => ({
+	duration,
+	easing: cubicInOut,
+	css: (t) => `translate: ${(1 - t) * from}${unit} 0;`
+});

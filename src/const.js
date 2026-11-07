@@ -36,8 +36,11 @@ export const TAP_TURN_MS = 500;
 // a half turn, on holding an arrow (or ↑ ↓), and how long the hold takes
 export const HALF_TURN_MS = 700;
 export const HOLD_MS = 400;
-// how long the game page takes to fade in
-export const PAGE_FADE_MS = 250;
+// the splash slides off to the left as the page slides in from the right, pushing it, in this long
+export const SPLASH_SLIDE_MS = 700;
+// One page pushes another the same way, in this long. They stand in a row, Home, the launcher, a game, so going on
+// pushes to the left and Back to the right.
+export const PAGE_SLIDE_MS = 500;
 // Play new: the map flips a quarter turn about its horizontal axis, its gold edge coming towards the player, till it's
 // edge-on, the next sky is charted out of sight, and it flips back, each way in this long, at an even pace. Coming to
 // the game page for a new puzzle, it starts edge-on and only flips back.

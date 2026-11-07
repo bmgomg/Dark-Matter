@@ -1,11 +1,11 @@
 <script>
 	import { onMount } from 'svelte';
-	import { fade } from 'svelte/transition';
-	import { R, TAGLINE, TITLE } from './const';
+	import { PAGE_SLIDE_MS, R, TAGLINE, TITLE } from './const';
 	import Emblem from './Emblem.svelte';
 	import Planet from './Planet.svelte';
 	import { loadCommon, ss } from './shared.svelte';
 	import TextButton from './Text Button.svelte';
+	import { slideX } from './utils';
 
 	onMount(loadCommon);
 
@@ -32,7 +32,8 @@
 </script>
 
 {#if ss.home}
-	<div class="home ga11" in:fade={{ duration: 300 }} out:fade={{ duration: 200 }}>
+	<!-- the first page in the row: it leaves to the left, and comes back from there -->
+	<div class="home ga11" transition:slideX={{ from: -100, unit: '%', duration: PAGE_SLIDE_MS }}>
 		<div class="hero">
 			<Emblem />
 		</div>

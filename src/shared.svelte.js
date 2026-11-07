@@ -10,7 +10,7 @@ import {
 	MSG_BROKE,
 	MSG_REVEALED,
 	MSG_WON,
-	PAGE_FADE_MS,
+	PAGE_SLIDE_MS,
 	PROMPT_PLAY_NEW,
 	TAP_TURN_MS,
 	TURN_MS
@@ -38,8 +38,11 @@ export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 // cursor: the keyboard's cell, [i, j]; cursorOn: while it shows, which only keyboard use brings about
 // flip: how far the map is tilted away for a new puzzle, 0 flat to 1 edge-on
 // stand: while a game coming back flips flat, its planets standing up off the map, on its edge at first
+// launcher: while the launcher is up in place of a game; it is from the start, waiting on Home's right, so Home's Daily or
+// Binge slides the page in with it already there
 export const ss = $state({
 	home: true,
+	launcher: true,
 	scale: 1,
 	stats: newStats(),
 	now: Date.now(),
@@ -280,7 +283,7 @@ export const playNew = () => {
 };
 
 // Coming to the game page: the map starts edge-on and flips back, as in the second half of Play new. Its pause starts as
-// the page starts fading in, so it's seen for all of it. For a new puzzle, unless one was dealt earlier and never touched,
+// the page starts sliding in, so it's seen for all of it. For a new puzzle, unless one was dealt earlier and never touched,
 // which is still new to the player: the launcher offers it under Start. For a game resumed (or a finished daily reopened),
 // its planets stand on the gold edge, and go to their cells as the map comes flat.
 const arriveEdgeOn = async (resumed) => {
@@ -300,7 +303,7 @@ const arriveEdgeOn = async (resumed) => {
 		}
 	}
 
-	flipBack(t0, PAGE_FADE_MS + FLIP_PAUSE_MS);
+	flipBack(t0, PAGE_SLIDE_MS + FLIP_PAUSE_MS);
 };
 
 // the new planets stay down till the map has flipped back (flipBack)
