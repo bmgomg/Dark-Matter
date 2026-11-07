@@ -94,9 +94,13 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   there with only the gold edge showing (`FLIP_PAUSE_MS`, 0.5 s; the rim in `Board.svelte`, the plate's thickness on that
   edge), and flips the empty map back (the designer's call: x-axis, linear, 0.5 s each way; easing out and in was tried
   and dropped, and so was the y-axis, which left a pause edge-on a blank screen). Only once it's flat do the tray's new
-  planets grow in, so the two don't move at once (the designer's call). Coming to the game page for a new puzzle
-  (the launcher's Start, an untouched one kept too; not Resume) plays the second half of this: the map starts edge-on
-  (`arriveEdgeOn`; its pause starts with the page's fade-in, `PAGE_FADE_MS`) and flips back. The board can't be turned
+  planets grow in, so the two don't move at once (the designer's call). Coming to the game page plays the second half
+  of this: the map starts edge-on (`arriveEdgeOn`; its pause starts with the page's fade-in, `PAGE_FADE_MS`) and flips
+  back. So does a game coming back (Resume, or a finished daily reopened), at the designer's wish, with its planets
+  hovering above the gold edge as on the itch cover, upright, their centres on one line and a lane's concentric (the
+  designer's call), the nearer ones larger and in front, each with a shadow on the plate, and going to their cells as the map comes flat (`ss.stand`; `standing` in
+  `Board.svelte`, a layer apart from the tilted map, using the same projection; `HOVER`, in cells). Play
+  new's first half doesn't do this: those planets flatten with the map, since they're leaving. The board can't be turned
   and its cells can't be tapped while it flips (a turn costs, and would show nothing).
 - A real 3D turn of the planets was rejected: their speeds would show their depth, and hidden ones would show
   mid-turn, giving the puzzle away.

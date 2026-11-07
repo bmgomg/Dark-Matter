@@ -15,7 +15,8 @@
 	const cell = $derived(MAP / N);
 	const front = $derived(sideAt(ss.angle));
 	const shown = $derived(pzl.over === 'revealed' ? pzl.sol : pzl.marks);
-	const won = $derived(pzl.over === 'won');
+	// (a won game reopened celebrates once it's flat)
+	const won = $derived(pzl.over === 'won' && !ss.stand);
 	// the cell being marked, pulsing while the palette is up
 	const sel = $derived(ss.sel ? ss.sel[0] * N + ss.sel[1] : -1);
 	// the keyboard's cell, while it shows (shared.svelte.js); a selected cell has a look of its own
@@ -55,6 +56,26 @@
 		}
 
 		return out;
+	});
+
+	// A game coming back (ss.stand): the planets, drawn apart from the tilted map, stay upright and follow their cells
+	// through the flip, the same projection as the map's CSS transform, hovering over the plate as on the itch cover.
+	// Edge-on, their centres are all on one line above the gold edge, and a lane's are concentric, as in the tray (so the
+	// perspective's spread sideways fades out as the map nears edge-on), nearer ones larger and in front; flat, they're
+	// where they are on the map, each over its shadow.
+	const HOVER = 0.62;
+
+	const standing = $derived.by(() => {
+		const t = (ss.flip * Math.PI) / 2;
+		const c = Math.cos(t);
+		const s = Math.sin(t);
+
+		return [...marks]
+			.sort((a, b) => a.y - b.y)
+			.map((m) => {
+				const k = FLIP_PERSPECTIVE / (FLIP_PERSPECTIVE - m.y * s);
+				return { ...m, x: m.x * (1 + (k - 1) * c), y: m.y * c * k - HOVER * cell * s, r: m.r * k };
+			});
 	});
 
 	// the plate's edge on the side facing the player, before turning: South, East, North, West
@@ -153,6 +174,10 @@
 				<stop offset="0.56" stop-color="#fff" stop-opacity="0.04" />
 				<stop offset="1" stop-color="#fff" stop-opacity="0" />
 			</linearGradient>
+			<radialGradient id="hover-shadow">
+				<stop offset="0" stop-color="#05050f" stop-opacity="0.8" />
+				<stop offset="1" stop-color="#05050f" stop-opacity="0" />
+			</radialGradient>
 		</defs>
 
 		<g transform="rotate({ss.angle})">
@@ -189,13 +214,23 @@
 			transform="rotate({ss.angle})"
 		/>
 
-		{#each marks as m (m.id)}
-			<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GAP, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
-				<g class:beat={won} style="--delay: {m.delay}ms;">
-					<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
+		<!-- the hovering planets' shadows, on the plate, so they tilt with it; once it's flat, each is hidden by its planet -->
+		{#if ss.stand}
+			{#each marks as m (m.id)}
+				<circle cx={m.x} cy={m.y} r={m.r} fill="url(#hover-shadow)" class="nope" />
+			{/each}
+		{/if}
+
+		<!-- hidden, not gone, while the standing ones show: they take over with no frame to paint new ones in -->
+		<g style:visibility={ss.stand ? 'hidden' : null}>
+			{#each marks as m (m.id)}
+				<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GAP, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
+					<g class:beat={won} style="--delay: {m.delay}ms;">
+						<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
+					</g>
 				</g>
-			</g>
-		{/each}
+			{/each}
+		</g>
 
 		<!-- over the planets, so a large one can't hide it -->
 		{#if cursor >= 0 && cursor !== sel}
@@ -216,6 +251,14 @@
 		{/if}
 	</svg>
 
+	{#if ss.stand}
+		<svg class="standing" viewBox="-225 -175 450 350" aria-hidden="true">
+			{#each standing as m (m.id)}
+				<Planet x={m.x} y={m.y} r={m.r} size={m.v} />
+			{/each}
+		</svg>
+	{/if}
+
 	<!-- A flip tips the near edge towards the player. This is the plate's thickness on that edge: square to the map, so
 	     unseen while it's flat, and full on when it's edge-on, when the map itself has no height left to show. -->
 	{#if ss.flip}
@@ -235,15 +278,23 @@
 	}
 
 	.board,
+	.standing,
 	.rim {
 		grid-area: 1 / 1;
 	}
 
-	.board {
+	.board,
+	.standing {
 		width: 450px;
 		height: 350px;
 		overflow: visible;
 		outline: none;
+	}
+
+	/* positioned, to come over the map, which its transform lifts above anything that isn't */
+	.standing {
+		position: relative;
+		pointer-events: none;
 	}
 
 	.rim {

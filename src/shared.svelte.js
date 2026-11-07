@@ -37,6 +37,7 @@ export const newStats = () => ({ plays: 0, solved: 0, total: 0, best: 0 });
 // sel: the cell being marked, [i, j], while the palette is up
 // cursor: the keyboard's cell, [i, j]; cursorOn: while it shows, which only keyboard use brings about
 // flip: how far the map is tilted away for a new puzzle, 0 flat to 1 edge-on
+// stand: while a game coming back flips flat, its planets standing up off the map, on its edge at first
 export const ss = $state({
 	home: true,
 	scale: 1,
@@ -161,14 +162,8 @@ export const stopTurning = () => {
 	delete ss.turnFrom;
 };
 
-// what's waiting its moment: the map flipping back from edge-on, or the tray's planets rising
+// what's waiting its moment: the map flipping back from edge-on
 let pending;
-
-const riseHorizon = (delay = 0) => {
-	ss.rise = 1;
-	clearTimeout(pending);
-	pending = setTimeout(() => tween('rise', 0, 700), delay);
-};
 
 // whatever a flip was about to do, it won't
 const stopFlip = () => {
@@ -252,7 +247,20 @@ export const turnHalf = (dir) => {
 // to it). Only then do the tray's new planets rise, so the two don't move at once.
 const flipBack = (t0, pause = FLIP_PAUSE_MS) => {
 	clearTimeout(pending);
-	pending = setTimeout(() => tween('flip', 0, FLIP_MS, () => tween('rise', 0, 700), linear), Math.max(0, pause - (performance.now() - t0)));
+	pending = setTimeout(
+		() =>
+			tween(
+				'flip',
+				0,
+				FLIP_MS,
+				() => {
+					delete ss.stand;
+					tween('rise', 0, 700);
+				},
+				linear
+			),
+		Math.max(0, pause - (performance.now() - t0))
+	);
 };
 
 // Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and
@@ -271,18 +279,25 @@ export const playNew = () => {
 	);
 };
 
-// Coming to the game page for a new puzzle: the map starts edge-on and flips back, as in the second half of Play new.
-// Its pause starts as the page starts fading in, so it's seen for all of it. One dealt earlier and never touched is
-// still new to the player: the launcher offers it under Start.
-const arriveEdgeOn = async () => {
+// Coming to the game page: the map starts edge-on and flips back, as in the second half of Play new. Its pause starts as
+// the page starts fading in, so it's seen for all of it. For a new puzzle, unless one was dealt earlier and never touched,
+// which is still new to the player: the launcher offers it under Start. For a game resumed (or a finished daily reopened),
+// its planets stand on the gold edge, and go to their cells as the map comes flat.
+const arriveEdgeOn = async (resumed) => {
 	const t0 = performance.now();
 
 	stopFlip();
 	ss.flip = 1;
 	ss.rise = 1;
 
-	if (!ss.pzl || ss.pzl.over) {
-		await newPuzzle();
+	if (resumed) {
+		ss.stand = true;
+	} else {
+		delete ss.stand;
+
+		if (!ss.pzl || ss.pzl.over) {
+			await newPuzzle();
+		}
 	}
 
 	flipBack(t0, PAGE_FADE_MS + FLIP_PAUSE_MS);
@@ -384,21 +399,13 @@ export const onPlay = (id) => {
 		closeOldDaily();
 	}
 
-	if (ss.pzl && (ss.pzl.over ? ss.daily : begun(ss.pzl))) {
-		// a game resumed: the map is simply there, flat
-		stopFlip();
-		ss.flip = 0;
+	const resumed = !!ss.pzl && (ss.pzl.over ? !!ss.daily : begun(ss.pzl));
 
-		if (ss.pzl.over) {
-			ss.prompt = PROMPT_PLAY_NEW;
-		}
-
-		if (changed || ss.rise) {
-			riseHorizon(400);
-		}
-	} else {
-		arriveEdgeOn();
+	if (resumed && ss.pzl.over) {
+		ss.prompt = PROMPT_PLAY_NEW;
 	}
+
+	arriveEdgeOn(resumed);
 
 	if (!_sound.musicPlayed) {
 		_sound.playMusic();
