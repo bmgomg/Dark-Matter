@@ -60,7 +60,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 - **The launcher** (`Launcher.svelte`, as in Triangula; Home's Binge opens it, and Daily, in the daily's form: see
   Daily): a glass panel with the economy
   paragraph, Board (4×4 / 5×5) and Difficulty (Easy / Not Easy / Quite Hard: `DIFF_NAMES`, what the player reads; the code and the saves say `hard` for Not Easy and `expert` for Quite Hard) pills, each difficulty pill as wide as its name, and Start, or Resume when the picked level has a
-  game begun (a turn or a mark) and not finished (`inProgress`). No stats there (the designer's call). It opens on
+  game begun (a turn or a mark) and not finished (`inProgress`); picking another level crossfades the word, the pill
+  holding still. No stats there (the designer's call). It opens on
   the level last picked, next session too; an untouched new puzzle is kept, under Start. The toolbar's first button is
   Back (text, like the rest: no icons in the toolbar): a game → the launcher → Home. The music's credit (see License)
   shows at the foot of the page while the launcher is up, and only then (`Game Page.svelte`; the designer's call).

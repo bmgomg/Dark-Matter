@@ -1,4 +1,5 @@
 <script>
+	import { fade } from 'svelte/transition';
 	import { BANK, COST_CHANGE, COST_TURN, DIFF_NAMES, LEVELS } from './const';
 	import Countdown from './Countdown.svelte';
 	import { costOf, dateOf, money, shareCard } from './logic';
@@ -140,12 +141,12 @@
 			</div>
 		</div>
 
-		<TextButton
-			text={[resume ? 'resume' : 'start']}
-			framed
-			style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em; margin-top: 15px;"
-			onClick={() => play(id)}
-		/>
+		<!-- the pill holds still while its word changes -->
+		<TextButton framed style="width: 150px; padding: 13px 0; font-size: 16px; letter-spacing: 0.3em; margin-top: 15px;" onClick={() => play(id)}>
+			{#key resume}
+				<div class="word" transition:fade={{ duration: 200 }}>{resume ? 'resume' : 'start'}</div>
+			{/key}
+		</TextButton>
 	{/if}
 </div>
 
@@ -184,6 +185,11 @@
 		display: grid;
 		justify-items: center;
 		gap: 12px;
+	}
+
+	/* Start and Resume, one over the other as they cross */
+	.word {
+		grid-area: 1 / 1;
 	}
 
 	.label {

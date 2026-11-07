@@ -5,7 +5,8 @@
 	// a press shrinks the button and springs it back; it acts once it's back. onPress comes during the press itself, with
 	// the click, for what browsers allow only then (the clipboard); a press that slips off the shrinking button has no
 	// click, though, so it can't be all a button does
-	const { id, text, framed, style = '', disabled, sound = true, onPress, onClick } = $props();
+	// (children: what it says, in place of text's lines, for words that need more than to be lines)
+	const { id, text, children, framed, style = '', disabled, sound = true, onPress, onClick } = $props();
 
 	let scale = $state(1);
 	let timer = null;
@@ -59,9 +60,13 @@
 	onkeydown={onKeyDown}
 	ontransitionend={onTransitionEnd}
 >
-	{#each text as line, i (i)}
-		<div>{line}</div>
-	{/each}
+	{#if children}
+		{@render children()}
+	{:else}
+		{#each text as line, i (i)}
+			<div>{line}</div>
+		{/each}
+	{/if}
 </div>
 
 <style>
