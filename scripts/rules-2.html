@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Rules</title>
+<!-- The rules graphic, second version, after Tic-Tac-Turn's: Home's rules (RULES in src/Home.svelte) styled as there, with
+     its planet and eclipse bullets, on the game's sky, and the bank's line (BANK, COST_TURN, COST_CHANGE in src/const.js).
+     450 wide, as tall as the rules make it (the height is written to data-height), rendered at twice that. Change the
+     wording with Home's and the costs with the game's. -->
+<style>
+	@font-face {
+		font-family: CZ;
+		src: url('../src/lib/fonts/Cinzel.ttf');
+		font-weight: 400 900;
+	}
+
+	@font-face {
+		font-family: QS;
+		src: url('../src/lib/fonts/Quicksand.ttf');
+	}
+
+	html,
+	body {
+		margin: 0;
+		overflow: hidden;
+		background: #05050f;
+	}
+
+	.card {
+		position: relative;
+		box-sizing: border-box;
+		width: 450px;
+		padding: 46px 0;
+		display: grid;
+		justify-content: center;
+		overflow: hidden;
+		background: radial-gradient(ellipse at 50% 50%, #2a1b5e 0%, #0d0b24 68%, #05050f 100%);
+	}
+
+	canvas {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+	}
+
+	.rules {
+		position: relative;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+		width: 384px;
+		display: grid;
+		gap: 12px;
+	}
+
+	li {
+		display: grid;
+		grid-template-columns: 24px 1fr;
+		gap: 12px;
+		align-items: start;
+		font-family: QS;
+		font-size: 17px;
+		line-height: 1.3;
+		color: #ece8ff;
+	}
+
+	li em {
+		font-style: normal;
+		color: #ffd77a;
+	}
+
+	.bullet {
+		width: 24px;
+		height: 24px;
+		overflow: visible;
+	}
+
+	/* the bank's bullet: a gold coin, lit from the upper left as the planets are, its $ struck into the face */
+	.coin text {
+		font-family: CZ;
+		font-weight: 700;
+		font-size: 10px;
+	}
+</style>
+</head>
+<body>
+<div class="card">
+	<canvas id="c"></canvas>
+	<ul class="rules"></ul>
+</div>
+
+<svg width="0" height="0" style="position: absolute">
+	<defs>
+		<!-- the emblem's gradients, for the eclipse bullet (src/Emblem.svelte) -->
+		<radialGradient id="corona">
+			<stop offset="0.5" stop-color="#fff8e6" stop-opacity="1" />
+			<stop offset="0.56" stop-color="#ffe2a0" stop-opacity="0.85" />
+			<stop offset="0.7" stop-color="#ffb35c" stop-opacity="0.35" />
+			<stop offset="1" stop-color="#b06bff" stop-opacity="0" />
+		</radialGradient>
+		<!-- the coin: a raised rim, light on its upper left and dark on its lower right, its inner wall the other way round,
+		     so the face sits below it; the face nearly flat -->
+		<linearGradient id="coin-rim" x1="0.15" y1="0.15" x2="0.85" y2="0.85">
+			<stop offset="0" stop-color="#fff4cc" />
+			<stop offset="0.5" stop-color="#f0c060" />
+			<stop offset="1" stop-color="#9a6a1a" />
+		</linearGradient>
+		<linearGradient id="coin-wall" x1="0.15" y1="0.15" x2="0.85" y2="0.85">
+			<stop offset="0" stop-color="#8a5a12" />
+			<stop offset="1" stop-color="#ffe9a8" />
+		</linearGradient>
+		<linearGradient id="coin-face" x1="0.15" y1="0.15" x2="0.85" y2="0.85">
+			<stop offset="0" stop-color="#ffdf8c" />
+			<stop offset="1" stop-color="#e6b04a" />
+		</linearGradient>
+		<radialGradient id="moon-dark" cx="0.4" cy="0.35" r="0.75">
+			<stop offset="0" stop-color="#1c1838" />
+			<stop offset="1" stop-color="#05040e" />
+		</radialGradient>
+	</defs>
+</svg>
+
+<script>
+	// as on Home: [planet size, 0 for the eclipse or 'bank' for a coin, text]; the bank's line goes before the last
+	const RULES = [
+		[1, 'Planets of three sizes hide in the cells of a square board.'],
+		[2, 'You see the board <em>edge-on</em>, one side at a time. Swipe the edge to turn the board.'],
+		[3, 'A planet eclipses anything its size or smaller behind it. A bigger one still shows around it.'],
+		['bank', 'You start with <em>$10</em>. Each turn costs <em>$1</em>, and so does changing your mind about a cell.'],
+		[0, 'Map every planet. The game ends once your map is right.']
+	];
+
+	const R = [0, 17, 29, 44]; // src/const.js
+
+	const bullet = (size) => {
+		if (size === 'bank') {
+			return `<svg viewBox="-12 -12 24 24" class="bullet coin">
+				<circle cx="0.4" cy="0.6" r="8.6" fill="#5e3c0a" />
+				<circle r="8.6" fill="url(#coin-rim)" />
+				<circle r="6.9" fill="url(#coin-wall)" />
+				<circle r="6.3" fill="url(#coin-face)" />
+				<text x="-0.35" y="-0.35" text-anchor="middle" dominant-baseline="central" fill="#fff6d6">$</text>
+				<text x="0.35" y="0.35" text-anchor="middle" dominant-baseline="central" fill="#8a5a12">$</text>
+				<text x="0" y="0" text-anchor="middle" dominant-baseline="central" fill="#d9a03a">$</text>
+			</svg>`;
+		}
+
+		if (!size) {
+			return `<svg viewBox="-12 -12 24 24" class="bullet">
+				<circle r="11" fill="url(#corona)" />
+				<circle r="5.5" fill="url(#moon-dark)" stroke="#fff4dc" stroke-width="0.3" />
+				<circle cx="3.9" cy="-3.9" r="0.8" fill="#fff" />
+			</svg>`;
+		}
+
+		const r = (R[size] / R[3]) * 10;
+		return `<svg viewBox="-12 -12 24 24" class="bullet">
+			<image href="../src/lib/images/planet-${size}.webp" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" />
+		</svg>`;
+	};
+
+	document.querySelector('.rules').innerHTML = RULES.map(
+		([size, text]) => `<li>${bullet(size)}<span>${text}</span></li>`
+	).join('');
+
+	// once the fonts are in: the card's height, for the render to size the window by, and the sky to fill it
+	document.fonts.ready.then(() => {
+		const H = document.querySelector('.card').offsetHeight;
+		document.body.dataset.height = H;
+
+		// a faint sky, Space.svelte's stars, kept dim behind the text (the canvas at twice the card's size, for the 2× render)
+		const rand = (() => {
+			let a = 20261103;
+			return () => {
+				a = (a + 0x6d2b79f5) | 0;
+				let t = Math.imul(a ^ (a >>> 15), 1 | a);
+				t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+				return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+			};
+		})();
+
+		const canvas = document.getElementById('c');
+		canvas.width = 900;
+		canvas.height = 2 * H;
+		const ctx = canvas.getContext('2d');
+
+		for (let i = 0; i < (170 * H) / 300; i++) {
+			ctx.globalAlpha = 0.12 + rand() * 0.28;
+			ctx.fillStyle = '#ffffff';
+			ctx.beginPath();
+			ctx.arc(rand() * 900, rand() * 2 * H, 0.4 + rand() ** 3 * 1.1, 0, 2 * Math.PI);
+			ctx.fill();
+		}
+	});
+</script>
+</body>
+</html>

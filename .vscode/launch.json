@@ -6,14 +6,16 @@
 			"request": "launch",
 			"type": "msedge",
 			"url": "http://localhost:1119",
-			"webRoot": "${workspaceFolder}"
+			"webRoot": "${workspaceFolder}",
+			"preLaunchTask": "dev server"
 		},
 		{
 			"name": "Integrated Browser",
 			"request": "launch",
 			"type": "editor-browser",
 			"url": "http://localhost:1119",
-			"webRoot": "${workspaceFolder}"
+			"webRoot": "${workspaceFolder}",
+			"preLaunchTask": "dev server"
 		},
 		{
 			// starts the dev server task if it isn't running yet, then opens Chrome on it
