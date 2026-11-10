@@ -52,7 +52,7 @@
 		font-family: SI;
 		font-size: 20px;
 		line-height: 1.35;
-		color: #d8d2ff;
+		color: hsl(var(--mono) 84%);
 	}
 
 	/* in one place, while one pushes the other out */

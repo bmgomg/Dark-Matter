@@ -121,13 +121,13 @@
 		text-wrap: balance;
 		font-family: SR;
 		font-size: 21px;
-		color: #d8d2ff;
+		color: hsl(var(--mono) 84%);
 	}
 
 	.over.won {
 		font-family: CZ;
 		font-size: 24px;
-		color: #ffd77a;
-		text-shadow: 0 0 14px #ffd77a88;
+		color: hsl(var(--mono) 98%);
+		text-shadow: 0 0 14px hsl(var(--mono) 98% / 0.53);
 	}
 </style>

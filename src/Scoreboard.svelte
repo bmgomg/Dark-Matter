@@ -72,18 +72,18 @@
 		font-size: 10px;
 		letter-spacing: 0.24em;
 		text-transform: uppercase;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 	}
 
 	.level {
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 		white-space: nowrap;
 	}
 
 	.value {
 		font-family: SM;
 		font-size: 14px;
-		color: #ece8ff;
+		color: hsl(var(--mono) 90%);
 		white-space: nowrap;
 	}
 
@@ -123,26 +123,26 @@
 		font-family: CZ;
 		font-size: 30px;
 		line-height: 1.5;
-		color: #d8d2ff;
+		color: hsl(var(--mono) 84%);
 		opacity: 0.75;
 	}
 
 	.balance {
-		color: #fff4dc;
+		color: hsl(var(--mono) 98%);
 		opacity: 1;
-		text-shadow: 0 0 12px #ffd77a55;
+		text-shadow: 0 0 12px hsl(var(--mono) 98% / 0.33);
 	}
 
 	.broke {
-		color: #ff8a98;
-		text-shadow: 0 0 12px #ff6b7d55;
+		color: hsl(var(--mono) 66%);
+		text-shadow: none;
 	}
 
 	.sign {
 		font-family: SR;
 		font-size: 28px;
 		line-height: 1;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 	}
 
 	.sr {

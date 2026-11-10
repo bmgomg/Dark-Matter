@@ -54,7 +54,7 @@
 		width: 410px;
 		height: 46px;
 		margin: 0 auto 12px;
-		border-top: 1px solid #8f86ff33;
+		border-top: 1px solid hsl(var(--mono) 72% / 0.2);
 		padding-top: 8px;
 	}
 </style>

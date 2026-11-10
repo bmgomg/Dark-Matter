@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Eclipse icon</title>
 <!-- The app icons, rendered by render-icons.sh: a total eclipse, its corona on the night sky (the app's --bg),
-     with the golden moon and the gas giant beside it. Layouts, as #kind-size:
+     with the moon and the gas giant beside it, all in the game's one hue. Layouts, as #kind-size:
      #any-N         rounded, on transparency (favicon, PWA "any")
      #apple-180     full bleed, for iOS to round
      #maskable-N    full bleed, the eclipse inside the 80% safe zone
@@ -27,6 +27,18 @@
 	const size = +n || 512;
 	const tiny = kind === 'svg' || size <= 32;
 
+	// the game's one hue, as in src/palette.js (copied: a page opened from a file can't import it)
+	const HUE = 248;
+	const SAT = 70;
+	const hex = (l) => {
+		const s = SAT / 100;
+		const L = l / 100;
+		const k = (n) => (n + HUE / 30) % 12;
+		const a = s * Math.min(L, 1 - L);
+		const f = (n) => L - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+		return '#' + [0, 8, 4].map((n) => Math.round(f(n) * 255).toString(16).padStart(2, '0')).join('');
+	};
+
 	const SCALE = { any: 1, svg: 1.12, apple: 0.95, maskable: 0.82 }[kind] ?? 1;
 
 	const planet = (x, y, r, a, b, c) =>
@@ -35,15 +47,15 @@
 
 	const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="${size}" height="${size}">`
 		+ '<defs>'
-		+ '<radialGradient id="sky" cx="0.5" cy="0.4" r="0.75"><stop offset="0" stop-color="#2a1b5e"/><stop offset="1" stop-color="#0a0920"/></radialGradient>'
-		+ '<radialGradient id="corona"><stop offset="0.5" stop-color="#fff8e6"/><stop offset="0.56" stop-color="#ffe2a0" stop-opacity="0.9"/><stop offset="0.72" stop-color="#ffb35c" stop-opacity="0.35"/><stop offset="1" stop-color="#b06bff" stop-opacity="0"/></radialGradient>'
+		+ `<radialGradient id="sky" cx="0.5" cy="0.4" r="0.75"><stop offset="0" stop-color="${hex(22)}"/><stop offset="1" stop-color="${hex(8)}"/></radialGradient>`
+		+ `<radialGradient id="corona"><stop offset="0.5" stop-color="${hex(99)}"/><stop offset="0.56" stop-color="${hex(95)}" stop-opacity="0.9"/><stop offset="0.72" stop-color="${hex(70)}" stop-opacity="0.35"/><stop offset="1" stop-color="${hex(62)}" stop-opacity="0"/></radialGradient>`
 		+ '</defs>'
 		+ `<rect width="100" height="100" rx="${kind === 'any' || kind === 'svg' ? 22 : 0}" fill="url(#sky)"/>`
 		+ `<g transform="translate(50 50) scale(${SCALE}) translate(-50 -50)">`
 		+ '<circle cx="50" cy="48" r="38" fill="url(#corona)"/>'
-		+ '<circle cx="50" cy="48" r="19" fill="#07061a" stroke="#fff4dc" stroke-width="0.8"/>'
-		+ '<circle cx="63.5" cy="34.5" r="1.8" fill="#fff"/>'
-		+ (tiny ? '' : planet(22, 74, 6, '#fff6dc', '#f2c96a', '#5e3b0e') + planet(77, 72, 9, '#f6e9ff', '#b993f2', '#2a1160'))
+		+ `<circle cx="50" cy="48" r="19" fill="${hex(6)}" stroke="${hex(98)}" stroke-width="0.8"/>`
+		+ `<circle cx="63.5" cy="34.5" r="1.8" fill="${hex(100)}"/>`
+		+ (tiny ? '' : planet(22, 74, 6, hex(97), hex(80), hex(52)) + planet(77, 72, 9, hex(60), hex(36), hex(14)))
 		+ '</g></svg>';
 
 	if (kind === 'svg') {

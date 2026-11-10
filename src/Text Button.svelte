@@ -91,39 +91,39 @@
 		line-height: 1.35;
 		letter-spacing: 0.14em;
 		text-transform: uppercase;
-		color: #d8d2ff;
+		color: hsl(var(--mono) 84%);
 		opacity: 0.85;
 	}
 
 	.text-only:hover {
 		opacity: 1;
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 	}
 
 	.framed {
 		padding: 13px 34px;
-		border: 1px solid #ffd77a;
+		border: 1px solid hsl(var(--mono) 98%);
 		border-radius: 999px;
-		background: #ffd77a14;
-		color: #ffd77a;
+		background: hsl(var(--mono) 98% / 0.08);
+		color: hsl(var(--mono) 98%);
 		font-family: SM;
 		font-size: 15px;
 		letter-spacing: 0.3em;
 		text-transform: uppercase;
 		box-shadow:
-			0 0 14px #ffd77a33,
-			inset 0 0 10px #ffd77a1a;
+			0 0 14px hsl(var(--mono) 98% / 0.2),
+			inset 0 0 10px hsl(var(--mono) 98% / 0.1);
 	}
 
 	.framed:hover,
 	.framed:focus-visible {
-		background: #ffd77a;
-		color: #14102e;
+		background: hsl(var(--mono) 98%);
+		color: hsl(var(--mono) 12%);
 		font-weight: 700;
 	}
 
 	.text-only:focus-visible {
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 		text-decoration: underline;
 	}
 

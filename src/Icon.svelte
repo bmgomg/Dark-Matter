@@ -63,6 +63,6 @@
 
 <style>
 	svg {
-		filter: drop-shadow(0 0 3px #b8b0ff66);
+		filter: drop-shadow(0 0 3px hsl(var(--mono) 76% / 0.4));
 	}
 </style>

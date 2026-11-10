@@ -109,23 +109,23 @@
 
 <style>
 	.picker {
-		filter: drop-shadow(0 6px 14px #000c);
+		filter: drop-shadow(0 6px 14px hsl(var(--mono) 0% / 0.8));
 	}
 
 	.body {
-		fill: #120f30;
-		stroke: #ffd77a;
+		fill: hsl(var(--mono) 12%);
+		stroke: hsl(var(--mono) 98%);
 		stroke-opacity: 0.6;
 		stroke-width: 1.5;
 	}
 
 	.notch-fill {
-		fill: #120f30;
+		fill: hsl(var(--mono) 12%);
 	}
 
 	.notch {
 		fill: none;
-		stroke: #ffd77a;
+		stroke: hsl(var(--mono) 98%);
 		stroke-opacity: 0.6;
 		stroke-width: 1.5;
 		stroke-linejoin: round;
@@ -137,8 +137,8 @@
 	}
 
 	.ring {
-		fill: #ffffff0a;
-		stroke: #8f86ff;
+		fill: hsl(var(--mono) 100% / 0.04);
+		stroke: hsl(var(--mono) 72%);
 		stroke-opacity: 0.35;
 		stroke-width: 1.5;
 		transition:
@@ -149,7 +149,7 @@
 
 	.swatch:not(.idle):hover .ring {
 		stroke-opacity: 0.9;
-		fill: #ffffff14;
+		fill: hsl(var(--mono) 100% / 0.08);
 	}
 
 	.swatch.idle {
@@ -161,14 +161,14 @@
 	}
 
 	.picked .ring {
-		fill: #ffd77a1a;
-		stroke: #ffd77a;
+		fill: hsl(var(--mono) 98% / 0.1);
+		stroke: hsl(var(--mono) 98%);
 		stroke-opacity: 1;
 		stroke-width: 2.5;
 	}
 
 	.cross {
-		stroke: #d8d2ff;
+		stroke: hsl(var(--mono) 84%);
 		stroke-width: 3.5;
 		stroke-linecap: round;
 	}

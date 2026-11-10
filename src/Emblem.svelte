@@ -1,4 +1,5 @@
 <script>
+	import { shade } from './palette';
 	import { R } from './const';
 	import Planet from './Planet.svelte';
 
@@ -44,14 +45,14 @@
 <svg class="emblem" viewBox="-200 -110 400 220" aria-hidden="true">
 	<defs>
 		<radialGradient id="corona">
-			<stop offset="0.5" stop-color="#fff8e6" stop-opacity="1" />
-			<stop offset="0.56" stop-color="#ffe2a0" stop-opacity="0.85" />
-			<stop offset="0.7" stop-color="#ffb35c" stop-opacity="0.35" />
-			<stop offset="1" stop-color="#b06bff" stop-opacity="0" />
+			<stop offset="0.5" stop-color={shade(99)} />
+			<stop offset="0.56" stop-color={shade(95, 0.85)} />
+			<stop offset="0.7" stop-color={shade(70, 0.35)} />
+			<stop offset="1" stop-color={shade(62, 0)} />
 		</radialGradient>
 		<radialGradient id="moon-dark" cx="0.4" cy="0.35" r="0.75">
-			<stop offset="0" stop-color="#1c1838" />
-			<stop offset="1" stop-color="#05040e" />
+			<stop offset="0" stop-color={shade(15)} />
+			<stop offset="1" stop-color={shade(4)} />
 		</radialGradient>
 	</defs>
 
@@ -67,9 +68,9 @@
 	</g>
 	<circle r="104" fill="url(#corona)" class="corona" />
 	<circle r="52" fill="url(#moon-dark)" />
-	<circle r="52" fill="none" stroke="#fff4dc" stroke-width="1.2" stroke-opacity="0.8" />
+	<circle r="52" fill="none" stroke={shade(98)} stroke-width="1.2" stroke-opacity="0.8" />
 	<!-- the diamond ring: the last of the sun, at the moon's edge -->
-	<circle cx="36" cy="-37.5" r="3.2" fill="#fff" class="diamond" />
+	<circle cx="36" cy="-37.5" r="3.2" fill={shade(100)} class="diamond" />
 
 	<path d="M {RX} 4 A {RX} {RY} 0 0 1 {-RX} 4" class="orbit" />
 	{#each bodies.filter((b) => b.near) as b (b.size)}
@@ -87,14 +88,14 @@
 
 	.orbit {
 		fill: none;
-		stroke: #b8b0ff;
+		stroke: hsl(var(--mono) 76%);
 		stroke-opacity: 0.35;
 		stroke-width: 1;
 		stroke-dasharray: 3 5;
 	}
 
 	.rays {
-		stroke: #ffe2a0;
+		stroke: hsl(var(--mono) 95%);
 		stroke-opacity: 0.3;
 		stroke-width: 1.5;
 		stroke-linecap: round;
@@ -108,7 +109,7 @@
 	}
 
 	.diamond {
-		filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 10px #ffe2a0);
+		filter: drop-shadow(0 0 4px hsl(var(--mono) 100%)) drop-shadow(0 0 10px hsl(var(--mono) 95%));
 		animation: glint 4s ease-in-out infinite;
 	}
 

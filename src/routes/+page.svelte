@@ -154,11 +154,11 @@
 		/* the pages waiting off to the side, and those sliding in or out, show only within it */
 		overflow: hidden;
 		touch-action: none;
-		background: radial-gradient(ellipse at 50% 30%, #1a1442cc, #0a0920e6 70%);
+		background: radial-gradient(ellipse at 50% 30%, hsl(var(--mono) 16% / 0.8), hsl(var(--mono) 8% / 0.9) 70%);
 		box-shadow:
-			0 0 0 1px #8f86ff40,
-			0 0 40px #6b40c240,
-			inset 0 0 60px #00000080;
+			0 0 0 1px hsl(var(--mono) 72% / 0.25),
+			0 0 40px hsl(var(--mono) 45% / 0.25),
+			inset 0 0 60px hsl(var(--mono) 0% / 0.5);
 	}
 
 	/* rounded only while it floats free, with room all round: the page never grows past 450 × 800, and in a window no

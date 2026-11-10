@@ -29,7 +29,7 @@
 	const BOARD = 'width: 130px; padding: 10px 0 9px;';
 	// three names of different lengths: each pill as wide as its name
 	const DIFFICULTY = 'padding: 10px 12px 9px;';
-	const PICKED = 'background: #ffd77a; color: #14102e; font-weight: 700;';
+	const PICKED = 'background: hsl(var(--mono) 98%); color: hsl(var(--mono) 12%); font-weight: 700;';
 	// the daily's: as wide as their names, as above, with room for a second line, one or two lines keeping the row level
 	const DAILY_OP = 'height: 56px; padding: 0 15px; align-content: center; font-size: 13px; letter-spacing: 0.1em;';
 	// wide enough for what it says after a press, so it holds still
@@ -162,9 +162,9 @@
 		padding: 36px 30px 40px;
 		box-sizing: border-box;
 		border-radius: 24px;
-		background: #0a0820a0;
-		border: 1px solid #8f86ff33;
-		box-shadow: 0 0 40px #b06bff22;
+		background: hsl(var(--mono) 8% / 0.63);
+		border: 1px solid hsl(var(--mono) 72% / 0.2);
+		box-shadow: 0 0 40px hsl(var(--mono) 62% / 0.13);
 	}
 
 	.economy {
@@ -173,12 +173,12 @@
 		font-size: 20px;
 		line-height: 1.45;
 		text-align: justify;
-		color: #ece8ff;
+		color: hsl(var(--mono) 90%);
 	}
 
 	.economy em {
 		font-style: normal;
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 	}
 
 	.pick {
@@ -197,7 +197,7 @@
 		font-size: 11px;
 		letter-spacing: 0.3em;
 		text-transform: uppercase;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 	}
 
 	.ops {
@@ -235,15 +235,15 @@
 		letter-spacing: 0.06em;
 	}
 
-	/* finished, solved or given up: lavender, for the day's progress to show at a glance; a hover or the keyboard's focus
-	   still turns it gold, as on any pill */
+	/* finished, solved or given up: dimmer, for the day's progress to show at a glance; a hover or the keyboard's focus
+	   still fills it, as on any pill */
 	.finished :global(.framed:not(:hover, :focus-visible)) {
-		border-color: #b8b0ff;
-		background: #b8b0ff26;
-		color: #ece8ff;
+		border-color: hsl(var(--mono) 76%);
+		background: hsl(var(--mono) 76% / 0.15);
+		color: hsl(var(--mono) 90%);
 		box-shadow:
-			0 0 14px #b8b0ff33,
-			inset 0 0 10px #b8b0ff1a;
+			0 0 14px hsl(var(--mono) 76% / 0.2),
+			inset 0 0 10px hsl(var(--mono) 76% / 0.1);
 	}
 
 	.scored :global(.button > div + div) {

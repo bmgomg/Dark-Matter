@@ -43,7 +43,7 @@
 		border: none;
 		background: none;
 		cursor: pointer;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 		font-family: SM;
 		font-size: 10px;
 		letter-spacing: 0.2em;
@@ -75,8 +75,8 @@
 	}
 
 	.ring {
-		fill: #ffffff08;
-		stroke: #8f86ff;
+		fill: hsl(var(--mono) 100% / 0.03);
+		stroke: hsl(var(--mono) 72%);
 		stroke-opacity: 0.3;
 		stroke-width: 1.5;
 		transition:
@@ -91,19 +91,19 @@
 
 	/* the cell's own planet */
 	.picked {
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 	}
 
 	.picked .ring {
-		fill: #ffd77a14;
-		stroke: #ffd77a;
+		fill: hsl(var(--mono) 98% / 0.08);
+		stroke: hsl(var(--mono) 98%);
 		stroke-opacity: 1;
 		stroke-width: 2.5;
-		filter: drop-shadow(0 0 6px #ffd77a);
+		filter: drop-shadow(0 0 6px hsl(var(--mono) 98%));
 	}
 
 	.cross {
-		stroke: #d8d2ff;
+		stroke: hsl(var(--mono) 84%);
 		stroke-width: 5;
 		stroke-linecap: round;
 	}

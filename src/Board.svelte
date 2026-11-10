@@ -1,4 +1,5 @@
 <script>
+	import { shade } from './palette';
 	import { cubicOut } from 'svelte/easing';
 	import { FLIP_PERSPECTIVE, MAP, NAMES, PALETTE_AT_CELL, R, SIDES } from './const';
 	import Picker from './Picker.svelte';
@@ -164,19 +165,19 @@
 	>
 		<defs>
 			<radialGradient id="cell-fill" cx="0.5" cy="0.45" r="0.75">
-				<stop offset="0" stop-color="#4a43b8" stop-opacity="0.5" />
-				<stop offset="1" stop-color="#211d5c" stop-opacity="0.8" />
+				<stop offset="0" stop-color={shade(46, 0.5)} />
+				<stop offset="1" stop-color={shade(22, 0.8)} />
 			</radialGradient>
 			<linearGradient id="sheen" gradientUnits="userSpaceOnUse" x1="-170" y1="-170" x2="170" y2="170">
-				<stop offset="0" stop-color="#fff" stop-opacity="0" />
-				<stop offset="0.44" stop-color="#fff" stop-opacity="0.06" />
-				<stop offset="0.5" stop-color="#fff" stop-opacity="0.11" />
-				<stop offset="0.56" stop-color="#fff" stop-opacity="0.04" />
-				<stop offset="1" stop-color="#fff" stop-opacity="0" />
+				<stop offset="0" stop-color={shade(100, 0)} />
+				<stop offset="0.44" stop-color={shade(100, 0.06)} />
+				<stop offset="0.5" stop-color={shade(100, 0.11)} />
+				<stop offset="0.56" stop-color={shade(100, 0.04)} />
+				<stop offset="1" stop-color={shade(100, 0)} />
 			</linearGradient>
 			<radialGradient id="hover-shadow">
-				<stop offset="0" stop-color="#05050f" stop-opacity="0.8" />
-				<stop offset="1" stop-color="#05050f" stop-opacity="0" />
+				<stop offset="0" stop-color={shade(4, 0.8)} />
+				<stop offset="1" stop-color={shade(4, 0)} />
 			</radialGradient>
 		</defs>
 
@@ -300,22 +301,22 @@
 	.rim {
 		height: 5px;
 		border-radius: 3px;
-		background: #ffd77a;
-		box-shadow: 0 0 10px #ffd77a;
+		background: hsl(var(--mono) 98%);
+		box-shadow: 0 0 10px hsl(var(--mono) 98%);
 		pointer-events: none;
 	}
 
 	.plate {
-		fill: #15183f;
-		stroke: #a99cff;
+		fill: hsl(var(--mono) 15%);
+		stroke: hsl(var(--mono) 78%);
 		stroke-width: 1.5;
 		stroke-opacity: 0.7;
-		filter: drop-shadow(0 0 8px #8f7bff88);
+		filter: drop-shadow(0 0 8px hsl(var(--mono) 70% / 0.53));
 	}
 
 	.cell {
 		fill: url(#cell-fill);
-		stroke: #8f86ff;
+		stroke: hsl(var(--mono) 72%);
 		stroke-width: 1;
 		stroke-opacity: 0.5;
 		cursor: pointer;
@@ -324,7 +325,7 @@
 
 	@media (hover: hover) {
 		.board:not(.locked) .cell:hover {
-			fill: #5a4fe0;
+			fill: hsl(var(--mono) 55%);
 		}
 	}
 
@@ -334,8 +335,8 @@
 
 	/* the cell being marked */
 	.board .cell.sel {
-		fill: #5a4fe0;
-		stroke: #ffd77a;
+		fill: hsl(var(--mono) 55%);
+		stroke: hsl(var(--mono) 98%);
 		stroke-opacity: 1;
 		stroke-width: 2.5;
 		animation: sel 0.9s ease-in-out infinite alternate;
@@ -343,26 +344,27 @@
 
 	@keyframes sel {
 		from {
-			filter: drop-shadow(0 0 2px #ffd77a88);
+			filter: drop-shadow(0 0 2px hsl(var(--mono) 98% / 0.53));
 		}
 		to {
-			filter: drop-shadow(0 0 9px #ffd77a);
+			filter: drop-shadow(0 0 9px hsl(var(--mono) 98%));
 			stroke-width: 3.5;
 		}
 	}
 
-	/* the keyboard's cell: white, as the selected one is gold */
+	/* the keyboard's cell: dashed, as the selected one is solid and pulsing, both white in the one hue */
 	.cursor {
-		fill: #ffffff14;
-		stroke: #fff;
+		fill: hsl(var(--mono) 100% / 0.08);
+		stroke: hsl(var(--mono) 100%);
 		stroke-width: 2.5;
+		stroke-dasharray: 7 5;
 	}
 
 	.front {
-		stroke: #ffd77a;
+		stroke: hsl(var(--mono) 98%);
 		stroke-width: 3;
 		stroke-linecap: round;
-		filter: drop-shadow(0 0 5px #ffd77a);
+		filter: drop-shadow(0 0 5px hsl(var(--mono) 98%));
 		pointer-events: none;
 	}
 
@@ -389,7 +391,7 @@
 
 	@keyframes pulse {
 		50% {
-			filter: brightness(1.35) drop-shadow(0 0 6px #fff7);
+			filter: drop-shadow(0 0 3px hsl(var(--mono) 100% / 0.9)) drop-shadow(0 0 10px hsl(var(--mono) 100% / 0.6));
 		}
 	}
 

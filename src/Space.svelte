@@ -1,4 +1,5 @@
 <script>
+	import { shade } from './palette';
 	import { ss } from './shared.svelte';
 
 	// The night sky behind everything: nebulae and a fixed scatter of stars (seeded, so it's the same sky every time),
@@ -43,7 +44,8 @@
 		};
 	})();
 
-	const TINTS = ['#ffffff', '#ffffff', '#ffffff', '#ffe9c4', '#c9d6ff', '#e6d6ff'];
+	// most white, some a shade of the hue
+	const TINTS = [shade(100), shade(100), shade(100), shade(92), shade(86), shade(80)];
 
 	const stars = Array.from({ length: 260 }, (_, i) => {
 		const r = 0.4 + rand() ** 3 * 1.6;
@@ -207,7 +209,7 @@
 	.space {
 		position: fixed;
 		inset: 0;
-		background: radial-gradient(ellipse at 50% 120%, #2a1b5e 0%, #0d0b24 55%, #05050f 100%);
+		background: radial-gradient(ellipse at 50% 120%, hsl(var(--mono) 22%) 0%, hsl(var(--mono) 9%) 55%, hsl(var(--mono) 4%) 100%);
 		pointer-events: none;
 		overflow: hidden;
 	}
@@ -217,10 +219,10 @@
 		position: absolute;
 		inset: -50px;
 		background:
-			radial-gradient(ellipse 60% 40% at 18% 22%, #6b3fc255, transparent 70%),
-			radial-gradient(ellipse 50% 35% at 85% 35%, #15808a40, transparent 70%),
-			radial-gradient(ellipse 70% 30% at 60% 85%, #b06bff30, transparent 70%),
-			radial-gradient(ellipse 30% 20% at 75% 10%, #ffb35c22, transparent 70%);
+			radial-gradient(ellipse 60% 40% at 18% 22%, hsl(var(--mono) 45% / 0.33), transparent 70%),
+			radial-gradient(ellipse 50% 35% at 85% 35%, hsl(var(--mono) 40% / 0.25), transparent 70%),
+			radial-gradient(ellipse 70% 30% at 60% 85%, hsl(var(--mono) 62% / 0.19), transparent 70%),
+			radial-gradient(ellipse 30% 20% at 75% 10%, hsl(var(--mono) 70% / 0.13), transparent 70%);
 		filter: blur(10px);
 		will-change: transform;
 	}

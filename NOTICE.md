@@ -9,7 +9,7 @@ that license. Each stays under the terms given here. Paths are those in the
 
 © 2026 Arkady Elterman. All rights reserved. To reuse the code in your own project, replace these files.
 
-- `src/lib/images/` (the planets and the BMG logo)
+- `src/lib/images/` (the BMG logo)
 - `static/favicon.png`, `static/favicon.svg`, `static/icons/` (the app icon)
 - `scripts/icon.html` (the source of the app icon)
 

@@ -21,14 +21,14 @@
 <style>
 	.splash {
 		position: absolute;
-		background: #8a0000;
-		background-image: radial-gradient(transparent, black 100%);
+		background: hsl(var(--mono) 22%);
+		background-image: radial-gradient(transparent, hsl(var(--mono) 0%) 100%);
 		z-index: 300;
 		transition: background-color 0.3s;
 	}
 
 	.dark {
-		background-color: #500000;
+		background-color: hsl(var(--mono) 13%);
 	}
 
 	.bmg {

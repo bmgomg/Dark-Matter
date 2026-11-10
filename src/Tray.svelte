@@ -1,4 +1,5 @@
 <script>
+	import { shade } from './palette';
 	import { HOLD_MS, MAP, R, SIDES, SWIPE_PX } from './const';
 	import { elevation } from './logic';
 	import Icon from './Icon.svelte';
@@ -167,9 +168,9 @@
 		<defs>
 			<!-- a faint glow along the line of sight -->
 			<radialGradient id="sight">
-				<stop offset="0" stop-color="#ffcf7a" stop-opacity="0.16" />
-				<stop offset="0.6" stop-color="#b06bff" stop-opacity="0.06" />
-				<stop offset="1" stop-color="#b06bff" stop-opacity="0" />
+				<stop offset="0" stop-color={shade(98, 0.16)} />
+				<stop offset="0.6" stop-color={shade(62, 0.06)} />
+				<stop offset="1" stop-color={shade(62, 0)} />
 			</radialGradient>
 			<!-- the planets show only within the tray's ends -->
 			<clipPath id="on-tray">
@@ -248,7 +249,7 @@
 		padding: 0;
 		border: none;
 		background: none;
-		color: #d8d2ff;
+		color: hsl(var(--mono) 84%);
 		opacity: 0.8;
 		cursor: pointer;
 		display: grid;

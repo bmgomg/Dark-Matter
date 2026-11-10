@@ -52,7 +52,7 @@
 		display: grid;
 		place-items: center;
 		z-index: 10;
-		background: #05041299;
+		background: hsl(var(--mono) 5% / 0.6);
 	}
 
 	/* the page's top corners, while it has them (#app-content) */
@@ -70,9 +70,9 @@
 		padding: 30px 28px 34px;
 		box-sizing: border-box;
 		border-radius: 24px;
-		background: #0e0b28f0;
-		border: 1px solid #8f86ff55;
-		box-shadow: 0 0 40px #b06bff33;
+		background: hsl(var(--mono) 10% / 0.94);
+		border: 1px solid hsl(var(--mono) 72% / 0.33);
+		box-shadow: 0 0 40px hsl(var(--mono) 62% / 0.2);
 	}
 
 	.title {
@@ -80,7 +80,7 @@
 		font-size: 11px;
 		letter-spacing: 0.3em;
 		text-transform: uppercase;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 	}
 
 	.rows {
@@ -99,10 +99,10 @@
 	kbd {
 		min-width: 14px;
 		padding: 4px 7px 3px;
-		border: 1px solid #ffd77a99;
+		border: 1px solid hsl(var(--mono) 98% / 0.6);
 		border-radius: 6px;
-		background: #ffd77a14;
-		color: #ffd77a;
+		background: hsl(var(--mono) 98% / 0.08);
+		color: hsl(var(--mono) 98%);
 		font-family: SM;
 		font-size: 13px;
 		text-align: center;
@@ -112,6 +112,6 @@
 		font-family: QS;
 		font-size: 16px;
 		line-height: 1.3;
-		color: #ece8ff;
+		color: hsl(var(--mono) 90%);
 	}
 </style>

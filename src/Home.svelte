@@ -1,4 +1,5 @@
 <script>
+	import { shade } from './palette';
 	import { onMount } from 'svelte';
 	import { PAGE_SLIDE_MS, R, TAGLINE, TITLE } from './const';
 	import Emblem from './Emblem.svelte';
@@ -55,8 +56,8 @@
 						{:else}
 							<!-- the favicon's eclipse, in the emblem's gradients -->
 							<circle r="11" fill="url(#corona)" />
-							<circle r="5.5" fill="url(#moon-dark)" stroke="#fff4dc" stroke-width="0.3" />
-							<circle cx="3.9" cy="-3.9" r="0.8" fill="#fff" />
+							<circle r="5.5" fill="url(#moon-dark)" stroke={shade(98)} stroke-width="0.3" />
+							<circle cx="3.9" cy="-3.9" r="0.8" fill={shade(100)} />
 						{/if}
 					</svg>
 					<!-- eslint-disable-next-line svelte/no-at-html-tags -->
@@ -98,7 +99,7 @@
 		font-size: 11px;
 		letter-spacing: 0.34em;
 		text-transform: uppercase;
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 	}
 
 	.title {
@@ -106,10 +107,10 @@
 		font-size: 44px;
 		line-height: 1;
 		text-align: center;
-		color: #fff4dc;
+		color: hsl(var(--mono) 98%);
 		text-shadow:
-			0 0 18px #ffd77a66,
-			0 0 40px #b06bff55;
+			0 0 18px hsl(var(--mono) 98% / 0.4),
+			0 0 40px hsl(var(--mono) 62% / 0.33);
 	}
 
 	.title-2 {
@@ -135,12 +136,12 @@
 		font-family: QS;
 		font-size: 17px;
 		line-height: 1.3;
-		color: #ece8ff;
+		color: hsl(var(--mono) 90%);
 	}
 
 	li :global(em) {
 		font-style: normal;
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 	}
 
 	.bullet {

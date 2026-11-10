@@ -10,6 +10,20 @@ splash, Home (title, rules, Daily and Binge), a launcher (the economy, then toda
 scales down to fit, a PWA that plays offline. `npm run dev` serves it on port 1119. The rules, generator and solver come
 from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, tiers, levels; "Known facts" there are settled).
 
+## Monochrome (this branch)
+
+A version for the Monochrome Jam (itch.io, Clyde's; theme Distortion; 10–17 Nov 2026), whose one rule on looks is "only
+one hue". Every color is hue 248 (violet-blue) at 70% saturation, only its lightness changing, black to white
+(`src/palette.js`: `shade(l, a)` for SVG attributes and the canvas, `hsl(var(--mono) l% / a)` in CSS, `--mono` set on the
+root by `+layout.svelte`, `hex(l)` for the manifest and theme color). Opacity is free, as blending shades of one hue (or
+with black or white) keeps it; a filter that scales or clips the channels (`brightness()` and the like) could leave it,
+so the win's pulse is a glow. `src/palette.test.js` fails on any other color in the source. Below, "gold" (the edge, the
+selection, pills) now means the brightest shade, and "lavender" a dimmer one. What color told apart is told by brightness
+and shape: the keyboard's cursor is dashed (the selected cell solid and pulsing), a negative balance dim, a finished
+daily's pill dimmer. The planets are SVGs (`Defs.svelte`), lightest small to darkest large, so a bigger one behind reads
+as a darker ring, each with a fine dark limb. The splash's BMG logo and the app icons (`scripts/icon.html`) were redone
+in the hue (the logo by its lightness). Not yet: the itch page's art (`scripts/cover.html` and the rest).
+
 ## Rules
 
 - Planets of three sizes (small, medium, large) on an N × N board, at most one per cell.
@@ -30,10 +44,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   stars drift, swinging to a new heading every 20–40 s, the sky breathes (zooms slowly in and out), and it pans as the
   board turns (the same way as the tray's planets) and leans with a mouse. On a touch screen (the designer's call: a
   phone's page hides nearly all of it) or with reduced motion, it's still.
-- The planets (`Defs.svelte`, one image each on a unit circle, used through `Planet.svelte`): 1 a banded golden world,
-  2 a teal swirled ocean world, 3 a violet gas giant. The designer's Recraft images (`src/lib/images/planet-*.webp`),
-  replacing drawn SVGs, each cropped to its disc, stretched to a true circle, 256 px. Lit from the upper left. Radii as
-  the brief: 17, 29, 44 hundredths of a cell.
+- The planets (`Defs.svelte`, drawn on a unit circle, used through `Planet.svelte`): 1 a cratered moon, 2 an ocean world
+  under swirling clouds, 3 a banded gas giant, in the one hue (see Monochrome; the SHIFT version used the designer's
+  Recraft images). Lit from the upper left. Radii as the brief: 17, 29, 44 hundredths of a cell.
 - **The map** (`Board.svelte`): flat, top-down, `MAP` (330 px) wide, the side being viewed at the bottom with a gold
   edge. It turns with the board (`ss.angle`), live while the tray is dragged; its planets stay upright. Tap a cell to
   select it (`ss.sel`: gold, pulsing), again to let it go; the map itself doesn't swipe. The board turns with a cell

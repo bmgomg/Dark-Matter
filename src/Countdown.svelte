@@ -29,13 +29,13 @@
 		font-size: 11px;
 		letter-spacing: 0.24em;
 		text-transform: uppercase;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 	}
 
 	/* Space Mono: every digit the same width, so it holds still as the seconds go by */
 	.time {
 		font-family: SM;
 		font-size: 16px;
-		color: #ffd77a;
+		color: hsl(var(--mono) 98%);
 	}
 </style>

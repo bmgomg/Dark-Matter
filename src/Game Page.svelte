@@ -105,7 +105,7 @@
 		padding-bottom: 14px;
 		font-family: SI;
 		font-size: 14px;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 	}
 
 	.stage {
@@ -136,6 +136,6 @@
 		font-size: 12px;
 		letter-spacing: 0.3em;
 		text-transform: uppercase;
-		color: #b8b0ff;
+		color: hsl(var(--mono) 76%);
 	}
 </style>
