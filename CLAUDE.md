@@ -30,12 +30,14 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   stars drift, swinging to a new heading every 20–40 s, the sky breathes (zooms slowly in and out), and it pans as the
   board turns (the same way as the tray's planets) and leans with a mouse. On a touch screen (the designer's call: a
   phone's page hides nearly all of it) or with reduced motion, it's still.
-- The planets (`Defs.svelte`, drawn as SVG on a unit circle, used through `Planet.svelte`): 1 a golden cratered moon,
-  2 a teal ocean world under swirling clouds, 3 a violet banded gas giant, each with a fine dark limb, so one in front of
-  another stays apart from it in the tray. Drawn first for the monochrome version, then colored for this one; they
-  replaced the designer's Recraft images (`src/lib/images/planet-*.webp`), which the itch art (`scripts/cover.html`,
-  `scripts/rules-2.html`) still uses. Drawn as vectors they made a turn jitter, visibly to the designer against the
-  images, as every gradient and clip was drawn again each frame; so once the page is up, each is drawn once into a
+- The planets (`src/planets.js`, SVG markup on a unit circle, put in by `Defs.svelte` and used through `Planet.svelte`):
+  1 a golden cratered moon, 2 a teal ocean world under swirling clouds, 3 a violet banded gas giant, each with a fine
+  dark limb, so one in front of another stays apart from it in the tray. Drawn first for the monochrome version, then
+  colored for this one; they replaced the designer's Recraft images (`src/lib/images/planet-*.webp`, now unused). A
+  plain module, so that the itch art (`scripts/cover.html`, `scripts/rules-2.html`) imports the same planets; the art
+  draws them larger, so it gives the limb its own width (`planetSvg`'s third argument; the cover's about 1.5 px, as the
+  game's 1 px width came out heavy there). Drawn as vectors they made a turn jitter, visibly to the designer against
+  the images, as every gradient and clip was drawn again each frame; so once the page is up, each is drawn once into a
   256 px bitmap and shown as an image (`toImage`; the vectors stay should that fail). Lit from the upper left. Radii as
   the brief: 17, 29, 44 hundredths of a cell.
 - **The map** (`Board.svelte`): flat, top-down, `MAP` (330 px) wide, the side being viewed at the bottom with a gold
@@ -104,7 +106,8 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   of this: the map starts edge-on (`arriveEdgeOn`; its pause starts as the page slides in, `PAGE_SLIDE_MS`) and flips
   back. So does a game coming back (Resume, or a finished daily reopened), at the designer's wish, with its planets
   hovering above the gold edge as on the itch cover, upright, their centres on one line and a lane's concentric (the
-  designer's call), the nearer ones larger and in front, each with a shadow on the plate, and going to their cells as the map comes flat (`ss.stand`; `standing` in
+  designer's call), the nearer ones larger and in front (their sizes by half the perspective, `SIZE_DEPTH`: in full, a
+  medium in front of a giant left it a thin ring, unlike the tray's; the designer's call), each with a shadow on the plate, and going to their cells as the map comes flat (`ss.stand`; `standing` in
   `Board.svelte`, a layer apart from the tilted map, using the same projection; `HOVER`, in cells). Play
   new's first half doesn't do this: those planets flatten with the map, since they're leaving. The board can't be turned
   and its cells can't be tapped while it flips (a turn costs, and would show nothing).
@@ -243,11 +246,15 @@ they ship ready-made: `src/puzzles.js` (365 for each size, a year of dailies, no
   legible on white and black. `scripts/tile.html` is the page's background, a seamless tile, 1024 × 1024: the game's sky on
   a flat base, its nebulae fractal noise that wraps. `scripts/rules.html` is the rules graphic for the page's description,
   900 × 600, in the format of Hexodus's: its wording states the difficulties' names and the price of a turn, so change it
-  with the game. `sh scripts/render-cover.sh` writes the stills to `itch/`: `cover.png`, `embed-bg.png`, `social.png`,
-  `logo.png`, `tile.png`, `rules.png`. `node scripts/render-screenshots.mjs` writes `itch/screenshots/`, five shots of the real game, with the dev server
-  running; the puzzle is random, so look at them. `node scripts/render-resume-gif.mjs` writes `itch/screenshots/1-resume.gif`: the first shot's view, then Back and the flip of Resume, the launcher kept out of the picture (the designer's call), looping, from the real game on a clock of its own (one frame per tick, as a screenshot is too slow to keep up), with a deal that shows an eclipse at 90°; also random, and its size varies with the deal. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
+  with the game. `scripts/rules-2.html` is its second version, Home's rules with their planet bullets, 900 wide (twice
+  450) and as tall as they make it. `sh scripts/render-cover.sh` writes the stills to `itch/`: `cover.png`,
+  `embed-bg.png`, `social.png`, `logo.png`, `tile.png`, `rules.png`, `rules-2.png`. `node scripts/render-screenshots.mjs` writes `itch/screenshots/`, five shots of the real game, with the dev server
+  running; the puzzle is random, dealt again (up to 30 times) till the new puzzle's tray shows every size, a ring, no empty lane and no two lanes alike (the designer asked for more variety in the lineup); Home's shot waits till the emblem's three planets are all in sight, and the win's till its swell is over (mid-swell, its wave left one giant larger than another); so look at them. `node scripts/render-resume-gif.mjs` writes `itch/screenshots/1-resume.gif`: the first shot's view, then Back and the flip of Resume, the launcher kept out of the picture (the designer's call), looping, from the real game on a clock of its own (one frame per tick, as a screenshot is too slow to keep up), with a deal that shows an eclipse at 90°; also random, and its size varies with the deal. `node scripts/render-cover-gif.mjs [cover|embed|wide]` writes `itch/cover.gif`, `itch/embed-bg.gif` or `itch/wide-cover.gif`: a
   hold on that view, then one full turn (needs ffmpeg). GIFs work on itch, in the designer's experience. The settings are
-  set to come in under 3 MB, itch's limit on GIFs by forum reports (no official figure found).
+  set to come in under 3 MB, itch's limit on GIFs by forum reports (no official figure found; kept under 3.0
+  million bytes, in case it means a million). They're dithered (Bayer, which leaves what
+  holds still unchanged from frame to frame): the vector planets' smooth gradients banded into rings without it, as the
+  Recraft images' texture hadn't.
 
 ## License
 

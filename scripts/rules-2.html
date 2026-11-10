@@ -121,7 +121,10 @@
 	</defs>
 </svg>
 
-<script>
+<script type="module">
+	// the game's planets (src/planets.js), as SVG
+	import { planetUrl } from '../src/planets.js';
+
 	// as on Home: [planet size, 0 for the eclipse or 'bank' for a coin, text]; the bank's line goes before the last
 	const RULES = [
 		[1, 'Planets of three sizes hide in the cells of a square board.'],
@@ -156,7 +159,7 @@
 
 		const r = (R[size] / R[3]) * 10;
 		return `<svg viewBox="-12 -12 24 24" class="bullet">
-			<image href="../src/lib/images/planet-${size}.webp" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" />
+			<image href="${planetUrl(size, 96)}" x="${-r}" y="${-r}" width="${2 * r}" height="${2 * r}" />
 		</svg>`;
 	};
 

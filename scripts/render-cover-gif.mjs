@@ -9,9 +9,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const LAYOUTS = {
-	cover: { width: 630, height: 500, hash: '', file: 'cover.gif', fps: 12, colors: 96 },
+	cover: { width: 630, height: 500, hash: '', file: 'cover.gif', fps: 12, colors: 80 },
 	embed: { width: 640, height: 360, hash: '#embed', file: 'embed-bg.gif', fps: 15, colors: 256 },
-	wide: { width: 840, height: 360, hash: '#wide', file: 'wide-cover.gif', fps: 10, colors: 112 }
+	wide: { width: 840, height: 360, hash: '#wide', file: 'wide-cover.gif', fps: 10, colors: 96 }
 };
 const LAYOUT = LAYOUTS[process.argv[2] ?? 'cover'];
 
@@ -28,6 +28,9 @@ const FPS = +(process.env.FPS ?? LAYOUT.fps);
 const TURN_SECONDS = +(process.env.TURN ?? 6);
 const HOLD_SECONDS = +(process.env.HOLD ?? 1.5);
 const COLORS = +(process.env.COLORS ?? LAYOUT.colors);
+// an ordered dither, fixed to each pixel's place, so what holds still stays the same from frame to frame and costs
+// nothing after the first, unlike an error-diffusing one; the larger the scale, the finer and cheaper, and the more it bands
+const DITHER = process.env.DITHER ?? 'bayer:bayer_scale=3';
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const work = mkdtempSync(join(tmpdir(), 'cover-gif-'));
@@ -118,10 +121,11 @@ try {
 
 	ws.close();
 
-	// one palette for the whole GIF, and no dither: cover.html's grain does that job where it's cheap (see there)
+	// one palette for the whole GIF, dithered: the planets' smooth gradients banded without it, even at 256 colours, and
+	// cover.html's grain, which does the sky's, was too faint to break them
 	mkdirSync(dirname(OUT), { recursive: true });
 
-	const filter = `[0:v]split[a][b];[a]palettegen=max_colors=${COLORS}:stats_mode=full[p];[b][p]paletteuse=dither=none:diff_mode=rectangle`;
+	const filter = `[0:v]split[a][b];[a]palettegen=max_colors=${COLORS}:stats_mode=full[p];[b][p]paletteuse=dither=${DITHER}:diff_mode=rectangle`;
 	const ffmpeg = spawnSync(
 		'ffmpeg',
 		['-y', '-hide_banner', '-loglevel', 'error', '-framerate', String(FPS), '-i', join(dir, '%04d.png'), '-lavfi', filter, '-loop', '0', OUT],

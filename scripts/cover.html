@@ -169,7 +169,10 @@
 		<div class="tagline">It takes a shift</div>
 	</div>
 </div>
-<script>
+<script type="module">
+	// the game's planets (src/planets.js), as SVG: the canvas draws them at whatever size they come out
+	import { planetUrl } from '../src/planets.js';
+
 	// [column from the left, row from the front, size]
 	const ECLIPSE = [
 		// the eclipse: one lane, all on one line of sight, and behind them, seen only by its shadow, the dark matter
@@ -237,6 +240,8 @@
 	document.getElementById('cover').classList.add(NAME);
 
 	const ctx = canvas.getContext('2d');
+	// the planets come down from 512 px to a fraction of that
+	ctx.imageSmoothingQuality = 'high';
 
 	const rand = (() => {
 		let a = 20261103;
@@ -525,7 +530,19 @@
 	const TAGLINE_FADE = 0.05;
 
 	// a frame for the GIF (render-cover-gif.mjs): how far through the turn, 0 to 1, from the eclipse round to it again
-	window.ready = Promise.all([1, 2, 3].map((i) => image(`../src/lib/images/planet-${i}.webp`))).then(async ([a, b, c]) => {
+	// the planets' dark limb, about LIMB_PX wide at the size each is drawn here (the game's, a pixel at its size, came out
+	// heavy at this one): in each one's radii, from its average radius on the screen in this layout's first view
+	const LIMB_PX = 1.5;
+	const limbWidth = (size) => {
+		const radii = PLANETS.filter(([, , s]) => s === size).map(([c, r]) => {
+			const [x, z] = cellCentre(c, r);
+			return BIG * R[size] * project(x, AXIS, z, YAW).k;
+		});
+
+		return radii.length ? LIMB_PX / (radii.reduce((a, b) => a + b) / radii.length) : undefined;
+	};
+
+	window.ready = Promise.all([1, 2, 3].map((i) => image(planetUrl(i, 512, limbWidth(i))))).then(async ([a, b, c]) => {
 		await document.fonts.ready;
 		const images = [null, a, b, c];
 

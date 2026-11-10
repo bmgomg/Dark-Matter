@@ -64,6 +64,9 @@
 	// perspective's spread sideways fades out as the map nears edge-on), nearer ones larger and in front; flat, they're
 	// where they are on the map, each over its shadow.
 	const HOVER = 0.62;
+	// how much of the perspective their sizes take (their places take it all): in full, a medium in the front row came out
+	// nearly as large as a giant in the back one, leaving it a thin ring, unlike the tray's (the designer's call)
+	const SIZE_DEPTH = 0.5;
 
 	const standing = $derived.by(() => {
 		const t = (ss.flip * Math.PI) / 2;
@@ -74,7 +77,7 @@
 			.sort((a, b) => a.y - b.y)
 			.map((m) => {
 				const k = FLIP_PERSPECTIVE / (FLIP_PERSPECTIVE - m.y * s);
-				return { ...m, x: m.x * (1 + (k - 1) * c), y: m.y * c * k - HOVER * cell * s, r: m.r * k };
+				return { ...m, x: m.x * (1 + (k - 1) * c), y: m.y * c * k - HOVER * cell * s, r: m.r * (1 + (k - 1) * SIZE_DEPTH) };
 			});
 	});
 

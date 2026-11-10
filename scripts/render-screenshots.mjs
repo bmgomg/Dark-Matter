@@ -2,12 +2,13 @@
 // a throwaway profile: node scripts/render-screenshots.mjs [output folder]
 // Needs the dev server (npm run dev), since it reaches the store through its source module, and Node 22 or later. It plays
 // through the game's own functions, reading the solution, not with a mouse, so the scoreboard shows a clean win. The puzzle
-// is random, and not every one shows rings in the tray: look at the results, and run it again if they don't.
+// is random, though dealt again till the tray shows a varied lineup (see varied): look at the results all the same.
 import { spawn } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { elevation } from '../src/logic.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const OUT = resolve(process.argv[2] ?? join(HERE, '../itch/screenshots'));
@@ -129,6 +130,25 @@ try {
 	await sleep(800);
 	await park();
 	await sleep(300);
+
+	// the emblem's three planets all in sight (the designer's call): none on the far side of the orbit behind the dark
+	// disc, which hides one for about a tenth of the orbit's 9 s (the far ones come before the rays in the SVG)
+	const ORBIT_MS = 9000;
+	const allInSight = `(() => {
+		const svg = document.querySelector('.emblem');
+		const rays = svg.querySelector('.rays');
+		const disc = svg.querySelector('circle[r="52"]').getBoundingClientRect();
+		return [...svg.querySelectorAll('use.planet')].every((u) => {
+			const far = u.compareDocumentPosition(rays) & Node.DOCUMENT_POSITION_FOLLOWING;
+			const p = u.getBoundingClientRect();
+			return !far || p.right < disc.left - 4 || p.left > disc.right + 4;
+		});
+	})()`;
+
+	for (let waited = 0; waited < ORBIT_MS && !(await evaluate(allInSight)); waited += 50) {
+		await sleep(50);
+	}
+
 	await shot('4-home.png');
 
 	await click('binge');
@@ -140,17 +160,41 @@ try {
 	await shot('5-launcher.png');
 
 	// past the map's flip and the planets' growing in
+	const DEAL_WAIT = 3200;
 	await click('start');
-	await sleep(3200);
-	await park();
-	await shot('2-new-puzzle.png');
+	await sleep(DEAL_WAIT);
 
 	// the store as the page has it: the dev server may have added ?t= to the module's URL, and a plain import would be
 	// another copy, with no puzzle in it
 	const store = await evaluate('performance.getEntriesByType(\'resource\').map((e) => e.name).find((n) => /shared\\.svelte/.test(n))');
 	await evaluate(`import(${JSON.stringify(store)}).then((s) => { window.__s = s; })`);
 
-	const sol = await evaluate('JSON.parse(JSON.stringify(__s.ss.pzl.sol))');
+	// a lineup worth showing in the tray, dealt again till there is one: every size, a ring (a bigger planet around a
+	// smaller one), no empty lane, and no two lanes alike (the designer's call: two lanes of a moon in a giant looked samey)
+	const varied = (sol) => {
+		const lanes = elevation(sol, 0);
+		const keys = lanes.map((l) => l.join());
+		return (
+			new Set(lanes.flat()).size === 3 &&
+			lanes.some((l) => l.length > 1) &&
+			lanes.every((l) => l.length) &&
+			new Set(keys).size === keys.length
+		);
+	};
+	const DEALS = 30;
+	const getSol = () => evaluate('JSON.parse(JSON.stringify(__s.ss.pzl.sol))');
+	let sol = await getSol();
+	let deal = 1;
+
+	for (; deal < DEALS && !varied(sol); deal++) {
+		await evaluate('__s.playNew()');
+		await sleep(DEAL_WAIT);
+		sol = await getSol();
+	}
+
+	console.log(`deal ${deal}: ${JSON.stringify(elevation(sol, 0))}`);
+	await park();
+	await shot('2-new-puzzle.png');
 	const planets = sol.flatMap((row, i) => row.flatMap((v, j) => (v ? [[i, j, v]] : [])));
 	const half = Math.ceil(planets.length / 2);
 
@@ -182,8 +226,10 @@ try {
 	await turn();
 	await markAll(planets.slice(half));
 
-	// into the win's swell
-	await sleep(700);
+	// past the win's swell, under its message (OVER_MS, 4 s): mid-swell, its wave left one planet larger than another of
+	// its size (the designer saw a giant too large); it's over by 1.9 s (the wave's 60 ms a cell, then three of 0.5 s),
+	// and the glow stays
+	await sleep(2300);
 	await shot('3-win.png');
 
 	if (problems.length) {
