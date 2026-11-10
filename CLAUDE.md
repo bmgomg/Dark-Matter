@@ -34,7 +34,10 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   2 a teal ocean world under swirling clouds, 3 a violet banded gas giant, each with a fine dark limb, so one in front of
   another stays apart from it in the tray. Drawn first for the monochrome version, then colored for this one; they
   replaced the designer's Recraft images (`src/lib/images/planet-*.webp`), which the itch art (`scripts/cover.html`,
-  `scripts/rules-2.html`) still uses. Lit from the upper left. Radii as the brief: 17, 29, 44 hundredths of a cell.
+  `scripts/rules-2.html`) still uses. Drawn as vectors they made a turn jitter, visibly to the designer against the
+  images, as every gradient and clip was drawn again each frame; so once the page is up, each is drawn once into a
+  256 px bitmap and shown as an image (`toImage`; the vectors stay should that fail). Lit from the upper left. Radii as
+  the brief: 17, 29, 44 hundredths of a cell.
 - **The map** (`Board.svelte`): flat, top-down, `MAP` (330 px) wide, the side being viewed at the bottom with a gold
   edge. It turns with the board (`ss.angle`), live while the tray is dragged; its planets stay upright. Tap a cell to
   select it (`ss.sel`: gold, pulsing), again to let it go; the map itself doesn't swipe. The board turns with a cell
