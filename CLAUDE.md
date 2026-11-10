@@ -21,7 +21,8 @@ so the win's pulse is a glow. `src/palette.test.js` fails on any other color in 
 selection, pills) now means the brightest shade, and "lavender" a dimmer one. What color told apart is told by brightness
 and shape: the keyboard's cursor is dashed (the selected cell solid and pulsing), a negative balance dim, a finished
 daily's pill dimmer. The planets are SVGs (`Defs.svelte`), lightest small to darkest large, so a bigger one behind reads
-as a darker ring, each with a fine dark limb. The splash's BMG logo and the app icons (`scripts/icon.html`) were redone
+as a darker ring, each with a fine dark limb. Drawn as vectors they made a turn jitter (every gradient and clip drawn
+again each frame), so once the page is up each is drawn once into a 256 px bitmap and shown as an image (`toImage`). The splash's BMG logo and the app icons (`scripts/icon.html`) were redone
 in the hue (the logo by its lightness). Not yet: the itch page's art (`scripts/cover.html` and the rest).
 
 ## Rules
