@@ -41,7 +41,7 @@
 	{#if ss.keyboard}
 		<TextButton id="keys-button" text={['Keys']} onClick={toggleKeys} />
 	{/if}
-	<TextButton text={['Sound', _sound.sfx ? 'On' : 'Off']} onClick={onSfx} />
+	<TextButton text={['Sfx', _sound.sfx ? 'On' : 'Off']} onClick={onSfx} />
 	<TextButton text={['Music', _sound.music ? 'On' : 'Off']} onClick={onMusic} />
 </div>
 
