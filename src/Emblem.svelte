@@ -11,7 +11,14 @@
 		{ size: 3, r: 20, phase: 4.2 }
 	];
 
-	let t = $state(0.6);
+	// Seconds of animation. Everything here moves by it, attributes set each frame, none by a CSS animation: on a phone
+	// and on itch (a page scaled by a fraction), the rays spun by CSS left a faint flickering ghost of a ray elsewhere.
+	let sec = $state(5.4);
+	const t = $derived(sec / 9); // one orbit in 9 s
+	const wave = (period) => (1 - Math.cos((sec / period) * Math.PI * 2)) / 2; // 0 → 1 → 0, eased
+	const spin = $derived(sec * 4.5); // a turn in 80 s
+	const breathe = $derived(wave(6));
+	const glint = $derived(wave(4));
 
 	$effect(() => {
 		if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -22,8 +29,8 @@
 		let t0;
 
 		const tick = (now) => {
-			t0 ??= now - t * 1000 * 9;
-			t = (now - t0) / 1000 / 9;
+			t0 ??= now - sec * 1000;
+			sec = (now - t0) / 1000;
 			raf = requestAnimationFrame(tick);
 		};
 
@@ -60,16 +67,16 @@
 		<Planet x={b.x} y={b.y} r={b.r * b.k} size={b.size} />
 	{/each}
 
-	<g class="rays">
+	<g class="rays" transform="rotate({spin})">
 		{#each { length: 18 }, k (k)}
 			<line x1="0" y1="-62" x2="0" y2={k % 2 ? -92 : -104} transform="rotate({k * 20})" />
 		{/each}
 	</g>
-	<circle r="104" fill="url(#corona)" class="corona" />
+	<circle r="104" fill="url(#corona)" transform="scale({1 + breathe * 0.04})" opacity={1 - breathe * 0.1} />
 	<circle r="52" fill="url(#moon-dark)" />
 	<circle r="52" fill="none" stroke="#fff4dc" stroke-width="1.2" stroke-opacity="0.8" />
 	<!-- the diamond ring: the last of the sun, at the moon's edge -->
-	<circle cx="36" cy="-37.5" r="3.2" fill="#fff" class="diamond" />
+	<circle cx="36" cy="-37.5" r="3.2" fill="#fff" class="diamond" opacity={1 - glint * 0.45} />
 
 	<path d="M {RX} 4 A {RX} {RY} 0 0 1 {-RX} 4" class="orbit" />
 	{#each bodies.filter((b) => b.near) as b (b.size)}
@@ -98,44 +105,9 @@
 		stroke-opacity: 0.3;
 		stroke-width: 1.5;
 		stroke-linecap: round;
-		transform-origin: 0 0;
-		animation: spin 80s linear infinite;
-	}
-
-	.corona {
-		animation: breathe 6s ease-in-out infinite;
-		transform-origin: 0 0;
 	}
 
 	.diamond {
 		filter: drop-shadow(0 0 4px #fff) drop-shadow(0 0 10px #ffe2a0);
-		animation: glint 4s ease-in-out infinite;
-	}
-
-	@keyframes spin {
-		to {
-			rotate: 360deg;
-		}
-	}
-
-	@keyframes breathe {
-		50% {
-			scale: 1.04;
-			opacity: 0.9;
-		}
-	}
-
-	@keyframes glint {
-		50% {
-			opacity: 0.55;
-		}
-	}
-
-	@media (prefers-reduced-motion: reduce) {
-		.rays,
-		.corona,
-		.diamond {
-			animation: none;
-		}
 	}
 </style>
