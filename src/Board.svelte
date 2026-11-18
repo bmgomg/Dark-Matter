@@ -1,6 +1,6 @@
 <script>
 	import { cubicOut } from 'svelte/easing';
-	import { FLIP_PERSPECTIVE, MAP, NAMES, PALETTE_AT_CELL, R, SIDES } from './const';
+	import { CELL_DELAY_MS, FLIP_PERSPECTIVE, GROW_GAP_MS, MAP, NAMES, PALETTE_AT_CELL, R, SIDES } from './const';
 	import Picker from './Picker.svelte';
 	import Planet from './Planet.svelte';
 	import { deselect, hideCursor, isOver, select, showCursor, sideAt, ss } from './shared.svelte';
@@ -50,7 +50,7 @@
 
 				if (v > 0) {
 					const [x, y] = turned(...center(i, j));
-					out.push({ id: `${i}-${j}-${v}`, x, y, v, r: (R[v] / 100) * cell, delay: (i + j) * 60 });
+					out.push({ id: `${i}-${j}-${v}`, x, y, v, r: (R[v] / 100) * cell, delay: (i + j) * CELL_DELAY_MS });
 				}
 			}
 		}
@@ -94,7 +94,6 @@
 	// Showing the solution: the planets marked wrong shrink away and the true ones grow in their place, cell by cell
 	// from the north-west corner; a cell marked right stays as it is. Marking and a new puzzle change over at once.
 	const revealing = () => pzl.over === 'revealed';
-	const GAP = 250;
 
 	const grow = (node, { x, y, delay, duration }) =>
 		revealing()
@@ -118,11 +117,11 @@
 		return lastAt;
 	});
 
-	// a tap anywhere off the map lets the selected cell go, as with any popover
+	// a tap anywhere off the map lets the selected cell go, as with any popover (quietly on a button, which has its own sound)
 	$effect(() => {
 		const onDown = (e) => {
 			if (ss.sel && !e.target.closest?.('.board')) {
-				deselect();
+				deselect(!!e.target.closest?.('.button, button'));
 			}
 		};
 
@@ -227,7 +226,7 @@
 		<!-- hidden, not gone, while the standing ones show: they take over with no frame to paint new ones in -->
 		<g style:visibility={ss.stand ? 'hidden' : null}>
 			{#each marks as m (m.id)}
-				<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GAP, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
+				<g in:grow={{ x: m.x, y: m.y, delay: m.delay + GROW_GAP_MS, duration: 450 }} out:grow={{ x: m.x, y: m.y, delay: m.delay, duration: 250 }}>
 					<g class:beat={won} style="--delay: {m.delay}ms;">
 						<Planet x={m.x} y={m.y} r={m.r} size={m.v} klass={won ? 'pulse' : ''} style="--delay: {m.delay}ms;" />
 					</g>

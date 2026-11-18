@@ -52,6 +52,10 @@ export const FLIP_MS = 500;
 export const FLIP_PAUSE_MS = 500;
 // how far the player is from the map as it flips, in px; nearer makes the gold edge look wider
 export const FLIP_PERSPECTIVE = 1000;
+// A wave across the map, from the north-west corner (a win's swells, a give-up's change-over): each cell this much after
+// the one before it. In a give-up, the true planets grow in GROW_GAP_MS after the wrong ones start to shrink.
+export const CELL_DELAY_MS = 60;
+export const GROW_GAP_MS = 250;
 
 export const PROMPT_SURRENDER = 'Average will be affected — give up?';
 export const PROMPT_RESET_STATS = 'Reset stats — are you sure?';

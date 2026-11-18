@@ -1,9 +1,10 @@
 <script>
 	import { fade } from 'svelte/transition';
-	import { BANK, COST_CHANGE, COST_TURN, DIFF_NAMES, LEVELS } from './const';
+	import { BANK, COST_CHANGE, COST_TURN, DIFF_NAMES, LEVELS, PAGE_SLIDE_MS } from './const';
 	import Countdown from './Countdown.svelte';
 	import { costOf, dateOf, money, shareCard } from './logic';
 	import { begun, dailyGame, inProgress, onPlay, persistCommon, ss, today } from './shared.svelte';
+	import { sfx } from './sound.svelte';
 	import TextButton from './Text Button.svelte';
 	import { copyText, post } from './utils';
 
@@ -69,6 +70,7 @@
 		const copied = await copyText(shareCard(date, finished));
 
 		shared = copied ? 'copied' : 'copy failed';
+		sfx.copied(copied);
 		clearTimeout(sharedTimer);
 		sharedTimer = post(() => (shared = ''), SHARED_MS);
 	};
@@ -88,6 +90,7 @@
 	};
 
 	const play = (level) => {
+		sfx.slide(PAGE_SLIDE_MS, 1);
 		delete ss.launcher;
 		onPlay(level);
 	};

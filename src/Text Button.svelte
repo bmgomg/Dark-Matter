@@ -1,5 +1,5 @@
 <script>
-	import { tap } from './sound.svelte';
+	import { sfx } from './sound.svelte';
 	import { post } from './utils';
 
 	// a press shrinks the button and springs it back; it acts once it's back. onPress comes during the press itself, with
@@ -29,7 +29,7 @@
 		}
 
 		if (sound) {
-			tap();
+			sfx.tap();
 		}
 
 		scale = 0.85;

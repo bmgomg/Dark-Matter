@@ -1,8 +1,10 @@
 import {
 	APP_STATE,
 	BANK,
+	CELL_DELAY_MS,
 	FLIP_MS,
 	FLIP_PAUSE_MS,
+	GROW_GAP_MS,
 	HALF_TURN_MS,
 	LEVELS,
 	MSG_AVERAGE_IMPROVED,
@@ -16,7 +18,7 @@ import {
 	TURN_MS
 } from './const';
 import { costOf, dailyPuzzle, dayOf, generate } from './logic';
-import { _sound, sfx, tap, whoosh } from './sound.svelte';
+import { _sound, sfx } from './sound.svelte';
 
 // the side facing the player at a board angle, 0..3 (South, East, North, West)
 export const sideAt = (deg) => ((Math.round(deg / 90) % 4) + 4) % 4;
@@ -198,6 +200,7 @@ const onSettled = () => {
 	// one move, however far it went (a long drag shows nothing on the way), and free if it's come full circle
 	if (sideAt(step * 90) !== sideAt(pzl.step * 90)) {
 		pzl.turns += 1;
+		sfx.coin();
 	}
 
 	pzl.step = step;
@@ -213,7 +216,10 @@ const onSettled = () => {
 // turnFrom: the angle it set off from, for the tray to slide the next lineup in over the whole of the turn
 export const spinTo = (step, tapped = false, ms = tapped ? TAP_TURN_MS : TURN_MS) => {
 	if (ss.target !== step && step !== ss.pzl?.step) {
-		whoosh();
+		sfx.turn(ms, Math.sign(step * 90 - ss.angle) || 1, ms === HALF_TURN_MS);
+	} else if (Math.abs(ss.angle - step * 90) > 1) {
+		// a swipe let go short of a turn, easing back
+		sfx.settle();
 	}
 
 	// released bang on the side it's turning to: a hair off it, so the next lineup, which slides in as the angle
@@ -227,10 +233,18 @@ export const spinTo = (step, tapped = false, ms = tapped ? TAP_TURN_MS : TURN_MS
 	tween('angle', step * 90, ms, onSettled, tapped ? linear : easeOut);
 };
 
+// an arrow or a key that can't turn the board now (it's turning, or flipping): a bump, to say so
+const blocked = () => {
+	if (ss.pzl) {
+		sfx.bump();
+	}
+};
+
 // a tap on an arrow, or ← →; dir 1: clockwise from above, so the east side comes round to the front (as a swipe to the left)
 // (not while the map is flipping: a turn costs, and there would be nothing to see for it; nor over a turn under way)
 export const turnBy = (dir) => {
 	if (!ss.pzl || ss.flip || turnUnderWay()) {
+		blocked();
 		return;
 	}
 
@@ -240,6 +254,7 @@ export const turnBy = (dir) => {
 // an arrow held, or ↑ ↓: straight to the opposite side, for the price of one turn; dir as turnBy's, the way it spins
 export const turnHalf = (dir) => {
 	if (!ss.pzl || ss.flip || turnUnderWay()) {
+		blocked();
 		return;
 	}
 
@@ -251,17 +266,20 @@ export const turnHalf = (dir) => {
 const flipBack = (t0, pause = FLIP_PAUSE_MS) => {
 	clearTimeout(pending);
 	pending = setTimeout(
-		() =>
+		() => {
+			sfx.flipBack(FLIP_MS);
 			tween(
 				'flip',
 				0,
 				FLIP_MS,
 				() => {
 					delete ss.stand;
+					sfx.rise();
 					tween('rise', 0, 700);
 				},
 				linear
-			),
+			);
+		},
 		Math.max(0, pause - (performance.now() - t0))
 	);
 };
@@ -269,6 +287,7 @@ const flipBack = (t0, pause = FLIP_PAUSE_MS) => {
 // Play new: the solved map flips a quarter turn till it's edge-on, the next puzzle is made while it can't be seen, and
 // the new, empty map flips back.
 export const playNew = () => {
+	sfx.flipAway(FLIP_MS);
 	tween(
 		'flip',
 		1,
@@ -342,7 +361,6 @@ export const newPuzzle = async () => {
 		...(day && { day })
 	};
 
-	sfx('draw', 1.4, 0.5);
 	ss.rise = 1;
 	persist();
 };
@@ -423,17 +441,25 @@ export const select = (i, j) => {
 		return;
 	}
 
-	tap();
 	ss.cursor = [i, j];
 
 	if (ss.sel?.[0] === i && ss.sel?.[1] === j) {
+		sfx.deselect();
 		delete ss.sel;
 	} else {
+		sfx.select();
 		ss.sel = [i, j];
 	}
 };
 
-export const deselect = () => delete ss.sel;
+// the selected cell let go; quiet when what let it go has a sound of its own (a button pressed)
+export const deselect = (quiet = false) => {
+	if (ss.sel && !quiet) {
+		sfx.deselect();
+	}
+
+	delete ss.sel;
+};
 
 // The board as the keyboard plays it: the map is one Tab stop, with a cursor on one of its cells. It remembers its cell
 // (a tap moves it too), and it starts in the corner at the screen's top left. It's for the keyboard only: it shows when
@@ -444,6 +470,10 @@ const canPlay = () => ss.pzl && !ss.pzl.over && !ss.flip && !ss.prompt;
 export const showCursor = () => {
 	if (!canPlay()) {
 		return;
+	}
+
+	if (!ss.cursorOn) {
+		sfx.tick();
 	}
 
 	if (ss.sel) {
@@ -485,6 +515,13 @@ export const moveCursor = (dx, dy) => {
 	const i = limit(ss.cursor[0] - dx * s + dy * c);
 	const j = limit(ss.cursor[1] + dx * c + dy * s);
 
+	// against the map's edge, it can't go on
+	if (i === ss.cursor[0] && j === ss.cursor[1]) {
+		sfx.bump();
+		return;
+	}
+
+	sfx.tick();
 	ss.cursor = [i, j];
 
 	if (ss.sel) {
@@ -534,11 +571,10 @@ export const mark = (v) => {
 	delete ss.sel;
 
 	if (was === -1) {
-		sfx('plop');
+		sfx.place(v);
 	} else {
 		pzl.changes += 1;
-		sfx(v ? 'plop' : 'click');
-		sfx('coin1');
+		sfx.change(v);
 	}
 
 	if (matches(pzl)) {
@@ -560,6 +596,8 @@ export const clearAll = () => {
 		return;
 	}
 
+	const { changes } = pzl;
+
 	pzl.marks = pzl.marks.map((row) =>
 		row.map((v) => {
 			if (v > 0) {
@@ -572,8 +610,7 @@ export const clearAll = () => {
 	);
 
 	delete ss.sel;
-	sfx('click');
-	sfx('coin1');
+	sfx.clearAll(pzl.changes - changes);
 
 	if (matches(pzl)) {
 		win();
@@ -608,10 +645,12 @@ const win = () => {
 	}
 
 	pzl.over = 'won';
-	sfx('won');
 
 	ss.message =
 		hadBest && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() > prevAvg ? MSG_AVERAGE_IMPROVED : score < 0 ? MSG_BROKE : MSG_WON;
+
+	// the fanfare, with a sparkle for a record, or a minor chord for a win in the red
+	sfx.win({ [MSG_BEST_SCORE]: 'best', [MSG_AVERAGE_IMPROVED]: 'average', [MSG_BROKE]: 'broke' }[ss.message]);
 	gameOver();
 };
 
@@ -634,19 +673,44 @@ export const reveal = () => {
 
 	countGiveUp();
 
+	// the map changes over to the sky cell by cell, as Board.svelte has it: each wrong planet shrinks away at its cell's
+	// time, from the north-west corner, and each true one grows in GROW_GAP after
+	const outs = [];
+	const ins = [];
+
+	pzl.sol.forEach((row, i) =>
+		row.forEach((v, j) => {
+			const m = Math.max(0, pzl.marks[i][j]);
+			const at = ((i + j) * CELL_DELAY_MS) / 1000;
+
+			if (m !== v) {
+				if (m) {
+					outs.push(at);
+				}
+
+				if (v) {
+					ins.push([at + GROW_GAP_MS / 1000, v]);
+				}
+			}
+		})
+	);
+
 	pzl.over = 'revealed';
-	sfx('lost');
+	sfx.lost(outs, ins);
 	ss.message = MSG_REVEALED;
 	gameOver();
 };
 
 export const resetStats = () => {
+	sfx.reset();
 	ss.stats = newStats();
 	persist();
 };
 
 // the card with the keyboard shortcuts (Keys on the toolbar, or ?)
 export const toggleKeys = () => {
+	sfx.card(!ss.keys);
+
 	if (ss.keys) {
 		delete ss.keys;
 	} else {
@@ -654,8 +718,25 @@ export const toggleKeys = () => {
 	}
 };
 
+// the card put away by a tap elsewhere or a key
+export const closeKeys = () => {
+	if (ss.keys) {
+		sfx.card(false);
+		delete ss.keys;
+	}
+};
+
+// a question below the tray (Give Up, Clear All, Reset Stats)
+export const ask = (prompt) => {
+	delete ss.sel;
+	sfx.question();
+	ss.prompt = prompt;
+};
+
 // Back: from a game to the launcher, from the launcher to Home
 export const goBack = () => {
+	sfx.slide(PAGE_SLIDE_MS, -1);
+
 	if (ss.launcher) {
 		ss.home = true;
 		return;

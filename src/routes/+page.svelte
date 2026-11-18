@@ -5,8 +5,9 @@
 	import Space from '../Space.svelte';
 	import Splash from '../Splash.svelte';
 	import { DX, DY, SPLASH_SLIDE_MS } from '../const';
-	import { deselect, hideCursor, markCursor, moveCursor, selectCursor, ss, toggleKeys, turnBy, turnHalf } from '../shared.svelte';
-	import { _sound } from '../sound.svelte';
+	import { closeKeys, deselect, hideCursor, markCursor, moveCursor, selectCursor, ss, toggleKeys, turnBy, turnHalf } from '../shared.svelte';
+	import { wakeAudio } from '../sfx';
+	import { _sound, sfx } from '../sound.svelte';
 	import { clientRect, post, slideX } from '../utils';
 
 	// a key's move of the map's cursor on screen, dx and dy
@@ -58,7 +59,7 @@
 
 			if (ss.keys) {
 				if (!['Shift', 'Tab', 'Enter', ' '].includes(e.key)) {
-					delete ss.keys;
+					closeKeys();
 					e.preventDefault();
 				}
 
@@ -89,6 +90,7 @@
 			} else if (ss.sel && e.key === 'Escape') {
 				deselect();
 			} else if (ss.cursorOn && e.key === 'Escape') {
+				sfx.tock();
 				hideCursor();
 			} else {
 				return;
@@ -102,6 +104,12 @@
 		// the clock, for the daily's countdown, and its next puzzle at midnight
 		const clock = setInterval(() => (ss.now = Date.now()), 1000);
 
+		// The effects' audio starts on a tap or a key, which browsers require, ahead of what the tap does (so its sound
+		// can play). A touch counts only once lifted, so a phone's first tap is silent.
+		const wake = () => wakeAudio();
+		const WAKERS = ['pointerdown', 'pointerup', 'touchend', 'keydown'];
+
+		WAKERS.forEach((type) => window.addEventListener(type, wake, true));
 		window.addEventListener('contextmenu', disable);
 		window.addEventListener('dblclick', disable);
 		window.addEventListener('resize', onResize);
@@ -111,6 +119,7 @@
 
 		return () => {
 			clearInterval(clock);
+			WAKERS.forEach((type) => window.removeEventListener(type, wake, true));
 			window.removeEventListener('contextmenu', disable);
 			window.removeEventListener('dblclick', disable);
 			window.removeEventListener('resize', onResize);
@@ -121,7 +130,11 @@
 	});
 
 	let splash = $state(true);
-	post(() => (splash = false), 2000);
+	// (its push is heard only if the splash was tapped: before any tap, browsers keep the audio off)
+	post(() => {
+		splash = false;
+		sfx.slide(SPLASH_SLIDE_MS, 1);
+	}, 2000);
 </script>
 
 <Defs />

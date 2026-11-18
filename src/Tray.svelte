@@ -4,6 +4,7 @@
 	import Icon from './Icon.svelte';
 	import Planet from './Planet.svelte';
 	import { sideAt, spinTo, ss, stopTurning, turnBy, turnHalf } from './shared.svelte';
+	import { sfx } from './sound.svelte';
 
 	// The view from the player's seat, edge-on: each lane seen along its line of sight, the planets centred on it, a
 	// bigger one behind showing around the ones in front of it, like an annular eclipse. Swiping it turns the board:
@@ -83,7 +84,7 @@
 
 		stopTurning();
 		e.currentTarget.setPointerCapture(e.pointerId);
-		drag = { x0: e.clientX, a0: ss.angle, moved: false, last: [[e.clientX, performance.now()]] };
+		drag = { x0: e.clientX, a0: ss.angle, near: Math.round(ss.angle / 90), moved: false, last: [[e.clientX, performance.now()]] };
 	};
 
 	const onPointerMove = (e) => {
@@ -100,6 +101,14 @@
 		if (drag.moved) {
 			ss.angle = drag.a0 - (dx * 90) / SWIPE_PX;
 			drag.last = [...drag.last.slice(-4), [e.clientX, performance.now()]];
+
+			// a tick as it passes halfway to a side, where a slow release would settle on that side instead
+			const near = Math.round(ss.angle / 90);
+
+			if (near !== drag.near) {
+				drag.near = near;
+				sfx.tick();
+			}
 		}
 	};
 

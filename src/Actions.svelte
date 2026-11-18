@@ -2,6 +2,7 @@
 	import { clearAllText, OVER_MS, STRIP_SLIDE_MS, PROMPT_CLEAR_ALL, PROMPT_PLAY_NEW, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
 	import Countdown from './Countdown.svelte';
 	import { clearAll, isOver, planetCount, playNew, resetStats, reveal, ss, today } from './shared.svelte';
+	import { sfx } from './sound.svelte';
 	import TextButton from './Text Button.svelte';
 	import { pushIn, pushOut, slideX } from './utils';
 
@@ -20,7 +21,10 @@
 	$effect(() => {
 		if (lingering) {
 			const { overAt } = ss;
-			const id = setTimeout(() => (spent = overAt), OVER_MS - (Date.now() - overAt));
+			const id = setTimeout(() => {
+				spent = overAt;
+				sfx.ready();
+			}, OVER_MS - (Date.now() - overAt));
 			return () => clearTimeout(id);
 		}
 	});
@@ -41,7 +45,7 @@
 	// (read from the start, so the first change knows where it came from)
 	$effect(() => void way);
 
-	// a prompt asked after the game ended goes back to Play new
+	// a prompt answered, or asked after the game ended, goes back to Play new
 	const dismiss = () => {
 		delete ss.prompt;
 
@@ -49,13 +53,19 @@
 			ss.prompt = PROMPT_PLAY_NEW;
 		}
 	};
+
+	// No
+	const no = () => {
+		sfx.dismiss();
+		dismiss();
+	};
 </script>
 
 <div class="actions">
 	{#if ss.prompt === PROMPT_SURRENDER}
 		<div class="pair" in:slideX={pushIn(way, STRIP_SLIDE_MS)} out:slideX={pushOut(way, STRIP_SLIDE_MS)}>
 			<TextButton text={[PROMPT_SURRENDER]} framed style={PILL} onClick={reveal} />
-			<TextButton text={['no']} framed style={PILL} onClick={dismiss} />
+			<TextButton text={['no']} framed style={PILL} onClick={no} />
 		</div>
 	{:else if ss.prompt === PROMPT_CLEAR_ALL}
 		<div class="pair" in:slideX={pushIn(way, STRIP_SLIDE_MS)} out:slideX={pushOut(way, STRIP_SLIDE_MS)}>
@@ -68,7 +78,7 @@
 					dismiss();
 				}}
 			/>
-			<TextButton text={['no']} framed style={PILL} onClick={dismiss} />
+			<TextButton text={['no']} framed style={PILL} onClick={no} />
 		</div>
 	{:else if ss.prompt === PROMPT_RESET_STATS}
 		<div class="pair" in:slideX={pushIn(way, STRIP_SLIDE_MS)} out:slideX={pushOut(way, STRIP_SLIDE_MS)}>
@@ -81,7 +91,7 @@
 					dismiss();
 				}}
 			/>
-			<TextButton text={['no']} framed style={PILL} onClick={dismiss} />
+			<TextButton text={['no']} framed style={PILL} onClick={no} />
 		</div>
 	{:else if ss.prompt === PROMPT_PLAY_NEW && lingering}
 		<div class="over" class:won={ss.pzl?.over === 'won'} in:slideX={pushIn(way, STRIP_SLIDE_MS)} out:slideX={pushOut(way, STRIP_SLIDE_MS)}>{ss.message}</div>

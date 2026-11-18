@@ -4,6 +4,7 @@
 	import Emblem from './Emblem.svelte';
 	import Planet from './Planet.svelte';
 	import { loadCommon, ss } from './shared.svelte';
+	import { sfx } from './sound.svelte';
 	import TextButton from './Text Button.svelte';
 	import { slideX } from './utils';
 
@@ -18,6 +19,8 @@
 
 	// to the launcher: today's puzzle, or the choice of board and difficulty
 	const play = (daily) => {
+		sfx.slide(PAGE_SLIDE_MS, 1);
+
 		if (daily) {
 			ss.daily = true;
 		} else {

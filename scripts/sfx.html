@@ -1,0 +1,330 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Sound Effects</title>
+		<!-- The game's sound effects (src/sfx.js), each with the arguments the game plays it with, to hear and compare. With
+		     the dev server running: http://localhost:1119/scripts/sfx.html. Each is rendered offline, then played; its
+		     peak is shown, in dB below full scale, and its loudness (the loudest 50 ms, by RMS). The scenes play a moment of the game, its sounds at their times. -->
+		<style>
+			:root {
+				color-scheme: dark;
+			}
+
+			body {
+				margin: 0;
+				padding: 24px 16px 48px;
+				background: #0a0920;
+				color: #ece8ff;
+				font: 15px/1.4 system-ui, sans-serif;
+			}
+
+			main {
+				max-width: 760px;
+				margin: 0 auto;
+			}
+
+			h1 {
+				margin: 0 0 4px;
+				font-size: 22px;
+				font-weight: 600;
+				color: #ffd77a;
+			}
+
+			p {
+				margin: 0 0 20px;
+				color: #b8b0ff;
+			}
+
+			h2 {
+				margin: 28px 0 10px;
+				font-size: 12px;
+				font-weight: 600;
+				letter-spacing: 0.2em;
+				text-transform: uppercase;
+				color: #b8b0ff;
+			}
+
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+				gap: 8px;
+			}
+
+			button {
+				display: grid;
+				gap: 2px;
+				padding: 10px 12px;
+				border: 1px solid #8f86ff44;
+				border-radius: 10px;
+				background: #15183f;
+				color: inherit;
+				font: inherit;
+				text-align: left;
+				cursor: pointer;
+			}
+
+			button:hover,
+			button:focus-visible {
+				border-color: #ffd77a;
+				outline: none;
+			}
+
+			button.playing {
+				background: #2a2366;
+			}
+
+			.name {
+				font-weight: 600;
+			}
+
+			.what {
+				font-size: 13px;
+				color: #b8b0ff;
+			}
+
+			.peak {
+				font: 12px ui-monospace, monospace;
+				color: #8f86ff;
+			}
+		</style>
+	</head>
+	<body>
+		<main>
+			<h1>Sound effects</h1>
+			<p>Every effect in the game, made in <code>src/sfx.js</code>. Click one to hear it.</p>
+			<div id="list"></div>
+		</main>
+
+		<script type="module">
+			import { render } from '../src/sfx.js';
+
+			// [name, arguments, when the game plays it]
+			const GROUPS = [
+				[
+					'Buttons and pages',
+					[
+						['tap', [], 'any button pressed'],
+						['toggle', [true], 'SFX or Music on'],
+						['toggle', [false], 'SFX or Music off'],
+						['slide', [500, 1], 'a page pushed in: Daily, Binge, Start'],
+						['slide', [500, -1], 'Back'],
+						['slide', [700, 1], 'the splash pushed off'],
+						['card', [true], 'the shortcuts card in'],
+						['card', [false], 'the shortcuts card out'],
+						['reset', [], 'Reset Stats done; the splash tapped']
+					]
+				],
+				[
+					'The map',
+					[
+						['select', [], 'a cell selected'],
+						['deselect', [], 'a cell let go'],
+						['tick', [], 'the cursor moved; a swipe passing halfway'],
+						['tock', [], 'the cursor put away (Esc)'],
+						['bump', [], 'nothing doing: the edge, a turn under way, a spent swatch'],
+						['place', [1], 'a small planet placed (free)'],
+						['place', [2], 'a medium planet placed (free)'],
+						['place', [3], 'a large planet placed (free)'],
+						['change', [2], 'a mark changed to another planet ($1)'],
+						['change', [0], 'a mark cleared ($1)'],
+						['clearAll', [3], 'Clear All, three planets ($3)']
+					]
+				],
+				[
+					'Turning',
+					[
+						['turn', [500, 1], 'a quarter turn, tapped, clockwise'],
+						['turn', [500, -1], 'a quarter turn, tapped, counterclockwise'],
+						['turn', [420, 1], 'a swipe let go, settling on the next side'],
+						['turn', [700, 1, true], 'a half turn (an arrow held, ↑ ↓)'],
+						['settle', [], 'a swipe let go short, easing back'],
+						['coin', [], 'a turn charged, as it lands']
+					]
+				],
+				[
+					'Flips and puzzles',
+					[
+						['flipAway', [500], 'Play new: the map flips away to edge-on'],
+						['flipBack', [500], 'the map flips back flat'],
+						['rise', [], 'the tray’s planets grow in']
+					]
+				],
+				[
+					'Prompts and endings',
+					[
+						['question', [], 'Give Up, Clear All or Reset Stats asked'],
+						['dismiss', [], 'No'],
+						['win', ['won'], 'solved'],
+						['win', ['best'], 'solved: best score'],
+						['win', ['average'], 'solved: average improved'],
+						['win', ['broke'], 'solved, in the red'],
+						[
+							'lost',
+							[
+								[0.12, 0.24],
+								[
+									[0.31, 2],
+									[0.43, 3],
+									[0.49, 1],
+									[0.61, 2]
+								]
+							],
+							'given up: two wrong planets out, four true ones in'
+						],
+						['ready', [], 'Play new or the countdown comes in'],
+						['copied', [true], 'Share: copied'],
+						['copied', [false], 'Share: copy failed']
+					]
+				]
+			];
+
+			// moments of the game, each sound at its time (ms)
+			const SCENES = [
+				[
+					'Start a game',
+					[
+						[0, 'tap'],
+						[200, 'slide', [500, 1]],
+						[1200, 'flipBack', [500]],
+						[1700, 'rise']
+					],
+					'Start pressed: the page in, the map flipping flat, the planets growing'
+				],
+				[
+					'Play new',
+					[
+						[0, 'tap'],
+						[200, 'flipAway', [500]],
+						[1200, 'flipBack', [500]],
+						[1700, 'rise']
+					],
+					'flip away, a pause edge-on, flip back, the new planets'
+				],
+				[
+					'Mark and turn',
+					[
+						[0, 'select'],
+						[600, 'place', [3]],
+						[1200, 'turn', [500, 1]],
+						[1700, 'coin'],
+						[2300, 'select'],
+						[2900, 'change', [1]]
+					],
+					'a giant placed, a turn, then a change of mind'
+				]
+			];
+
+			let ctx;
+			const cache = new Map();
+
+			const db = (buffer) => {
+				let peak = 0;
+
+				for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+					for (const v of buffer.getChannelData(ch)) {
+						peak = Math.max(peak, Math.abs(v));
+					}
+				}
+
+				return peak ? (20 * Math.log10(peak)).toFixed(1) : '−∞';
+			};
+
+			// how loud it sounds, roughly: the loudest 50 ms, by RMS over both channels, in dB
+			const loudness = (buffer) => {
+				const n = Math.round(buffer.sampleRate * 0.05);
+				const chs = [...Array(buffer.numberOfChannels).keys()].map((ch) => buffer.getChannelData(ch));
+				let most = 0;
+
+				for (let start = 0; start + n <= buffer.length; start += Math.floor(n / 2)) {
+					let sum = 0;
+
+					for (const data of chs) {
+						for (let i = start; i < start + n; i++) {
+							sum += data[i] * data[i];
+						}
+					}
+
+					most = Math.max(most, sum / (n * chs.length));
+				}
+
+				return most ? (10 * Math.log10(most)).toFixed(1) : '−∞';
+			};
+
+			const get = async (name, args = []) => {
+				const key = JSON.stringify([name, args]);
+
+				if (!cache.has(key)) {
+					cache.set(key, await render(name, args));
+				}
+
+				return cache.get(key);
+			};
+
+			const playBuffer = (buffer, when = 0) => {
+				const src = ctx.createBufferSource();
+				src.buffer = buffer;
+				src.connect(ctx.destination);
+				src.start(ctx.currentTime + when);
+				return src;
+			};
+
+			const button = (label, what, onClick) => {
+				const b = document.createElement('button');
+				b.innerHTML = `<span class="name"></span><span class="what"></span><span class="peak"></span>`;
+				b.querySelector('.name').textContent = label;
+				b.querySelector('.what').textContent = what;
+				b.onclick = async () => {
+					ctx ??= new AudioContext();
+					await ctx.resume();
+					b.classList.add('playing');
+					const ms = await onClick(b);
+					setTimeout(() => b.classList.remove('playing'), ms);
+				};
+				return b;
+			};
+
+			const list = document.getElementById('list');
+
+			const section = (title) => {
+				const h = document.createElement('h2');
+				const grid = document.createElement('div');
+				h.textContent = title;
+				grid.className = 'grid';
+				list.append(h, grid);
+				return grid;
+			};
+
+			for (const [title, items] of GROUPS) {
+				const grid = section(title);
+
+				for (const [name, args, what] of items) {
+					const label = args.length && typeof args[0] !== 'object' ? `${name}(${args.join(', ')})` : name;
+					const b = button(label, what, async () => {
+						const buffer = await get(name, args);
+						playBuffer(buffer);
+						return 600;
+					});
+
+					grid.append(b);
+
+					// the peak, shown from the start
+					get(name, args).then((buffer) => (b.querySelector('.peak').textContent = `peak ${db(buffer)} · loudness ${loudness(buffer)} dB`));
+				}
+			}
+
+			const scenes = section('Scenes');
+
+			for (const [title, steps, what] of SCENES) {
+				scenes.append(
+					button(title, what, async () => {
+						const buffers = await Promise.all(steps.map(([, name, args]) => get(name, args)));
+						steps.forEach(([ms], i) => playBuffer(buffers[i], ms / 1000 + 0.05));
+						return steps.at(-1)[0] + 600;
+					})
+				);
+			}
+		</script>
+	</body>
+</html>

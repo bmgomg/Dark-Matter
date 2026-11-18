@@ -19,10 +19,6 @@ that license. Each stays under the terms given here. Paths are those in the
 [Soundimage license](https://soundimage.org/sample-page/), which requires a credit in the game itself. Anyone
 redistributing this file must follow that license and keep the credit.
 
-## Sound effects
-
-`src/lib/sounds/sfx.mp3`: not covered by the MIT License. No rights in this file are granted here.
-
 ## Fonts
 
 Under the SIL Open Font License 1.1. The license text for each family is in `src/lib/fonts/`.

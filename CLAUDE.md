@@ -129,7 +129,41 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
   the hint to the left and letting it go brings it back; in `Actions.svelte` what comes next comes from the right (a
   question, the game-over message, Play new after it), and only a question put away after a game brings Play new back
   from the left. Fades stay where nothing moves from place to place: the shade behind the shortcuts card, Start and
-  Resume crossfading in their pill, hovers and disabled buttons; planets and the picker grow rather than fade. Sounds: the template's effects sprite; the music since `f6c4696` isn't Unmix's (see License). It fades up from silence (`MUSIC_FADE_MS`, 5 s) whenever it starts or resumes (the first Start, Music On, back in the window), at the designer's wish; it goes off at once.
+  Resume crossfading in their pill, hovers and disabled buttons; planets and the picker grow rather than fade. The music since `f6c4696` isn't Unmix's (see License). It fades up from silence (`MUSIC_FADE_MS`, 5 s) whenever it starts or resumes (the first Start, Music On, back in the window), at the designer's wish; it goes off at once.
+
+## Sounds
+
+Every interaction and transition has a sound, made in `src/sfx.js` with Web Audio (oscillators and band-passed noise,
+through a generated reverb), as in Off by One, in place of the template's sprite (the designer's call; its source was
+never known). Played through `sfx.<name>()` in `sound.svelte.js`, which drops them with SFX off. The audio starts on the
+first tap or key (`wakeAudio`, from `+page.svelte`); till then nothing plays, rather than queueing, so the splash's push
+is heard only if the splash was tapped, and a phone's first tap is silent (a touch counts only once lifted).
+
+- Any Text Button: `tap` on the press, then its action's own sound, if it has one, after the spring-back.
+- Pages: `slide` (Daily, Binge, Start, Resume, a daily: going on; Back: the other way, lower), panned across as the
+  page moves. The shortcuts card: `card` in (with a chime) and out.
+- The map: `select`, `deselect` (quiet when a button's tap let it go); `place` a planet, its note by size (the giant
+  lowest); `change` (another planet, or cleared) with a `coin` for the dollar; Clear All, a sweep and a coin a planet.
+  The cursor: `tick` a move, `bump` at the edge, `tock` put away. A spent swatch, or an arrow or key while a turn plays
+  out or the map flips: `bump`.
+- Turning: `turn`, a rush of air panned the way the lineups slide, over the turn's length, a half turn's lower; `coin`
+  as a charged turn lands; `settle` for a swipe let go short; a `tick` as a drag passes halfway to a side.
+- Flips: `flipAway` (rising, a glint as it goes edge-on), `flipBack` (falling, a thud as it lies flat), then `rise` as
+  the tray's planets grow in.
+- Prompts: `question` as one comes up, `dismiss` on No, `reset` on Reset Stats (and on tapping the splash, which wipes
+  the saves). A win: `win`, a note at each of the map's three swells, then a chord: a sparkle for a best or a better
+  average, a minor chord in the red. A give-up: `lost`, a sigh, then a pop and a drop at each cell's moment as the map
+  changes over (`CELL_DELAY_MS`, `GROW_GAP_MS`, shared with `Board.svelte`). Play new (or the countdown) coming in:
+  `ready`. Share: `copied`, or a double bump.
+- Left silent, as another sound covers the moment: the hint and the warning pushing each other (the select), the
+  picker growing, the game-over message (the win or the sigh), the digits rolling (the coin), Start and Resume
+  crossfading (the tap).
+
+`scripts/sfx.html` plays each one, with the dev server running (`http://localhost:1119/scripts/sfx.html`; `vite.config.js`
+serves `scripts/*.html` in dev, which SvelteKit would 404), with its peak and loudness, and a few scenes. The balance
+was set by that loudness: an ending about −19 dB, a turn, a flip or a page −23 to −27, a mark −25, a click about −40;
+`SFX_VOLUME` scales them all against the music. Not yet measured on the Pixel 6a for frame timing during a turn (a turn's
+sound makes a few audio nodes as it starts; the audio itself runs off the main thread).
 - App icon (`scripts/icon.html`, `sh scripts/render-icons.sh`): the eclipse with the moon and the giant.
 
 ## Scoring: the bank
@@ -234,6 +268,7 @@ they ship ready-made: `src/puzzles.js` (365 for each size, a year of dailies, no
   saves, as each level is done.
 - `src/shared.svelte.js`: the store `ss`, per-level saves (`APP_STATE • <level id>`: stats and the puzzle), turning
   (`turnBy`, `spinTo`, `ss.angle`, `sideAt`), selecting and marking (`select`, `mark`; a match ends the game), the budget (`cost`, `balance`), reveal, the daily's day (`today`, `dailyGame`, `closeOldDaily`), Back (`goBack`). `pzl.step` is the net count of clockwise quarter turns.
+- `src/sfx.js`: the sound effects, synthesized (see Sounds); `src/sound.svelte.js`: the music (howler) and the switches.
 - `src/const.js`: title, levels, sizes, sides, swipe and turn timing, the bank and costs, prompts.
 - `scripts/build-itch.js`: `npm run build:itch`, a static build without the PWA parts, zipped for itch.io.
 - `scripts/cover.html`: the itch.io cover, 630 × 500: the board seen from low down, under the title. The camera is in line
@@ -259,12 +294,13 @@ they ship ready-made: `src/puzzles.js` (365 for each size, a year of dailies, no
 ## License
 
 The code is MIT (`LICENSE`, the designer's choice). `NOTICE.md` lists what that doesn't cover: the art and the logo (all
-rights reserved), the music, the sound effects, the fonts (OFL, its texts in `src/lib/fonts`) and the libraries in the
+rights reserved), the music, the fonts (OFL, its texts in `src/lib/fonts`) and the libraries in the
 client bundle (howler, Svelte, SvelteKit, clsx). `static/NOTICE.md` is a copy of it, so that it ships with the game (MIT
 asks for the libraries' notices in every copy, and minifying strips them): change the two together, and add any new
 runtime library. The music's license (Soundimage: CC BY 4.0 with one restriction, not sublicensable) requires its credit
 in the game itself, so the launcher's line can't simply go.
 
-Not on record: the sound effects' source (the same sprite is in 64 of the BMG games), and the music's. The credit to Eric
+Not on record: the music's source. (The sound effects are now the game's own code, `src/sfx.js`; the template's sprite,
+whose source was never known either, is gone.) The credit to Eric
 Matyas was taken from this file's note on Unmix's track, but `f6c4696` replaced that track with one shared with DLMPY,
 Forever Contagion, Now You See Me, Parasite, Total Contagion and ZKT, none of which names a source; it's unconfirmed.

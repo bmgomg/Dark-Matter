@@ -7,6 +7,7 @@
 	import { NAMES, R } from './const';
 	import Planet from './Planet.svelte';
 	import { mark, selMark } from './shared.svelte';
+	import { sfx } from './sound.svelte';
 
 	// The palette at the selected cell, on the map: small, medium, large, clear, in a pill just above the cell (or
 	// below it, near the map's top), with a notch pointing at it. It grows out of the cell. The cell's own planet is lit
@@ -72,7 +73,9 @@
 	const pick = (e, v) => {
 		e.stopPropagation();
 
-		if (!idle(v)) {
+		if (idle(v)) {
+			sfx.bump();
+		} else {
 			mark(v);
 		}
 	};

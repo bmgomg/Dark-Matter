@@ -1,25 +1,27 @@
 <script>
 	import { PROMPT_CLEAR_ALL, PROMPT_RESET_STATS, PROMPT_SURRENDER } from './const';
-	import { goBack, isOver, persistCommon, planetCount, ss, toggleKeys } from './shared.svelte';
-	import { _sound } from './sound.svelte';
+	import { ask, goBack, isOver, persistCommon, planetCount, ss, toggleKeys } from './shared.svelte';
+	import { _sound, sfx } from './sound.svelte';
 	import TextButton from './Text Button.svelte';
 
 	const noSurrender = $derived(ss.launcher || !ss.pzl || isOver() || ss.prompt === PROMPT_SURRENDER);
 	const noClearAll = $derived(ss.launcher || isOver() || !planetCount() || ss.prompt === PROMPT_CLEAR_ALL);
 	const noResetStats = $derived(ss.launcher || ss.stats.plays === 0 || ss.prompt === PROMPT_RESET_STATS);
 
+	// after the tap, a toggle's two notes: up for on, down for off (played before the effects go quiet)
 	const onSfx = () => {
-		_sound.sfx = 1 - _sound.sfx;
-
 		if (_sound.sfx) {
-			_sound.play('won', { rate: 4 });
+			sfx.toggle(false);
 		}
 
+		_sound.sfx = 1 - _sound.sfx;
+		sfx.toggle(true);
 		persistCommon();
 	};
 
 	const onMusic = () => {
 		_sound.music = 1 - _sound.music;
+		sfx.toggle(_sound.music > 0);
 		_sound.playMusic();
 
 		persistCommon();
@@ -31,13 +33,10 @@
 	<TextButton
 		text={['Clear', 'All']}
 		disabled={noClearAll}
-		onClick={() => {
-			delete ss.sel;
-			ss.prompt = PROMPT_CLEAR_ALL;
-		}}
+		onClick={() => ask(PROMPT_CLEAR_ALL)}
 	/>
-	<TextButton text={['Give', 'Up']} disabled={noSurrender} onClick={() => (ss.prompt = PROMPT_SURRENDER)} />
-	<TextButton text={['Reset', 'Stats']} disabled={noResetStats} onClick={() => (ss.prompt = PROMPT_RESET_STATS)} />
+	<TextButton text={['Give', 'Up']} disabled={noSurrender} onClick={() => ask(PROMPT_SURRENDER)} />
+	<TextButton text={['Reset', 'Stats']} disabled={noResetStats} onClick={() => ask(PROMPT_RESET_STATS)} />
 	{#if ss.keyboard}
 		<TextButton id="keys-button" text={['Keys']} onClick={toggleKeys} />
 	{/if}

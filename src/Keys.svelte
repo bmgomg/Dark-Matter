@@ -1,7 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition';
 	import { DX, PAGE_SLIDE_MS } from './const';
-	import { ss } from './shared.svelte';
+	import { closeKeys } from './shared.svelte';
 	import { slideX } from './utils';
 
 	// the keyboard shortcuts, on a card over the page above the toolbar; a tap anywhere but the Keys button, or any
@@ -22,7 +22,7 @@
 	$effect(() => {
 		const onPointerDown = (e) => {
 			if (!e.target.closest?.('#keys-button')) {
-				delete ss.keys;
+				closeKeys();
 			}
 		};
 

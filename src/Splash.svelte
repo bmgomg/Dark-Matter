@@ -1,5 +1,6 @@
 <script>
 	import { APP_STATE, SPLASH_SLIDE_MS } from './const';
+	import { sfx } from './sound.svelte';
 	import { slideX } from './utils';
 
 	let classes = $state('splash');
@@ -10,6 +11,7 @@
 			.filter((key) => key.startsWith(APP_STATE))
 			.forEach((key) => localStorage.removeItem(key));
 		classes = 'splash dark';
+		sfx.reset();
 	};
 </script>
 
