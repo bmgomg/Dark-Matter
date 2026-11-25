@@ -123,26 +123,29 @@ const kitFor = (ctx) => {
 	return { tone, noise, bell };
 };
 
-// the notes, by name, for the chords
+// The notes, by name. Tuned to the music, which is open fifths on C, F, D and G with no thirds: its notes are C, D, F
+// and G (a little B flat and E flat), and hardly any E, A, B or F sharp. So the pitched sounds keep to those four, and
+// the one third, the minor chord's E flat, is a note the music has.
 const C5 = 523.25;
-const E5 = 659.25;
+const D5 = 587.33;
 const Eb5 = 622.25;
+const F5 = 698.46;
 const G5 = 783.99;
-const A5 = 880;
 const C6 = 1046.5;
 const D6 = 1174.66;
-const E6 = 1318.51;
+const F6 = 1396.91;
 const G6 = 1567.98;
-const A6 = 1760;
 const C7 = 2093;
+const D7 = 2349.32;
+const G7 = 3135.96;
 
 // a planet's note: the small one high, the giant low
 const PLANET_NOTE = [0, D6, G5, C5];
 
 // money going out: a coin, two notes down
 const coin = (k, at = 0) => {
-	k.bell({ f: 1975.53, dur: 0.12, vol: 0.06, at, wet: 0.25 });
-	k.bell({ f: 1479.98, dur: 0.18, vol: 0.06, at: at + 0.065, wet: 0.25 });
+	k.bell({ f: C7, dur: 0.12, vol: 0.06, at, wet: 0.25 });
+	k.bell({ f: G6, dur: 0.18, vol: 0.06, at: at + 0.065, wet: 0.25 });
 };
 
 // a planet put on the map: a drop, falling onto its note, deeper and longer the bigger it is
@@ -176,19 +179,19 @@ export const voices = {
 
 	// SFX or Music on (up) or off (down): two notes, as Off by One's checkbox
 	toggle: (k, on = true) => {
-		k.tone({ f: on ? 740 : 990, dur: 0.05, type: 'triangle', vol: 0.08, wet: 0.15 });
-		k.tone({ f: on ? 990 : 740, dur: 0.07, type: 'triangle', vol: 0.07, at: 0.05, wet: 0.15 });
+		k.tone({ f: on ? G5 : C6, dur: 0.05, type: 'triangle', vol: 0.08, wet: 0.15 });
+		k.tone({ f: on ? C6 : G5, dur: 0.07, type: 'triangle', vol: 0.07, at: 0.05, wet: 0.15 });
 	},
 
 	// a cell selected, its palette growing out of it: a ping, rising
 	select: (k) => {
-		k.tone({ f: 880, to: 1320, glide: 0.05, dur: 0.2, vol: 0.1, wet: 0.3 });
-		k.tone({ f: 2640, dur: 0.08, vol: 0.018, at: 0.04, wet: 0.3 });
+		k.tone({ f: G5, to: D6, glide: 0.05, dur: 0.2, vol: 0.1, wet: 0.3 });
+		k.tone({ f: D7, dur: 0.08, vol: 0.018, at: 0.04, wet: 0.3 });
 	},
 
 	// a cell let go, its palette going: the ping, falling
 	deselect: (k) => {
-		k.tone({ f: 1320, to: 880, glide: 0.05, dur: 0.13, vol: 0.09, wet: 0.2 });
+		k.tone({ f: D6, to: G5, glide: 0.05, dur: 0.13, vol: 0.09, wet: 0.2 });
 	},
 
 	// the keyboard's cursor moving a cell, or a swipe passing the point where it would settle on the next side
@@ -249,7 +252,7 @@ export const voices = {
 			panTo: -0.55 * dir,
 			wet: 0.25
 		});
-		k.tone({ f: half ? 82 : 110, to: half ? 123 : 147, dur, attack: dur * 0.5, vol: 0.035, wet: 0.1 });
+		k.tone({ f: half ? F5 / 8 : G5 / 8, to: C6 / 8, dur, attack: dur * 0.5, vol: 0.035, wet: 0.1 });
 	},
 
 	// a swipe let go short of a turn, the board easing back to the side it was on
@@ -263,7 +266,7 @@ export const voices = {
 
 		k.noise({ f: 300, mid: 1600, to: 1800, q: 1.3, dur: s + 0.08, attack: s * 0.85, vol: 0.13, wet: 0.25 });
 		k.tone({ f: 196, to: 392, glide: s, dur: s + 0.08, attack: s * 0.85, type: 'triangle', vol: 0.04, wet: 0.2 });
-		k.bell({ f: 2637, dur: 0.5, vol: 0.03, at: s, wet: 0.6 });
+		k.bell({ f: D7, dur: 0.5, vol: 0.03, at: s, wet: 0.6 });
 	},
 
 	// The map flipping back to flat, over ms: a falling rush, and a soft thud as it lies down.
@@ -277,7 +280,7 @@ export const voices = {
 
 	// the tray's planets growing in, a new puzzle's or a game's coming back: a shimmer, rising
 	rise: (k) => {
-		[C6, D6, E6, G6, A6].forEach((f, i) => k.tone({ f, dur: 0.6, vol: 0.03, at: i * 0.085, attack: 0.02, wet: 0.6 }));
+		[C6, D6, F6, G6, C7].forEach((f, i) => k.tone({ f, dur: 0.6, vol: 0.03, at: i * 0.085, attack: 0.02, wet: 0.6 }));
 	},
 
 	// A page pushing another, over ms: a broad rush moving across, the way the pages go (way 1: going on, from the right;
@@ -322,14 +325,14 @@ export const voices = {
 	// a question coming up (Give Up, Clear All, Reset Stats): two notes, asking
 	question: (k) => {
 		k.noise({ f: 500, mid: 1200, to: 400, dur: 0.4, attack: 0.18, vol: 0.04, pan: 0.4, panTo: 0, wet: 0.1 });
-		k.tone({ f: E5, dur: 0.14, type: 'triangle', vol: 0.07, at: 0.05, wet: 0.3 });
-		k.tone({ f: A5, dur: 0.26, type: 'triangle', vol: 0.07, at: 0.15, wet: 0.3 });
+		k.tone({ f: D5, dur: 0.14, type: 'triangle', vol: 0.07, at: 0.05, wet: 0.3 });
+		k.tone({ f: G5, dur: 0.26, type: 'triangle', vol: 0.07, at: 0.15, wet: 0.3 });
 	},
 
 	// No: the two notes back down
 	dismiss: (k) => {
-		k.tone({ f: A5, dur: 0.12, type: 'triangle', vol: 0.06, wet: 0.3 });
-		k.tone({ f: E5, dur: 0.22, type: 'triangle', vol: 0.06, at: 0.1, wet: 0.3 });
+		k.tone({ f: G5, dur: 0.12, type: 'triangle', vol: 0.06, wet: 0.3 });
+		k.tone({ f: D5, dur: 0.22, type: 'triangle', vol: 0.06, at: 0.1, wet: 0.3 });
 	},
 
 	// Play new (or the daily's countdown) coming in after the game-over message: a soft chime
@@ -341,16 +344,18 @@ export const voices = {
 
 	// The map solved, its planets swelling three times (half a second each): a note at each swell's height, rising, then
 	// a chord. kind: 'best' or 'average' (improved) add a sparkle; 'broke' (into the red) shifts the chord into a minor.
+	// The chord is open (C, G, C and a D over them), with no third, so it sits with any of the music's chords; a major
+	// one's E ground a semitone against the music's F.
 	win: (k, kind = 'won') => {
 		[
-			[C5, E5],
-			[E5, G5],
+			[C5, F5],
+			[D5, G5],
 			[G5, C6]
 		].forEach((notes, i) => chord(k, notes, 0.25 + i * 0.5, 0.45, 0.05));
 
-		chord(k, [C5, kind === 'broke' ? Eb5 : E5, G5, C6], 1.5, 1.6, 0.05);
+		chord(k, kind === 'broke' ? [C5, Eb5, G5, C6] : [C5, G5, C6, D6], 1.5, 1.6, 0.05);
 
-		const sparkle = { best: [E6, G6, C7, E6 * 2], average: [G6, C7] }[kind] ?? [];
+		const sparkle = { best: [G6, C7, D7, G7], average: [G6, C7] }[kind] ?? [];
 
 		sparkle.forEach((f, i) => k.bell({ f, dur: 0.5, vol: 0.025, at: 1.65 + i * 0.08, wet: 0.6 }));
 	},
@@ -373,8 +378,8 @@ export const voices = {
 	// Share: copied (two bright notes, up), or not (a bump, twice)
 	copied: (k, ok = true) => {
 		if (ok) {
-			k.bell({ f: E6, dur: 0.18, vol: 0.05, wet: 0.3 });
-			k.bell({ f: A6, dur: 0.3, vol: 0.05, at: 0.09, wet: 0.3 });
+			k.bell({ f: D6, dur: 0.18, vol: 0.05, wet: 0.3 });
+			k.bell({ f: G6, dur: 0.3, vol: 0.05, at: 0.09, wet: 0.3 });
 		} else {
 			[0, 0.13].forEach((at) => k.tone({ f: 190, to: 120, dur: 0.11, type: 'triangle', vol: 0.1, at, wet: 0.05 }));
 		}
