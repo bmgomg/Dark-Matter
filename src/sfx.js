@@ -125,12 +125,12 @@ const kitFor = (ctx) => {
 
 // The notes, by name. Tuned to the music, which is open fifths on C, F, D and G with no thirds: its notes are C, D, F
 // and G (a little B flat and E flat), and hardly any E, A, B or F sharp. So the pitched sounds keep to those four, and
-// the one third, the minor chord's E flat, is a note the music has.
+// the one third, a win in the red's B flat, is a note the music has.
 const C5 = 523.25;
 const D5 = 587.33;
-const Eb5 = 622.25;
 const F5 = 698.46;
 const G5 = 783.99;
+const Bb5 = 932.33;
 const C6 = 1046.5;
 const D6 = 1174.66;
 const F6 = 1396.91;
@@ -166,8 +166,16 @@ const unplace = (k, at = 0, vol = 1) => {
 	k.noise({ f: 3000, to: 6000, q: 2, dur: 0.08, vol: 0.05 * vol, at, attack: 0.01, wet: 0.1 });
 };
 
-// a chord's notes struck together, as bells
-const chord = (k, notes, at, dur, vol) => notes.forEach((f) => k.bell({ f, dur, vol, at, wet: 0.5 }));
+// how long a win's chimes ring, from the first, in seconds
+const WIN_RING = 1.7;
+
+// A chime, as the old sprite's "won" had them: a note with a bright partial a twelfth up (three times it), dying
+// sooner, and a copy a few cents sharp, beating with it for a shimmer.
+const chime = (k, f, at, dur, vol) => {
+	k.tone({ f, dur, vol, at, type: 'triangle', wet: 0.45 });
+	k.tone({ f: f * 1.004, dur, vol: vol * 0.5, at, type: 'triangle', wet: 0.45 });
+	k.tone({ f: f * 3, dur: dur * 0.3, vol: vol * 0.3, at, wet: 0.45 });
+};
 
 // Each voice takes the kit, then what the call passed. Times in seconds; the game's in ms are passed as they are.
 export const voices = {
@@ -342,22 +350,28 @@ export const voices = {
 		k.bell({ f: G6, dur: 0.6, vol: 0.025, at: 0.21, wet: 0.5 });
 	},
 
-	// The map solved, its planets swelling three times (half a second each): a note at each swell's height, rising, then
-	// a chord. kind: 'best' or 'average' (improved) add a sparkle; 'broke' (into the red) shifts the chord into a minor.
-	// The chord is open (C, G, C and a D over them), with no third, so it sits with any of the music's chords; a major
-	// one's E ground a semitone against the music's F.
+	// The map solved: chimes running quickly up and ringing on together, over a bass gliding up an octave, after the
+	// old sprite's "won" (G B C D G), whose B the music hasn't got, so it's left out: G C D G, open, with no third.
+	// kind: 'best' or 'average' (improved) add a sparkle; 'broke' (into the red) puts a minor third (B flat, which the
+	// music has) where the B was.
 	win: (k, kind = 'won') => {
-		[
-			[C5, F5],
-			[D5, G5],
-			[G5, C6]
-		].forEach((notes, i) => chord(k, notes, 0.25 + i * 0.5, 0.45, 0.05));
+		const notes = [
+			[G5, 0],
+			[C6, 0.1],
+			[D6, 0.25],
+			[G6, 0.35]
+		];
 
-		chord(k, kind === 'broke' ? [C5, Eb5, G5, C6] : [C5, G5, C6, D6], 1.5, 1.6, 0.05);
+		if (kind === 'broke') {
+			notes.splice(1, 0, [Bb5, 0.05]);
+		}
 
-		const sparkle = { best: [G6, C7, D7, G7], average: [G6, C7] }[kind] ?? [];
+		notes.forEach(([f, at]) => chime(k, f, at, WIN_RING - at, 0.055));
+		k.tone({ f: C6 / 8, to: C6 / 4, glide: 0.35, dur: 0.7, type: 'triangle', vol: 0.06, attack: 0.02, wet: 0.2 });
 
-		sparkle.forEach((f, i) => k.bell({ f, dur: 0.5, vol: 0.025, at: 1.65 + i * 0.08, wet: 0.6 }));
+		const sparkle = { best: [G6, C7, D7, G7], average: [C7, G7] }[kind] ?? [];
+
+		sparkle.forEach((f, i) => k.bell({ f, dur: 0.6, vol: 0.025, at: 0.55 + i * 0.07, wet: 0.6 }));
 	},
 
 	// Given up: a sigh, down; then, as the map changes over, a pop for each planet marked wrong and a drop for each true

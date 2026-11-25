@@ -649,7 +649,7 @@ const win = () => {
 	ss.message =
 		hadBest && best ? MSG_BEST_SCORE : stats.plays > 1 && avgScore() > prevAvg ? MSG_AVERAGE_IMPROVED : score < 0 ? MSG_BROKE : MSG_WON;
 
-	// the fanfare, with a sparkle for a record, or a minor chord for a win in the red
+	// the fanfare, with a sparkle for a record, or a minor third for a win in the red
 	sfx.win({ [MSG_BEST_SCORE]: 'best', [MSG_AVERAGE_IMPROVED]: 'average', [MSG_BROKE]: 'broke' }[ss.message]);
 	gameOver();
 };

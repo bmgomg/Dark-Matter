@@ -136,9 +136,9 @@ from the prototype, `edgewise.html`, and its brief, `edgewise-brief.md` (rules, 
 Every interaction and transition has a sound, made in `src/sfx.js` with Web Audio (oscillators and band-passed noise,
 through a generated reverb), as in Off by One, in place of the template's sprite (the designer's call; its source was
 never known). Tuned to the music, whose notes are C, D, F and G (open fifths, no thirds): the pitched sounds keep to
-those, and the win's chord is open, with no third, except the minor one into the red (E flat, which the music has). They
-were in C major pentatonic, whose E and A the music hardly plays: the coin's B and F sharp, the win's major third against
-its F. Played through `sfx.<name>()` in `sound.svelte.js`, which drops them with SFX off. The audio starts on the
+those, and the win is open, with no third, except into the red (a minor third, B flat, which the music has). They were
+in C major pentatonic, whose E and A the music hardly plays: the coin's B and F sharp, the win's major third against its
+F. Played through `sfx.<name>()` in `sound.svelte.js`, which drops them with SFX off. The audio starts on the
 first tap or key (`wakeAudio`, from `+page.svelte`); till then nothing plays, rather than queueing, so the splash's push
 is heard only if the splash was tapped, and a phone's first tap is silent (a touch counts only once lifted).
 
@@ -154,8 +154,9 @@ is heard only if the splash was tapped, and a phone's first tap is silent (a tou
 - Flips: `flipAway` (rising, a glint as it goes edge-on), `flipBack` (falling, a thud as it lies flat), then `rise` as
   the tray's planets grow in.
 - Prompts: `question` as one comes up, `dismiss` on No, `reset` on Reset Stats (and on tapping the splash, which wipes
-  the saves). A win: `win`, a note at each of the map's three swells, then a chord: a sparkle for a best or a better
-  average, a minor chord in the red. A give-up: `lost`, a sigh, then a pop and a drop at each cell's moment as the map
+  the saves). A win: `win`, chimes running up and ringing on over a bass gliding up an octave, after the old
+  sprite's "won" (the designer's wish; its G B C D G made G C D G, as the music has no B), in place of a note at each of
+  the map's three swells and a chord; a sparkle for a best or a better average, a minor third (B flat) in the red. A give-up: `lost`, a sigh, then a pop and a drop at each cell's moment as the map
   changes over (`CELL_DELAY_MS`, `GROW_GAP_MS`, shared with `Board.svelte`). Play new (or the countdown) coming in:
   `ready`. Share: `copied`, or a double bump.
 - Left silent, as another sound covers the moment: the hint and the warning pushing each other (the select), the
